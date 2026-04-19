@@ -220,4 +220,4 @@ baseline/
 | Kor-Learner | TBD | TBD | |
 | Union | TBD | TBD | |
 
-> 논문 수치는 학습 후 채워 넣을 것. 논문 PDF(`korean_gec.pdf`)에서 확인.
+> 논문 수치는 학습 후 채워 넣을 것. 논문 PDF(`papers/korean_gec.pdf`)에서 확인.

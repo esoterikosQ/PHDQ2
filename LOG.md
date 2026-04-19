@@ -5,6 +5,39 @@
 
 ---
 
+## [2026-04-19] Baseline 코드 이식 및 Skills 업데이트
+
+### 목표
+- baseline/ 디렉토리에 BART GEC 실행 코드 이식 (PL 2.x 마이그레이션)
+- skills 문서에 미반영 사항 반영 (PHDQ2 repo 상태, 논문 파일명)
+
+### 수행 내용
+- `baseline/run.py` 작성: PL 2.x Trainer 직접 생성, strategy='auto'
+- `baseline/model.py` 작성: on_train_epoch_end, on_validation_epoch_end 등 PL 2.x API
+- `baseline/dataset.py` 작성: GecDataModule + KoBARTGecDataset (변경 최소)
+- `baseline/metric/` 복사: gleu.py, gleumodule.py, m2scorer/ (deprecated 제거)
+- `baseline/requirements.txt` 작성: torch>=2.0, lightning>=2.0, transformers>=4.30
+- Skills 업데이트:
+  - SKILL.md: 논문 파일명 반영 (korean_gec.pdf, blt.pdf), phdq=PHDQ2 메타 추가
+  - pipeline-reference.md: phdq/가 PHDQ2 repo임을 반영한 구조도 갱신
+
+### PL 1.x → 2.x 마이그레이션 요약
+| 원본 (PL 1.x) | 마이그레이션 (PL 2.x) |
+|---|---|
+| `training_epoch_end(outputs)` | `on_train_epoch_end()` |
+| `validation_epoch_end(outputs)` | `on_validation_epoch_end()` + 수동 loss 축적 |
+| `Trainer.from_argparse_args()` | `L.Trainer()` 직접 생성 |
+| `strategy='dp'` | `strategy='auto'` |
+| `transformers.optimization.AdamW` | `torch.optim.AdamW` |
+| `import pytorch_lightning as pl` | `import lightning as L` |
+
+### 다음 단계
+- [ ] SLURM 환경에서 baseline 동작 확인
+- [ ] 학습 데이터 배치 및 전처리
+- [ ] blt_gec/ 데이터 어댑터 구현
+
+---
+
 ## [2026-04-19] 프로젝트 초기 구조 수립
 
 ### 목표

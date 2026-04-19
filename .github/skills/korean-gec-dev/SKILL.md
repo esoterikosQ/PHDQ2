@@ -9,6 +9,8 @@ argument-hint: '작업 내용을 간단히 설명 (예: "데이터 전처리 파
 <!-- BLT 원본: https://github.com/facebookresearch/blt.git -->
 <!-- 작업 결과물: https://github.com/esoterikosQ/PHDQ2.git -->
 <!-- 레퍼런스 코드 로컬: reference_code/Standard_Korean_GEC, reference_code/blt -->
+<!-- 논문 PDF: papers/korean_gec.pdf (GEC), papers/blt.pdf (BLT), papers/s10994-021-06034-2.pdf -->
+<!-- 워크스페이스(phdq/) = PHDQ2 git repo (origin → esoterikosQ/PHDQ2) -->
 
 # 한국어 GEC 코드 분석·개량 보조 스킬
 
@@ -56,14 +58,14 @@ argument-hint: '작업 내용을 간단히 설명 (예: "데이터 전처리 파
 
 ### Baseline: Standard_Korean_GEC
 - **로컬 경로**: `reference_code/Standard_Korean_GEC/`
-- **논문**: "Towards Standardizing Korean Grammatical Error Correction" (ACL 2023)
+- **논문**: `papers/korean_gec.pdf` — "Towards Standardizing Korean Grammatical Error Correction" (ACL 2023)
 - **모델**: `BartForConditionalGeneration` (KoBART pretrained)
 - **Docker(원본)**: `msyoon8/default:gec`
 - ⚠️ 원본 README 경고: "The original model code was implemented years ago, so it may not work well in current CUDA environments."
 
 ### Development: BLT
 - **로컬 경로**: `reference_code/blt/`
-- **논문**: "Byte Latent Transformer: Patches Scale Better Than Tokens" (Meta, 2024)
+- **논문**: `papers/blt.pdf` — "Byte Latent Transformer: Patches Scale Better Than Tokens" (Meta, 2024)
 - **핵심 차이**: 토크나이저 없이 바이트 단위로 입력 처리, 엔트로피 기반 동적 패치 분할
 - **사전학습 가중치**: `facebook/blt-1b`, `facebook/blt-7b` (HuggingFace)
 - **엔트로피 모델**: `facebook/blt-entropy` (패치 경계 결정용)

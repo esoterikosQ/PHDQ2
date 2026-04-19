@@ -2,39 +2,43 @@
 
 ## 프로젝트 구조 (두 트랙, 3-Machine)
 
+> **phdq/ 워크스페이스 = esoterikosQ/PHDQ2 git repo** (origin → GitHub)
+> `reference_code/`는 `.gitignore`로 제외 (로컬 전용 참조)
+
 ```
-phdq/                                   # 워크스페이스 루트
-├── reference_code/                     # ★ 원본 레퍼런스 코드 (읽기 전용 참조)
+phdq/  (= PHDQ2 git repo)
+├── .github/skills/korean-gec-dev/      # 이 스킬
+├── reference_code/                     # ★ 원본 코드 (로컬 전용, .gitignore)
 │   ├── Standard_Korean_GEC/            #   BART GEC + KAGAS 원본
 │   └── blt/                            #   BLT 원본 (facebookresearch)
-├── .github/skills/korean-gec-dev/      # 이 스킬
+├── baseline/                           # [Track A] BART 베이스라인 (마이그레이션 코드)
+│   ├── architecture.md                 #   아키텍처·재현 계획
+│   ├── run.py                          #   학습 진입점
+│   ├── model.py                        #   KoBART GEC 모델
+│   ├── dataset.py                      #   데이터 로더
+│   ├── requirements.txt                #   현대 버전 의존성
+│   └── metric/                         #   GLEU, M2 scorer
+├── blt_gec/                            # [Track B] BLT-GEC 개발 모델
+│   └── architecture.md                 #   설계 계획
+├── papers/                             # 논문 PDF
+│   ├── korean_gec.pdf                  #   GEC 논문
+│   ├── blt.pdf                         #   BLT 논문
+│   └── s10994-021-06034-2.pdf          #   참고 논문
 ├── LOG.md                              # 진행 로그
-└── *.pdf                               # 논문 PDF
-
-PHDQ2/                              # esoterikosQ/PHDQ2 — 3대 머신에서 공유
-├── baseline/                       # [Track A] BART 베이스라인
-│   └── (Standard_Korean_GEC 기반 코드)
-├── blt-gec/                        # [Track B] BLT 개발 모델
-│   ├── data/                       # GEC 데이터 → BLT 포맷 변환
-│   ├── model/                      # BLT-GEC 모델 정의
-│   ├── train/                      # 학습 스크립트
-│   └── eval/                       # 평가 (공통 지표)
-├── scripts/                        # SLURM job 스크립트 (.sh)
-├── ui/                             # UI 서빙 코드 (Ubuntu RTX 5090 서버용)
-├── results/                        # 학습·평가 결과 (SLURM에서 push)
-├── configs/                        # 학습 설정 파일 (yaml 등)
-├── eval/                           # 공통 평가 파이프라인
-├── .gitignore                      # 대용량 데이터·임시 파일 제외
-└── LOG.md                          # 진행 로그
+├── .gitignore                          # reference_code/, 체크포인트 등 제외
+└── (향후 추가)
+    ├── scripts/                        # SLURM job 스크립트
+    ├── ui/                             # UI 서빙 코드
+    ├── results/                        # 학습·평가 결과
+    ├── configs/                        # 학습 설정 파일
+    └── eval/                           # 공통 평가 파이프라인
 ```
-
-> `reference_code/`는 원본 코드 참조용. 실제 개발·실행 코드는 PHDQ2 리포에서 관리.
 
 ### 머신별 작업 영역
 | 머신 | 주 작업 디렉토리 | 역할 |
 |------|------------------|------|
-| Mac (로컬) | 전체 리포 편집 | 코드 작성 → `git push` |
-| SLURM 노드 | `baseline/`, `blt-gec/`, `scripts/` | `git pull` → 학습/추론 → `results/` push |
+| Mac (로컬) | phdq/ 전체 편집 | 코드 작성 → `git push` (origin = PHDQ2) |
+| SLURM 노드 | `baseline/`, `blt_gec/`, `scripts/` | `git pull` → 학습/추론 → `results/` push |
 | Ubuntu (RTX 5090) | `ui/`, `results/` | `git pull` → 모델 서빙·UI |
 
 ---

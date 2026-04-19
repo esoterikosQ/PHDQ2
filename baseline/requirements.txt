@@ -1,0 +1,8 @@
+# KoBART GEC Baseline - 현대 버전 의존성
+# 원본(torch==1.7.1, transformers==4.8.1, pytorch-lightning==1.1.0)에서 마이그레이션
+
+torch>=2.0.0
+lightning>=2.0.0
+transformers>=4.30.0
+scipy
+numpy
