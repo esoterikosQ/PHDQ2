@@ -1,0 +1,46 @@
+# Reference code (local only, cloned from GitHub)
+reference_code/
+
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Model checkpoints & large files (use git-lfs or external storage)
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.safetensors
+outputs/
+hf-weights/
+
+# Data (too large for git)
+*.dat
+*.m2
+
+# Logs (keep LOG.md, exclude runtime logs)
+logs/
+*.log
+!LOG.md
+
+# Jupyter
+.ipynb_checkpoints/
