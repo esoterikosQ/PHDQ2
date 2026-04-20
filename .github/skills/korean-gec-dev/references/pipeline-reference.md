@@ -1,6 +1,6 @@
 # 한국어 GEC 파이프라인 레퍼런스
 
-## 프로젝트 구조 (두 트랙, 3-Machine)
+## 프로젝트 구조 (세 트랙, 3-Machine)
 
 > **phdq/ 워크스페이스 = esoterikosQ/PHDQ2 git repo** (origin → GitHub)
 > `reference_code/`는 `.gitignore`로 제외 (로컬 전용 참조)
@@ -11,14 +11,20 @@ phdq/  (= PHDQ2 git repo)
 ├── reference_code/                     # ★ 원본 코드 (로컬 전용, .gitignore)
 │   ├── Standard_Korean_GEC/            #   BART GEC + KAGAS 원본
 │   └── blt/                            #   BLT 원본 (facebookresearch)
-├── baseline/                           # [Track A] BART 베이스라인 (마이그레이션 코드)
+├── serving/                            # [Track 1] GEC 서빙 (추론 + 웹 UI)
+│   ├── architecture.md                 #   서빙 아키텍처
+│   ├── app.py                          #   Gradio 웹 UI
+│   ├── infer.py                        #   추론 엔진
+│   ├── requirements.txt                #   서빙 의존성
+│   └── checkpoints/                    #   모델 체크포인트 (.gitignore)
+├── baseline/                           # [Track 2] BART 베이스라인 (학습 재현)
 │   ├── architecture.md                 #   아키텍처·재현 계획
 │   ├── run.py                          #   학습 진입점
 │   ├── model.py                        #   KoBART GEC 모델
 │   ├── dataset.py                      #   데이터 로더
 │   ├── requirements.txt                #   현대 버전 의존성
 │   └── metric/                         #   GLEU, M2 scorer
-├── blt_gec/                            # [Track B] BLT-GEC 개발 모델
+├── blt_gec/                            # [Track 3] BLT-GEC 개발 모델
 │   └── architecture.md                 #   설계 계획
 ├── papers/                             # 논문 PDF
 │   ├── korean_gec.pdf                  #   GEC 논문
@@ -28,7 +34,6 @@ phdq/  (= PHDQ2 git repo)
 ├── .gitignore                          # reference_code/, 체크포인트 등 제외
 └── (향후 추가)
     ├── scripts/                        # SLURM job 스크립트
-    ├── ui/                             # UI 서빙 코드
     ├── results/                        # 학습·평가 결과
     ├── configs/                        # 학습 설정 파일
     └── eval/                           # 공통 평가 파이프라인
@@ -39,7 +44,7 @@ phdq/  (= PHDQ2 git repo)
 |------|------------------|------|
 | Mac (로컬) | phdq/ 전체 편집 | 코드 작성 → `git push` (origin = PHDQ2) |
 | SLURM 노드 | `baseline/`, `blt_gec/`, `scripts/` | `git pull` → 학습/추론 → `results/` push |
-| Ubuntu (RTX 5090) | `ui/`, `results/` | `git pull` → 모델 서빙·UI |
+| Ubuntu (RTX 5090) | `serving/` | `git pull` → 모델 서빙·UI |
 
 ---
 

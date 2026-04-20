@@ -5,6 +5,34 @@
 
 ---
 
+## [2026-04-20] 3-트랙 구조 재편 (Serving 트랙 추가)
+
+### 목표
+- 프로젝트를 3트랙으로 확장: (1) Serving, (2) Baseline, (3) BLT-GEC
+
+### 수행 내용
+- `serving/` 디렉토리 생성 + `architecture.md` 작성
+  - 기학습 KoBART GEC 체크포인트를 RTX 5090에서 로드 → Gradio 웹 UI
+  - 추론 파이프라인, UI 레이아웃, 구현 단계 문서화
+- SKILL.md 전면 업데이트: 2-트랙 → 3-트랙 구조, Phase 번호 재배정
+  - Phase 3: GEC 서빙 (Track 1), Phase 4: Baseline (Track 2), Phase 5: BLT-GEC (Track 3)
+- pipeline-reference.md: 디렉토리 구조도에 `serving/` 반영
+- .gitignore: `serving/checkpoints/` 제외 추가
+
+### 트랙 구조
+| # | 트랙 | 디렉토리 | 실행 머신 | 상태 |
+|---|------|---------|----------|------|
+| 1 | Serving | `serving/` | Ubuntu RTX 5090 | 계획 완료 |
+| 2 | Baseline | `baseline/` | SLURM | 코드 이식 완료 |
+| 3 | BLT-GEC | `blt_gec/` | SLURM | 설계 완료 |
+
+### 다음 단계
+- [ ] Track 1: 체크포인트 확보 방법 확정, infer.py + app.py 구현
+- [ ] Track 2: SLURM에서 baseline 학습 실행
+- [ ] Track 3: 데이터 어댑터 구현
+
+---
+
 ## [2026-04-19] Baseline 코드 이식 및 Skills 업데이트
 
 ### 목표

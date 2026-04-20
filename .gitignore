@@ -1,6 +1,9 @@
 # Reference code (local only, cloned from GitHub)
 reference_code/
 
+# Serving checkpoints (large model files)
+serving/checkpoints/
+
 # macOS
 .DS_Store
 

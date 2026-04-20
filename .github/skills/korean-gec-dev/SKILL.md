@@ -15,8 +15,9 @@ argument-hint: '작업 내용을 간단히 설명 (예: "데이터 전처리 파
 # 한국어 GEC 코드 분석·개량 보조 스킬
 
 ## When to Use
-- Standard_Korean_GEC(BART) 베이스라인 코드를 분석·재현할 때
-- BLT 기반 GEC 모델을 설계·구현할 때
+- 기학습 GEC 모델을 로드하여 웹 UI로 서빙할 때 (Track 1)
+- Standard_Korean_GEC(BART) 베이스라인 코드를 분석·재현할 때 (Track 2)
+- BLT 기반 GEC 모델을 설계·구현할 때 (Track 3)
 - 학습 데이터 파이프라인을 이해하거나 개선할 때
 - 환경 호환성 문제(CUDA, Python, 패키지 버전)를 진단할 때
 - BART vs BLT 성능을 비교·평가할 때
@@ -26,13 +27,22 @@ argument-hint: '작업 내용을 간단히 설명 (예: "데이터 전처리 파
 
 **최종 목표**: KoBART(BART) 기반 한국어 GEC 모델을 **BLT(Byte Latent Transformer)**로 대체하여 성능 향상을 검증한다.
 
-### 두 트랙 구조
+### 세 트랙 구조
 
-| 트랙 | 모델 | 리포지토리 | 역할 |
-|------|------|-----------|------|
-| **Baseline** | KoBART (BART seq2seq) | `soyoung97/Standard_Korean_GEC` | 기존 성능 재현·비교 기준 |
-| **Development** | BLT (Byte Latent Transformer) | `facebookresearch/blt` | GEC 프레임워크에 BLT 결합 |
-| **Output** | BLT-GEC | `esoterikosQ/PHDQ2` | 작업 중간/최종 결과물 업로드 |
+| # | 트랙 | 디렉토리 | 내용 | 실행 머신 |
+|---|------|---------|------|----------|
+| 1 | **Serving** | `serving/` | 기학습 GEC 모델 로드 → 웹 UI 서비스 | Ubuntu (RTX 5090) |
+| 2 | **Baseline** | `baseline/` | KoBART GEC 학습 재현 · 비교 기준 | SLURM |
+| 3 | **BLT-GEC** | `blt_gec/` | BLT를 GEC에 결합 · 성능 비교 | SLURM |
+
+> Track 1(Serving)은 이미 공개된 학습 완료 체크포인트를 그대로 사용.
+> Track 2, 3은 학습 파이프라인을 구축·실행하여 성능을 비교.
+
+| 리포지토리 | 역할 |
+|-----------|------|
+| `soyoung97/Standard_Korean_GEC` | Baseline 원본 코드 + 공개 체크포인트 |
+| `facebookresearch/blt` | BLT 원본 코드 |
+| `esoterikosQ/PHDQ2` | 작업 결과물 (이 워크스페이스) |
 
 ### 실행 환경 (3-Machine)
 
@@ -123,9 +133,42 @@ argument-hint: '작업 내용을 간단히 설명 (예: "데이터 전처리 파
 
 ---
 
-## Phase 3: BART 베이스라인 확립
+## Phase 3: GEC 서빙 (Track 1 — Serving)
 
-1. Standard_Korean_GEC 원본 코드를 `esoterikosQ/PHDQ2`에 베이스라인으로 구성
+기학습된 KoBART GEC 체크포인트를 RTX 5090 Ubuntu 서버에서 로드하여 웹 UI로 서비스한다.
+**학습 없이** 추론만 수행하므로 가장 빨리 결과물을 낼 수 있는 트랙.
+
+### 3-1. 체크포인트 확보
+- Standard_Korean_GEC 리포의 공개 체크포인트 또는 논문 저자 제공 가중치 사용
+- `hyunwoongko/kobart` 사전학습 + GEC fine-tuned 가중치 로드
+- `serving/` 디렉토리에 추론 코드 배치
+
+### 3-2. 추론 파이프라인
+```
+사용자 입력 (오류 문장)
+    → KoBART Tokenizer → input_ids
+    → BartForConditionalGeneration.generate(num_beams=4)
+    → Tokenizer decode
+    → 교정 문장 반환
+```
+
+### 3-3. 웹 UI
+- **프레임워크**: Gradio 또는 Streamlit (빠른 프로토타이핑)
+- **기능**: 텍스트 입력 → 교정 결과 표시, 원문/교정 diff 하이라이트
+- **실행 환경**: Ubuntu RTX 5090 서버
+- **디렉토리**: `serving/`
+
+### 3-4. 구현 순서
+1. 추론 전용 모듈 작성 (`serving/infer.py`)
+2. 웹 UI 구현 (`serving/app.py`)
+3. Ubuntu 서버에서 동작 확인
+4. (선택) Docker 이미지화
+
+---
+
+## Phase 4: BART 베이스라인 확립 (Track 2 — Baseline)
+
+1. Standard_Korean_GEC 원본 코드를 `baseline/`에 마이그레이션 (완료)
 2. 원본 코드로 베이스라인 결과 재현 (또는 논문 수치 참조)
 3. 평가 지표 기록: **GLEU**, **M2 Precision/Recall/F0.5**
 4. 데이터셋별 결과 분리: Kor-Lang8, Kor-Learner, Kor-Native
@@ -133,11 +176,11 @@ argument-hint: '작업 내용을 간단히 설명 (예: "데이터 전처리 파
 
 ---
 
-## Phase 4: BLT-GEC 모델 설계·구현
+## Phase 5: BLT-GEC 모델 설계·구현 (Track 3 — BLT-GEC)
 
 BLT를 GEC 태스크에 적용하는 핵심 단계.
 
-### 4-1. 아키텍처 설계 결정
+### 5-1. 아키텍처 설계 결정
 BART → BLT 전환 시 핵심 설계 차이점:
 
 | 항목 | BART (Baseline) | BLT (Development) |
@@ -148,23 +191,23 @@ BART → BLT 전환 시 핵심 설계 차이점:
 | 패치 분할 | N/A | 엔트로피 기반 동적 분할 |
 | 디코딩 | 토큰 생성 | 패치 → 바이트 복원 |
 
-### 4-2. 구현 순서
+### 5-2. 구현 순서
 1. **BLT 코드 분석**: `facebookresearch/blt` 구조 파악 → [blt-architecture.md](./references/blt-architecture.md)
 2. **데이터 어댑터**: GEC 학습 데이터(orig\tcorrected txt)를 BLT 입력 형식으로 변환
 3. **모델 래핑**: BLT를 seq2seq GEC 태스크에 맞게 래핑 (encoder-decoder 또는 prefix-LM)
 4. **학습 루프**: BLT 학습 스크립트를 GEC 데이터에 맞게 수정
 5. **평가 통합**: BART 베이스라인과 동일한 평가 파이프라인(GLEU, M2) 사용
 
-### 4-3. 한국어 특수 고려사항
+### 5-3. 한국어 특수 고려사항
 - 한국어 UTF-8: 한 글자당 3바이트 → 패치 길이/엔트로피 분포가 영어와 다름
 - 띄어쓰기 오류(WS): 바이트 수준에서 공백(0x20) 삽입/삭제로 직접 모델링 가능
 - 자모 분리: 바이트 수준에서 초성/중성/종성 자연스럽게 구분됨 (한글 유니코드 블록)
 
 ---
 
-## Phase 5: 성능 비교 및 분석
+## Phase 6: 성능 비교 및 분석
 
-### 5-1. 실험 설계
+### 6-1. 실험 설계
 1. **통제 변수**: 동일 데이터셋, 동일 split, 동일 평가 지표
 2. **비교 축**:
    - 전체 성능: GLEU, M2 F0.5
@@ -172,11 +215,11 @@ BART → BLT 전환 시 핵심 설계 차이점:
    - 추론 속도 / 모델 크기
 3. **한 번에 하나의 변수만 변경** (controlled experiment)
 
-### 5-2. 결과 기록
+### 6-2. 결과 기록
 - 모든 실험 결과를 `LOG.md`에 수치와 함께 기록
 - `esoterikosQ/PHDQ2`에 체크포인트·결과 push
 
-### 5-3. 코드 재작성 판단 기준
+### 6-3. 코드 재작성 판단 기준
 다음 중 2개 이상 해당되면 해당 모듈 재작성을 검토:
 - [ ] 원본 코드가 deprecated API에 의존
 - [ ] 환경 패치로는 해결 불가능한 구조적 문제
@@ -185,7 +228,7 @@ BART → BLT 전환 시 핵심 설계 차이점:
 
 ---
 
-## Phase 6: 진행 로그 기록 및 결과물 관리
+## Phase 7: 진행 로그 기록 및 결과물 관리
 
 **모든 작업 세션의 시작과 끝에 로그를 업데이트한다.**
 
