@@ -5,6 +5,32 @@
 
 ---
 
+## [2026-04-22] Track 1 Serving 코드 구현 + 종합 계획서
+
+### 목표
+- Track 1(Serving) 실행 코드 구현
+- 전체 프로젝트 종합 실행 계획서 작성
+
+### 수행 내용
+- 체크포인트 확보 방법 확정: **HuggingFace `Soyoung97/gec_kr`** (논문 저자 공개)
+  - 별도 다운로드 불필요, `from_pretrained()` 직접 사용
+  - 논문 README 샘플 코드 기반 추론 파라미터: num_beams=4, repetition_penalty=2.0
+- `serving/infer.py` 구현: GecInferenceEngine 클래스, diff 생성 유틸
+- `serving/app.py` 구현: Gradio UI (단일/다중 문장 탭, diff 하이라이트)
+- `serving/requirements.txt` 생성
+- `serving/architecture.md` 업데이트: HF 모델 정보 반영, 실행 방법 갱신
+- `PROJECT_MASTER_PLAN.md` 작성: 3트랙 12주 실행 계획, 주차별 로드맵
+
+### 결과
+- Serving 코드 완성 — Ubuntu RTX 5090에서 `python app.py` 한 줄로 실행 가능
+- 종합 계획서 완성 — 마일스톤 6개, 주차별 작업 배분
+
+### 다음 단계
+- [ ] Ubuntu RTX 5090에서 serving 실행 테스트 (pull → pip install → python app.py)
+- [ ] SLURM baseline 데이터 준비 착수
+
+---
+
 ## [2026-04-20] 3-트랙 구조 재편 (Serving 트랙 추가)
 
 ### 목표

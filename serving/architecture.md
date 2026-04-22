@@ -28,22 +28,30 @@
 
 ## 2. 체크포인트 확보
 
-### 2-1. 옵션
+### 2-1. 모델 소스 (확정)
 
-| 옵션 | 소스 | 비고 |
-|------|------|------|
-| A. 논문 공개 체크포인트 | Standard_Korean_GEC 리포 | README에 다운로드 링크 확인 필요 |
-| B. HuggingFace Hub | `hyunwoongko/kobart` + fine-tune | 사전학습만 공개, GEC fine-tuned는 별도 |
-| C. 직접 학습 후 사용 | Track 2 (baseline/) 결과 | Track 2 완료 후 가능 |
+**HuggingFace 공개 모델: `Soyoung97/gec_kr`** (KoBART GEC fine-tuned)
 
-> **우선 전략**: 옵션 A를 먼저 시도. 체크포인트가 없으면 옵션 C로 전환 (Track 2 의존).
+논문 저자가 HuggingFace Hub에 GEC fine-tuned 가중치를 직접 공개.
+별도 다운로드 없이 `from_pretrained('Soyoung97/gec_kr')`로 즉시 사용 가능.
 
-### 2-2. 모델 파일 위치
+| 항목 | 값 |
+|------|-----|
+| HuggingFace ID | `Soyoung97/gec_kr` |
+| 기반 모델 | KoBART (`hyunwoongko/kobart`) |
+| 학습 데이터 | Kor-Native + Kor-Lang8 + Kor-Learner |
+| 데모 | https://huggingface.co/spaces/Soyoung97/gec-korean-demo |
+
+> 추후 Track 2에서 직접 학습한 체크포인트나 Track 3(BLT) 모델로 교체/A/B 비교 가능.
+
+### 2-2. 대안 (로컬 체크포인트)
+로컬 체크포인트를 사용할 경우:
 ```
 serving/
 └── checkpoints/          # .gitignore — 대용량 모델 파일
     └── kobart_gec.ckpt   # 또는 pytorch_model.bin
 ```
+`python app.py --model checkpoints/kobart_gec.ckpt` 으로 전환.
 
 ## 3. 추론 파이프라인
 
@@ -51,13 +59,18 @@ serving/
 
 ```python
 # 1. 모델 로드 (서버 시작 시 1회)
-model = BartForConditionalGeneration.from_pretrained(ckpt_path)
-tokenizer = PreTrainedTokenizerFast.from_pretrained('hyunwoongko/kobart')
+model = BartForConditionalGeneration.from_pretrained('Soyoung97/gec_kr')
+tokenizer = PreTrainedTokenizerFast.from_pretrained('Soyoung97/gec_kr')
 model.to('cuda').eval()
 
-# 2. 추론 (요청마다)
-input_ids = tokenizer.encode(input_text, return_tensors='pt').to('cuda')
-output_ids = model.generate(input_ids, num_beams=4, max_length=128, eos_token_id=1)
+# 2. 추론 (요청마다) — 논문 샘플 코드 기반
+raw_ids = tokenizer.encode(input_text)
+input_ids = [tokenizer.bos_token_id] + raw_ids + [tokenizer.eos_token_id]
+output_ids = model.generate(
+    torch.tensor([input_ids]).to('cuda'),
+    max_length=128, num_beams=4, eos_token_id=1,
+    early_stopping=True, repetition_penalty=2.0
+)
 corrected = tokenizer.decode(output_ids[0], skip_special_tokens=True)
 ```
 
@@ -138,8 +151,14 @@ gradio>=4.0.0
 cd serving/
 pip install -r requirements.txt
 
-# 체크포인트 배치 후
-python app.py --checkpoint checkpoints/kobart_gec.ckpt --port 7860
+# HuggingFace 공개 모델로 실행 (기본값)
+python app.py --port 7860
+
+# 또는 로컬 체크포인트 사용
+# python app.py --model checkpoints/kobart_gec.ckpt --port 7860
+
+# 외부 공유 링크 생성 (방화벽 우회)
+# python app.py --share
 
 # 브라우저에서 접속
 # http://<서버IP>:7860
