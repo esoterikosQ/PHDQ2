@@ -4,6 +4,33 @@
 > 최신 항목이 위에 오도록 역순으로 기록합니다.
 
 ---
+## [2026-04-27] Track 2 & 3 스캐폴딩 (SLURM 스크립트 및 데이터 어댑터)
+
+### 목표
+- PROJECT_MASTER_PLAN에 따른 다음 단계(Track 2, Track 3 준비) 수행
+- SLURM 환경을 위한 Baseline 학습 스크립트 작성
+- BLT 모델을 위한 데이터 어댑터 프로토타입 구현
+
+### 수행 내용
+- **Track 2 (Baseline)**
+  - `scripts/train_bart.sh`: SLURM 작업 제출용 배치 스크립트 생성 (노드/메모리/시간/GPU 설정 및 파라미터 매핑)
+  - `scripts/eval_bart.sh`: 모델 체크포인트 평가용 SLURM 스크립트 생성
+  - `data/README.md`: 데이터셋 형태(TSV) 및 파일 명명 규칙(native/lang8/learner) 문서화
+- **Track 3 (BLT-GEC)**
+  - `blt_gec/data_adapter.py`: TSV 파일을 읽어 Prefix-LM용 UTF-8 바이트 시퀀스와 loss mask를 생성하는 `GecBltDataset` 어댑터 구현
+
+### 결과
+- SLURM 환경에서 곧바로 Baseline 실험을 돌릴 수 있는 실행 환경 세팅 완료
+- 데이터 디렉토리 구조 확립 완료
+- BLT 모델 어댑터의 뼈대 구성 완료
+
+### 다음 단계
+- [ ] 실제 학습 데이터(Kor-Native 등)를 `data/` 디렉토리에 배치
+- [ ] SLURM 클러스터에서 `sbatch scripts/train_bart.sh` 실행 및 동작 확인
+- [ ] `blt_gec/` 디렉토리 내에 모델 래핑 코드 추가 구현
+
+---
+
 
 ## [2026-04-22] Track 1 Serving 코드 구현 + 종합 계획서
 
@@ -30,6 +57,33 @@
 - [ ] SLURM baseline 데이터 준비 착수
 
 ---
+## [2026-04-27] Track 2 & 3 스캐폴딩 (SLURM 스크립트 및 데이터 어댑터)
+
+### 목표
+- PROJECT_MASTER_PLAN에 따른 다음 단계(Track 2, Track 3 준비) 수행
+- SLURM 환경을 위한 Baseline 학습 스크립트 작성
+- BLT 모델을 위한 데이터 어댑터 프로토타입 구현
+
+### 수행 내용
+- **Track 2 (Baseline)**
+  - `scripts/train_bart.sh`: SLURM 작업 제출용 배치 스크립트 생성 (노드/메모리/시간/GPU 설정 및 파라미터 매핑)
+  - `scripts/eval_bart.sh`: 모델 체크포인트 평가용 SLURM 스크립트 생성
+  - `data/README.md`: 데이터셋 형태(TSV) 및 파일 명명 규칙(native/lang8/learner) 문서화
+- **Track 3 (BLT-GEC)**
+  - `blt_gec/data_adapter.py`: TSV 파일을 읽어 Prefix-LM용 UTF-8 바이트 시퀀스와 loss mask를 생성하는 `GecBltDataset` 어댑터 구현
+
+### 결과
+- SLURM 환경에서 곧바로 Baseline 실험을 돌릴 수 있는 실행 환경 세팅 완료
+- 데이터 디렉토리 구조 확립 완료
+- BLT 모델 어댑터의 뼈대 구성 완료
+
+### 다음 단계
+- [ ] 실제 학습 데이터(Kor-Native 등)를 `data/` 디렉토리에 배치
+- [ ] SLURM 클러스터에서 `sbatch scripts/train_bart.sh` 실행 및 동작 확인
+- [ ] `blt_gec/` 디렉토리 내에 모델 래핑 코드 추가 구현
+
+---
+
 
 ## [2026-04-20] 3-트랙 구조 재편 (Serving 트랙 추가)
 
@@ -58,6 +112,33 @@
 - [ ] Track 3: 데이터 어댑터 구현
 
 ---
+## [2026-04-27] Track 2 & 3 스캐폴딩 (SLURM 스크립트 및 데이터 어댑터)
+
+### 목표
+- PROJECT_MASTER_PLAN에 따른 다음 단계(Track 2, Track 3 준비) 수행
+- SLURM 환경을 위한 Baseline 학습 스크립트 작성
+- BLT 모델을 위한 데이터 어댑터 프로토타입 구현
+
+### 수행 내용
+- **Track 2 (Baseline)**
+  - `scripts/train_bart.sh`: SLURM 작업 제출용 배치 스크립트 생성 (노드/메모리/시간/GPU 설정 및 파라미터 매핑)
+  - `scripts/eval_bart.sh`: 모델 체크포인트 평가용 SLURM 스크립트 생성
+  - `data/README.md`: 데이터셋 형태(TSV) 및 파일 명명 규칙(native/lang8/learner) 문서화
+- **Track 3 (BLT-GEC)**
+  - `blt_gec/data_adapter.py`: TSV 파일을 읽어 Prefix-LM용 UTF-8 바이트 시퀀스와 loss mask를 생성하는 `GecBltDataset` 어댑터 구현
+
+### 결과
+- SLURM 환경에서 곧바로 Baseline 실험을 돌릴 수 있는 실행 환경 세팅 완료
+- 데이터 디렉토리 구조 확립 완료
+- BLT 모델 어댑터의 뼈대 구성 완료
+
+### 다음 단계
+- [ ] 실제 학습 데이터(Kor-Native 등)를 `data/` 디렉토리에 배치
+- [ ] SLURM 클러스터에서 `sbatch scripts/train_bart.sh` 실행 및 동작 확인
+- [ ] `blt_gec/` 디렉토리 내에 모델 래핑 코드 추가 구현
+
+---
+
 
 ## [2026-04-19] Baseline 코드 이식 및 Skills 업데이트
 
@@ -91,6 +172,33 @@
 - [ ] blt_gec/ 데이터 어댑터 구현
 
 ---
+## [2026-04-27] Track 2 & 3 스캐폴딩 (SLURM 스크립트 및 데이터 어댑터)
+
+### 목표
+- PROJECT_MASTER_PLAN에 따른 다음 단계(Track 2, Track 3 준비) 수행
+- SLURM 환경을 위한 Baseline 학습 스크립트 작성
+- BLT 모델을 위한 데이터 어댑터 프로토타입 구현
+
+### 수행 내용
+- **Track 2 (Baseline)**
+  - `scripts/train_bart.sh`: SLURM 작업 제출용 배치 스크립트 생성 (노드/메모리/시간/GPU 설정 및 파라미터 매핑)
+  - `scripts/eval_bart.sh`: 모델 체크포인트 평가용 SLURM 스크립트 생성
+  - `data/README.md`: 데이터셋 형태(TSV) 및 파일 명명 규칙(native/lang8/learner) 문서화
+- **Track 3 (BLT-GEC)**
+  - `blt_gec/data_adapter.py`: TSV 파일을 읽어 Prefix-LM용 UTF-8 바이트 시퀀스와 loss mask를 생성하는 `GecBltDataset` 어댑터 구현
+
+### 결과
+- SLURM 환경에서 곧바로 Baseline 실험을 돌릴 수 있는 실행 환경 세팅 완료
+- 데이터 디렉토리 구조 확립 완료
+- BLT 모델 어댑터의 뼈대 구성 완료
+
+### 다음 단계
+- [ ] 실제 학습 데이터(Kor-Native 등)를 `data/` 디렉토리에 배치
+- [ ] SLURM 클러스터에서 `sbatch scripts/train_bart.sh` 실행 및 동작 확인
+- [ ] `blt_gec/` 디렉토리 내에 모델 래핑 코드 추가 구현
+
+---
+
 
 ## [2026-04-19] 프로젝트 초기 구조 수립
 
@@ -143,6 +251,33 @@
 - BLT의 generate_nocache()가 beam search 미지원 — GEC용 beam search 구현 필요할 수 있음
 
 ---
+## [2026-04-27] Track 2 & 3 스캐폴딩 (SLURM 스크립트 및 데이터 어댑터)
+
+### 목표
+- PROJECT_MASTER_PLAN에 따른 다음 단계(Track 2, Track 3 준비) 수행
+- SLURM 환경을 위한 Baseline 학습 스크립트 작성
+- BLT 모델을 위한 데이터 어댑터 프로토타입 구현
+
+### 수행 내용
+- **Track 2 (Baseline)**
+  - `scripts/train_bart.sh`: SLURM 작업 제출용 배치 스크립트 생성 (노드/메모리/시간/GPU 설정 및 파라미터 매핑)
+  - `scripts/eval_bart.sh`: 모델 체크포인트 평가용 SLURM 스크립트 생성
+  - `data/README.md`: 데이터셋 형태(TSV) 및 파일 명명 규칙(native/lang8/learner) 문서화
+- **Track 3 (BLT-GEC)**
+  - `blt_gec/data_adapter.py`: TSV 파일을 읽어 Prefix-LM용 UTF-8 바이트 시퀀스와 loss mask를 생성하는 `GecBltDataset` 어댑터 구현
+
+### 결과
+- SLURM 환경에서 곧바로 Baseline 실험을 돌릴 수 있는 실행 환경 세팅 완료
+- 데이터 디렉토리 구조 확립 완료
+- BLT 모델 어댑터의 뼈대 구성 완료
+
+### 다음 단계
+- [ ] 실제 학습 데이터(Kor-Native 등)를 `data/` 디렉토리에 배치
+- [ ] SLURM 클러스터에서 `sbatch scripts/train_bart.sh` 실행 및 동작 확인
+- [ ] `blt_gec/` 디렉토리 내에 모델 래핑 코드 추가 구현
+
+---
+
 
 <!-- 아래 템플릿을 복사하여 새 세션을 추가하세요 -->
 <!--
