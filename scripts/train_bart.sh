@@ -1,5 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=bart-gec
+#SBATCH --comment python
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --error=logs/%x-%j.err
 #SBATCH --nodes=1
