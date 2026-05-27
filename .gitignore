@@ -36,7 +36,8 @@ env/
 outputs/
 hf-weights/
 
-# Data (too large for git)
+# Data (too large for git; keep existing tracked docs, ignore local corpora/outputs)
+data/
 *.dat
 *.m2
 

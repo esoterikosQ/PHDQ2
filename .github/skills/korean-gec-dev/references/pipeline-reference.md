@@ -25,7 +25,16 @@ phdq/  (= PHDQ2 git repo)
 │   ├── requirements.txt                #   현대 버전 의존성
 │   └── metric/                         #   GLEU, M2 scorer
 ├── blt_gec/                            # [Track 3] BLT-GEC 개발 모델
-│   └── architecture.md                 #   설계 계획
+│   ├── architecture.md                 #   설계 계획
+│   └── data_adapter.py                 #   TSV → UTF-8 byte Prefix-LM 데이터 어댑터
+├── scripts/                            # SLURM job 스크립트
+│   ├── train_bart.sh                   #   Baseline 학습 job
+│   └── eval_bart.sh                    #   Baseline 체크포인트 평가 job
+├── data/                               # 로컬 데이터/실험 산출물 (.gitignore)
+│   ├── README.md                       #   데이터 파일 규칙
+│   ├── Raw/                            #   원본 코퍼스 (로컬)
+│   ├── Preprocessed/                   #   전처리 데이터 (로컬)
+│   └── generated_outputs/              #   실험 생성 결과 (로컬)
 ├── papers/                             # 논문 PDF
 │   ├── korean_gec.pdf                  #   GEC 논문
 │   ├── blt.pdf                         #   BLT 논문
@@ -33,7 +42,6 @@ phdq/  (= PHDQ2 git repo)
 ├── LOG.md                              # 진행 로그
 ├── .gitignore                          # reference_code/, 체크포인트 등 제외
 └── (향후 추가)
-    ├── scripts/                        # SLURM job 스크립트
     ├── results/                        # 학습·평가 결과
     ├── configs/                        # 학습 설정 파일
     └── eval/                           # 공통 평가 파이프라인

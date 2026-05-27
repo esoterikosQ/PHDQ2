@@ -4,6 +4,33 @@
 > 최신 항목이 위에 오도록 역순으로 기록합니다.
 
 ---
+## [2026-05-27] 문서 상태 정합성 수정 및 data ignore 규칙 정리
+
+### 목표
+- 실제 코드 상태와 `PROJECT_MASTER_PLAN.md`의 현재 상태 설명 불일치 해소
+- `data/README.md`의 설명과 실제 `.gitignore` 정책 일치
+- 로컬 데이터/실험 산출물이 git 추적 대상으로 잡히지 않도록 정리
+
+### 수행 내용
+- `PROJECT_MASTER_PLAN.md`: 2026-05-27 기준 현재 상태로 갱신
+  - Track 1 Serving 코드(`infer.py`, `app.py`, `requirements.txt`) 구현 완료 반영
+  - Track 2 SLURM 스크립트(`train_bart.sh`, `eval_bart.sh`) 작성 완료 반영
+  - Track 3 BLT 데이터 어댑터(`data_adapter.py`) 초안 작성 완료 반영
+  - 다음 실행 To-do를 배포 테스트, baseline 실행, BLT 학습 루프 연결 중심으로 수정
+- `data/README.md`: 현재 로컬 데이터 구조(`Raw/`, `Preprocessed/`, `generated_outputs/`)와 git 추적 제외 방침 명시
+- `.gitignore`: `data/` 제외 규칙 추가
+
+### 결과
+- master plan의 오래된 미완료 항목과 실제 구현 상태가 일치하도록 정리됨
+- 로컬 데이터 및 실험 산출물이 기본적으로 git에 추가되지 않도록 설정됨
+
+### 다음 단계
+- [ ] Ubuntu RTX 5090에서 Serving 앱 실제 실행 검증
+- [ ] SLURM에서 `scripts/train_bart.sh` 기준 baseline 1차 학습 실행
+- [ ] `blt_gec/data_adapter.py`를 BLT 원본 학습 루프 입력 형식과 맞춰 확장
+
+---
+
 ## [2026-04-27] Track 2 & 3 스캐폴딩 (SLURM 스크립트 및 데이터 어댑터)
 
 ### 목표

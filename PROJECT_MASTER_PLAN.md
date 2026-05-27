@@ -1,7 +1,8 @@
 # 한국어 GEC 프로젝트 종합 실행 계획 (Master Plan)
 
 작성일: 2026-04-22
-기준 저장소: esoterikosQ/PHDQ (현재 workspace)
+최종 업데이트: 2026-05-27
+기준 저장소: esoterikosQ/PHDQ2 (현재 workspace)
 
 ---
 
@@ -20,19 +21,32 @@
 
 ---
 
-## 2) 현재 상태 (2026-04-22 기준)
+## 2) 현재 상태 (2026-05-27 기준)
 
 완료:
 - 3-트랙 구조 및 아키텍처 문서화 완료
 - baseline 코드 마이그레이션(PL 2.x) 및 metric 이식 완료
 - serving/architecture.md 생성 완료
+- Track 1 Serving 코드 구현 완료
+  - `serving/infer.py`: HuggingFace `Soyoung97/gec_kr` 기반 추론 엔진
+  - `serving/app.py`: Gradio 단일/다중 문장 UI와 diff 표시
+  - `serving/requirements.txt`: 서빙 의존성
+- Track 2 SLURM 실행 스크립트 초안 작성 완료
+  - `scripts/train_bart.sh`, `scripts/eval_bart.sh`
+- Track 3 BLT 데이터 어댑터 초안 작성 완료
+  - `blt_gec/data_adapter.py`: TSV -> UTF-8 byte Prefix-LM 입력 변환
+- `data/README.md`와 실제 `.gitignore` 정책 정합성 반영
 - 프로젝트 관리 문서(SKILL, pipeline-reference, LOG) 정비 완료
 
 미완료 (핵심 실행 단계):
-- Track 1: infer.py, app.py, requirements.txt 구현 및 RTX 5090 배포
-- Track 2: SLURM에서 데이터 준비/학습 실행/결과 확정
-- Track 3: 데이터 어댑터 및 BLT 학습 루프 구현/실험
+- Track 1: Ubuntu RTX 5090에서 실제 배포/접속 테스트 및 운영 안정화
+- Track 2: SLURM에서 데이터 경로 확정, 학습 실행, GLEU/M2 결과 확정
+- Track 3: BLT 모델 래퍼, 학습 루프, 생성/평가 파이프라인 구현 및 실험
 - 최종 비교 분석 및 보고서 정리
+
+주의:
+- `data/Preprocessed/`, `data/Raw/`, `data/generated_outputs/`는 로컬 데이터/실험 산출물로 취급하며 git 추적 대상이 아니다.
+- 대용량 체크포인트와 모델 가중치는 git-lfs 또는 외부 저장소를 사용한다.
 
 ---
 
@@ -265,12 +279,20 @@ Ubuntu RTX 5090:
 
 ## 10) 즉시 실행 To-do (다음 2주)
 
-1. serving/infer.py, serving/app.py, serving/requirements.txt 구현 (3~4일)
-2. 공개 체크포인트 확보 여부 확정 (1일)
-3. SLURM baseline 1차 실행 (3~5일)
-4. 결과 로그 템플릿 확정 및 주간 리뷰 루틴 시작 (1일)
+1. Ubuntu RTX 5090에서 `serving/` 앱 실행 테스트
+   - `pip install -r serving/requirements.txt`
+   - `python serving/app.py --port 7860`
+   - 단일/다중 문장 교정 및 diff 출력 확인
+2. SLURM baseline 데이터 경로 정리
+   - `data/` 로컬 파일을 `scripts/train_bart.sh`의 `native_train.tsv`, `native_dev.tsv`, `native_test.tsv` 규칙에 맞게 배치 또는 스크립트 경로 수정
+3. SLURM baseline 1차 실행
+   - `sbatch scripts/train_bart.sh`
+   - validation GLEU 산출물과 실패 원인 기록
+4. BLT-GEC 다음 구현 단위 확정
+   - `blt_gec/data_adapter.py`를 원본 BLT 학습 루프 입력 형식과 맞춤
+   - 모델 래퍼/loss/generation 중 먼저 연결할 파일 결정
 
 예상 성과(2주 후):
-- 웹 서비스 MVP 동작
-- baseline 첫 수치 확보
-- BLT 구현 착수 가능한 상태
+- Ubuntu 서버에서 웹 서비스 MVP 검증 완료
+- baseline 첫 GLEU 수치 확보
+- BLT 학습 루프 연결 착수 가능한 상태
