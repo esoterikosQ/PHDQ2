@@ -8,6 +8,7 @@
 ```
 phdq/  (= PHDQ2 git repo)
 ├── .github/skills/korean-gec-dev/      # 이 스킬
+│   └── references/neuron-slurm.md      #   Neuron SLURM 제출 규칙
 ├── reference_code/                     # ★ 원본 코드 (로컬 전용, .gitignore)
 │   ├── Standard_Korean_GEC/            #   BART GEC + KAGAS 원본
 │   └── blt/                            #   BLT 원본 (facebookresearch)

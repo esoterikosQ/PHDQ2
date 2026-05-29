@@ -264,6 +264,8 @@ BART → BLT 전환 시 핵심 설계 차이점:
 ### 결과물 관리 및 Git 동기화
 - **모든 코드 변경은 Mac에서 작성 후 반드시 `esoterikosQ/PHDQ2`에 push**
 - SLURM/Ubuntu에서는 실행 전 항상 `git pull` 먼저 수행
+- Neuron SLURM 학습은 2시간 제한을 전제로 짧은 job을 반복 제출한다.
+- 학습 스크립트는 `outputs/<dataset>/last.ckpt` 자동 resume을 사용하므로, 새 실험 시작 전에는 기존 `last.ckpt` 처리 여부를 확인한다.
 - 커밋 메시지 규칙: `[P{n}][{머신}] 작업 설명`
   - 예: `[P4][mac] BLT 데이터 어댑터 구현`
   - 예: `[P5][slurm] native 데이터 BLT 학습 결과`
@@ -276,15 +278,17 @@ BART → BLT 전환 시 핵심 설계 차이점:
 ```bash
 # SLURM에서 job 제출 패턴
 ssh slurm-node
-cd ~/PHDQ2 && git pull
+cd /scratch/$USER/PHDQ2 && git pull
 sbatch scripts/train_bart.sh   # 또는 BLT 학습
+# 시간 제한으로 중단되면 같은 명령을 다시 제출해 last.ckpt부터 재개
+sbatch scripts/train_bart.sh
 # 완료 후
 git add results/ logs/ && git commit -m "[P5][slurm] 학습 결과" && git push
 
 # Ubuntu 서버에서 UI 서빙
 ssh ubuntu-server
 cd ~/PHDQ2 && git pull
-python ui/serve.py
+python serving/app.py
 ```
 
 ---

@@ -44,8 +44,9 @@
 
 ## 사용법
 1. 위 규칙에 맞게 파일을 준비해서 이 디렉토리에 넣습니다.
-2. SLURM 클러스터에서 프로젝트 루트로 이동한 후 학습 스크립트를 실행합니다.
+2. SLURM 클러스터에서는 Neuron 정책에 맞게 `/scratch/$USER` 아래의 프로젝트 루트로 이동한 후 학습 스크립트를 실행합니다.
    ```bash
+   cd /scratch/$USER/PHDQ2
    sbatch scripts/train_bart.sh
    # (파일 내에서 DATASET_TYPE="native" 설정 확인)
    ```

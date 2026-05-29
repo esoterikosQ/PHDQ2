@@ -44,6 +44,8 @@ data/
 # Logs (keep LOG.md, exclude runtime logs)
 logs/
 *.log
+slurm-*.out
+slurm-*.err
 !LOG.md
 
 # Jupyter

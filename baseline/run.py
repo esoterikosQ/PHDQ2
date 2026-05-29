@@ -16,11 +16,25 @@ from pprint import pprint
 
 import lightning as L
 import torch
-from lightning.pytorch.callbacks import ModelCheckpoint
+from lightning.pytorch.callbacks import Callback, ModelCheckpoint
 from transformers import BartForConditionalGeneration, PreTrainedTokenizerFast
 
 from dataset import GecDataModule, KoBARTGecDataset
 from model import KoBARTConditionalGeneration
+
+
+class SaveLastOnTrainEnd(Callback):
+    """Write a final resumable checkpoint when Lightning stops before SLURM timeout."""
+
+    def __init__(self, checkpoint_path: str):
+        self.checkpoint_path = checkpoint_path
+
+    def on_train_end(self, trainer, pl_module):
+        if trainer.global_step <= 0:
+            return
+        os.makedirs(os.path.dirname(self.checkpoint_path), exist_ok=True)
+        trainer.save_checkpoint(self.checkpoint_path)
+        print(f"Saved final resumable checkpoint: {self.checkpoint_path}")
 
 
 def parse_args():
@@ -36,8 +50,14 @@ def parse_args():
     parser.add_argument('--train_data_path', type=str, required=True)
     parser.add_argument('--val_data_path', type=str, required=True)
     parser.add_argument('--test_data_path', type=str, required=True)
-    parser.add_argument('--every_n_epochs', type=int, default=10)
+    parser.add_argument('--every_n_epochs', type=int, default=1)
     parser.add_argument('--model_ckpt_path', type=str, default='')
+    parser.add_argument('--resume_ckpt_path', type=str, default='',
+                        help='Training checkpoint to resume from. Use for interrupted SLURM jobs.')
+    parser.add_argument('--checkpoint_interval_minutes', type=int, default=20,
+                        help='Save a resumable checkpoint every N minutes during training.')
+    parser.add_argument('--max_time', type=str, default='00:01:50:00',
+                        help='Lightning max_time in DD:HH:MM:SS format. Default leaves time before 2h SLURM limit.')
     parser.add_argument('--log_every_n_steps', type=int, default=50)
     parser.add_argument('--check_val_every_n_epoch', type=int, default=1)
     parser.add_argument('--warmup_ratio', type=float, default=0.0)
@@ -90,15 +110,25 @@ def main():
     model = KoBARTConditionalGeneration(args, bart_model, tokenizer, dm)
 
     # ---- 콜백 ----
-    ckpt_callback = ModelCheckpoint(
+    checkpoint_interval = datetime.timedelta(minutes=args.checkpoint_interval_minutes)
+    best_ckpt_callback = ModelCheckpoint(
         monitor='val_gleu',
         dirpath=f'outputs/{args.data}/',
         mode='max',
         verbose=True,
         save_last=False,
-        save_top_k=-1,
+        save_top_k=3,
         every_n_epochs=args.every_n_epochs,
-        filename=f'model_ckpt/{args.data}_{args.lr}_' + '{epoch:02d}')
+        filename=f'model_ckpt/{args.data}_{args.lr}_' + '{epoch:02d}_{step}')
+    resumable_ckpt_callback = ModelCheckpoint(
+        dirpath=f'outputs/{args.data}/',
+        verbose=True,
+        save_last=True,
+        save_top_k=-1,
+        train_time_interval=checkpoint_interval,
+        every_n_epochs=0,
+        filename=f'resume/{args.data}_{args.lr}_' + '{epoch:02d}_{step}')
+    save_last_on_end = SaveLastOnTrainEnd(f'outputs/{args.data}/last.ckpt')
 
     # log_every_n_steps 조정
     data_len = len(dm.train_dataloader().dataset)
@@ -111,14 +141,18 @@ def main():
         accelerator='auto',
         devices=device_count if device_count > 0 else 'auto',
         strategy='auto',
-        callbacks=[ckpt_callback],
+        callbacks=[best_ckpt_callback, resumable_ckpt_callback, save_last_on_end],
         check_val_every_n_epoch=args.check_val_every_n_epoch,
         log_every_n_steps=log_steps,
         num_sanity_val_steps=0,
+        max_time=args.max_time,
     )
 
     if args.model_ckpt_path == '':
-        trainer.fit(model, dm)
+        ckpt_path = args.resume_ckpt_path or None
+        if ckpt_path:
+            print(f"Resuming training from {ckpt_path}...")
+        trainer.fit(model, dm, ckpt_path=ckpt_path)
     else:
         print(f"Loading model from {args.model_ckpt_path}...")
         model = KoBARTConditionalGeneration.load_from_checkpoint(

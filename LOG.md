@@ -4,6 +4,67 @@
 > 최신 항목이 위에 오도록 역순으로 기록합니다.
 
 ---
+## [2026-05-29] 2시간 SLURM 제한 대비 checkpoint/resume 안전장치
+
+### 목표
+- Neuron SLURM 2시간 제한으로 학습 job이 중단되어도 이어서 재개 가능하도록 수정
+- 에이전트 지침과 레퍼런스 문서에 짧은 job 반복 제출 운영 원칙 반영
+
+### 수행 내용
+- `baseline/run.py`
+  - `--resume_ckpt_path` 추가: 학습 재개용 checkpoint 경로
+  - `--checkpoint_interval_minutes` 추가: 기본 20분 간격 재개용 checkpoint 저장
+  - `--max_time` 추가: 기본 `00:01:50:00`으로 SLURM 제한 전에 Lightning이 먼저 정지
+  - validation GLEU best checkpoint와 시간 기반 재개용 checkpoint 분리
+  - 학습 종료 시 `outputs/<dataset>/last.ckpt`를 저장하는 콜백 추가
+- `scripts/train_bart.sh`
+  - `#SBATCH --time=01:55:00`으로 2시간 제한에 맞춤
+  - `#SBATCH --signal=B:TERM@300`으로 종료 전 신호 요청
+  - `outputs/<dataset>/last.ckpt`가 있으면 자동으로 `--resume_ckpt_path` 전달
+  - `RESUME_CKPT=""`로 자동 재개 비활성화, `RESUME_CKPT=<path>`로 특정 checkpoint 재개 가능
+- `.github/skills/korean-gec-dev/` 레퍼런스와 `SKILL.md`에 checkpoint/resume 운영 지침 추가
+
+### 결과
+- 동일한 `sbatch scripts/train_bart.sh` 명령을 반복 제출하면 마지막 checkpoint부터 이어서 학습하는 구조가 됨
+- 2시간 제한 job에서도 최대 손실 구간을 약 20분 이내로 제한하고, 정상적인 Lightning 종료 시에는 마지막 상태를 한 번 더 저장
+
+### 다음 단계
+- [ ] Neuron에서 smoke run 제출 후 `outputs/native/last.ckpt` 생성 여부 확인
+- [ ] 첫 재제출에서 `Auto-resume enabled` 로그와 global step 재개 여부 확인
+- [ ] 필요하면 checkpoint 간격을 10분으로 줄이거나 batch size를 조정
+
+---
+
+## [2026-05-27] Neuron SLURM 가이드 반영
+
+### 목표
+- Neuron SLURM 작업 제출 가이드를 프로젝트 레퍼런스에 추가
+- Baseline 학습/평가 스크립트를 Neuron 정책에 맞게 수정
+
+### 수행 내용
+- `.github/skills/korean-gec-dev/references/neuron-slurm.md` 추가
+  - `/scratch/$USER` 제출 위치
+  - `--comment=pytorch` 필수
+  - `--mem` 미사용
+  - `sinfo`, `squeue`, `scancel` 기반 모니터링 명령 정리
+- `scripts/train_bart.sh`, `scripts/eval_bart.sh` 수정
+  - 기본 파티션 `cas_v100_4`
+  - `--ntasks-per-node=1`, `--cpus-per-task=10`, `--gres=gpu:1`
+  - `srun python ...` 실행 방식 적용
+  - `/scratch/$USER` 밖에서 제출하면 오류 처리
+- `env-checklist.md`, `pipeline-reference.md`, `SKILL.md`, `data/README.md`의 SLURM 경로/레퍼런스 설명 갱신
+
+### 결과
+- 현재 SLURM 스크립트가 Neuron 사용자 가이드의 제출 규칙과 맞도록 정리됨
+- `slurm-*.out`, `slurm-*.err` 런타임 로그를 `.gitignore`에 추가해 실험 로그 파일의 실수 커밋을 방지
+
+### 다음 단계
+- [ ] Neuron 로그인 노드에서 `/scratch/$USER/PHDQ2` 경로로 repo 배치
+- [ ] `sinfo`로 사용 가능한 GPU 파티션 확인 후 필요 시 스크립트의 `#SBATCH -p` 수정
+- [ ] `sbatch scripts/train_bart.sh`로 baseline smoke run 실행
+
+---
+
 ## [2026-05-27] 문서 상태 정합성 수정 및 data ignore 규칙 정리
 
 ### 목표

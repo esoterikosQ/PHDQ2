@@ -150,12 +150,19 @@ python demo.py "A BLT has"  # 정상 출력 확인
 - **해결**: blt-1b(1B)부터 시작, batch size 축소, gradient checkpointing
 
 ### SLURM Job 제출 패턴
+Neuron SLURM에서는 작업을 `/scratch/$USER` 아래에서 제출해야 하며, `--comment=pytorch`를 포함하고 `--mem` 옵션을 사용하지 않는다.
+2시간 제한에 대비해 학습 job은 `last.ckpt` 저장과 자동 resume을 전제로 운영한다.
+자세한 Neuron 전용 규칙은 [neuron-slurm.md](./neuron-slurm.md)를 따른다.
+
 ```bash
 # SLURM 노드에서 실행
 ssh slurm-node
-cd ~/PHDQ2 && git pull origin main
+cd /scratch/$USER/PHDQ2 && git pull origin main
 
 # BART 학습 job 제출
+sbatch scripts/train_bart.sh
+
+# 시간 제한 후 재제출: outputs/<dataset>/last.ckpt에서 자동 재개
 sbatch scripts/train_bart.sh
 
 # BLT 학습 job 제출
@@ -173,14 +180,19 @@ git add results/ logs/ && git commit -m "[P5][slurm] 학습 결과" && git push
 ```bash
 #!/bin/bash
 #SBATCH --job-name=blt-gec
-#SBATCH --output=logs/slurm-%j.out
-#SBATCH --error=logs/slurm-%j.err
+#SBATCH --comment=pytorch
+#SBATCH --output=slurm-%x-%j.out
+#SBATCH --error=slurm-%x-%j.err
+#SBATCH -p cas_v100_4
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:1
-#SBATCH --time=24:00:00
+#SBATCH --cpus-per-task=10
+#SBATCH --time=01:55:00
 
 conda activate blt
-cd ~/PHDQ2
-python -m bytelatent.train config=configs/gec_blt.yaml
+cd /scratch/$USER/PHDQ2
+srun python -m bytelatent.train config=configs/gec_blt.yaml max_time=00:01:50:00
 ```
 
 ---
