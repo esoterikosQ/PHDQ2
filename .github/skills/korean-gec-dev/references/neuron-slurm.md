@@ -12,9 +12,9 @@
   - 메모리는 `--ntasks-per-node`와 `--cpus-per-task`에 의해 자동 산정된다.
 - 일반 GPU 파티션은 시스템 상태에 따라 조정될 수 있으므로 제출 전 `sinfo`로 확인한다.
 
-## PHDQ Baseline 스크립트 기본값
+## PHDQ 학습 스크립트 기본값
 
-`scripts/train_bart.sh`와 `scripts/eval_bart.sh`는 Neuron 가이드에 맞춰 다음 기본값을 사용한다.
+`scripts/train_bart.sh`, `scripts/eval_bart.sh`, `scripts/train_blt.sh`는 Neuron 가이드에 맞춰 다음 기본값을 사용한다.
 
 ```bash
 #SBATCH -p cas_v100_4
@@ -36,6 +36,8 @@
 - 학습 종료 시 `outputs/<dataset>/last.ckpt`를 한 번 더 저장한다.
 - 다음 제출 시 `outputs/<dataset>/last.ckpt`가 있으면 자동으로 이어서 학습한다.
 
+BLT-GEC scaffold는 같은 정책을 사용하되 checkpoint 경로가 `outputs/blt_gec/<dataset>/last.ckpt`다.
+
 다른 GPU 파티션을 사용할 경우 스크립트의 `#SBATCH -p ...` 줄을 수정한다.
 예: `cas_v100nv_4`, `amd_a100nv_8`, `eme_h200nv_8`, `gh200_1`.
 
@@ -55,14 +57,19 @@ sinfo
 # 학습 제출
 sbatch scripts/train_bart.sh
 
+# BLT-GEC scaffold 학습 제출
+sbatch scripts/train_blt.sh
+
 # 이어서 학습할 때도 같은 명령 사용: last.ckpt가 있으면 자동 resume
 sbatch scripts/train_bart.sh
+sbatch scripts/train_blt.sh
 
 # 자동 resume을 끄고 새로 시작
 RESUME_CKPT="" sbatch scripts/train_bart.sh
 
 # 특정 checkpoint에서 재개
 RESUME_CKPT=outputs/native/model_ckpt/<checkpoint>.ckpt sbatch scripts/train_bart.sh
+RESUME_CKPT=outputs/blt_gec/native/best.ckpt sbatch scripts/train_blt.sh
 
 # 체크포인트 평가 제출
 sbatch scripts/eval_bart.sh outputs/native/model_ckpt/<checkpoint>.ckpt native
@@ -86,5 +93,6 @@ scancel <JOB_ID>
 - 2시간 제한이 있는 학습은 하나의 긴 job이 아니라 여러 번의 짧은 job으로 누적 실행한다.
 - 시간 제한으로 중단되었거나 `CANCELLED`, `TIMEOUT` 상태가 되었으면 동일 명령으로 다시 제출한다.
 - `outputs/<dataset>/last.ckpt`가 있으면 `scripts/train_bart.sh`가 자동으로 `--resume_ckpt_path`를 전달한다.
-- 새 실험을 시작하려면 기존 `outputs/<dataset>/last.ckpt`를 다른 위치로 옮기거나 `RESUME_CKPT="" sbatch scripts/train_bart.sh`를 사용한다.
+- `outputs/blt_gec/<dataset>/last.ckpt`가 있으면 `scripts/train_blt.sh`가 자동으로 `--resume_ckpt_path`를 전달한다.
+- 새 실험을 시작하려면 기존 `last.ckpt`를 다른 위치로 옮기거나 `RESUME_CKPT="" sbatch scripts/train_bart.sh` / `RESUME_CKPT="" sbatch scripts/train_blt.sh`를 사용한다.
 - 각 job의 `JOB_ID`, 종료 상태, 마지막 checkpoint, validation GLEU를 `LOG.md` 또는 별도 실험 노트에 기록한다.

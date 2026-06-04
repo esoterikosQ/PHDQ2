@@ -4,6 +4,43 @@
 > 최신 항목이 위에 오도록 역순으로 기록합니다.
 
 ---
+## [2026-06-05] BLT-GEC 학습 scaffold 구현
+
+### 목표
+- 현재 데이터 구조(`data/<dataset>_train/dev/test.tsv`)와 Neuron SLURM 운영 방식에 맞는 BLT-GEC 학습용 코드 작성
+- 2시간 제한에 대비한 checkpoint/resume 정책을 BLT-GEC 학습에도 적용
+
+### 수행 내용
+- `blt_gec/data_adapter.py`
+  - 특수 토큰을 `BOS=256`, `EOS=257`, `SEP=258`, `PAD=259`로 정리
+  - Prefix-LM causal label 구성으로 수정
+  - `attention_mask` 반환 추가
+- `blt_gec/model.py`
+  - repo-local byte Prefix-LM causal Transformer scaffold 추가
+  - 공식 BLT 연결 전 데이터/학습 루프 검증용 모델로 명시
+- `blt_gec/train.py`
+  - train/val/test TSV 경로 처리
+  - masked byte-level cross entropy 학습
+  - validation loss, `best.ckpt`, `last.ckpt`, 자동 resume 지원
+  - `--max_time 00:01:50:00`, 20분 checkpoint 간격 지원
+- `blt_gec/generate.py`
+  - 학습 checkpoint에서 greedy byte generation으로 교정문 생성
+- `scripts/train_blt.sh`
+  - Neuron SLURM용 BLT-GEC 학습 job 추가
+  - `outputs/blt_gec/<dataset>/last.ckpt` 자동 resume 적용
+- `blt_gec/architecture.md`, pipeline/env 레퍼런스 문서 갱신
+
+### 결과
+- `sbatch scripts/train_blt.sh`로 BLT-GEC scaffold 학습을 제출할 수 있는 구조가 마련됨
+- 공식 BLT fine-tuning 전에도 데이터 경로, loss masking, checkpoint/resume, 생성 루프를 end-to-end로 검증할 수 있음
+
+### 다음 단계
+- [ ] SLURM에서 작은 native subset으로 smoke run 실행
+- [ ] `outputs/blt_gec/native/last.ckpt` 생성 및 재제출 resume 확인
+- [ ] 공식 `ByteLatentTransformer` backend 연결 설계
+
+---
+
 ## [2026-05-29] 2시간 SLURM 제한 대비 checkpoint/resume 안전장치
 
 ### 목표

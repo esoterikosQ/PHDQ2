@@ -165,7 +165,7 @@ sbatch scripts/train_bart.sh
 # 시간 제한 후 재제출: outputs/<dataset>/last.ckpt에서 자동 재개
 sbatch scripts/train_bart.sh
 
-# BLT 학습 job 제출
+# BLT-GEC scaffold 학습 job 제출
 sbatch scripts/train_blt.sh
 
 # job 상태 확인
@@ -176,7 +176,7 @@ sacct -j <JOB_ID> --format=JobID,State,Elapsed,MaxRSS
 git add results/ logs/ && git commit -m "[P5][slurm] 학습 결과" && git push
 ```
 
-### SLURM 스크립트 템플릿 (참고)
+### SLURM 스크립트 템플릿 (공식 bytelatent 전환 시 참고)
 ```bash
 #!/bin/bash
 #SBATCH --job-name=blt-gec
@@ -193,6 +193,18 @@ git add results/ logs/ && git commit -m "[P5][slurm] 학습 결과" && git push
 conda activate blt
 cd /scratch/$USER/PHDQ2
 srun python -m bytelatent.train config=configs/gec_blt.yaml max_time=00:01:50:00
+```
+
+현재 repo-local BLT-GEC scaffold는 다음 명령으로 실행한다.
+
+```bash
+sbatch scripts/train_blt.sh
+
+# 시간 제한 후 재제출: outputs/blt_gec/<dataset>/last.ckpt에서 자동 재개
+sbatch scripts/train_blt.sh
+
+# 새 실험으로 시작
+RESUME_CKPT="" sbatch scripts/train_blt.sh
 ```
 
 ---

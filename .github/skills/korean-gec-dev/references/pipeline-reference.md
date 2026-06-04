@@ -27,10 +27,15 @@ phdq/  (= PHDQ2 git repo)
 │   └── metric/                         #   GLEU, M2 scorer
 ├── blt_gec/                            # [Track 3] BLT-GEC 개발 모델
 │   ├── architecture.md                 #   설계 계획
-│   └── data_adapter.py                 #   TSV → UTF-8 byte Prefix-LM 데이터 어댑터
+│   ├── data_adapter.py                 #   TSV → UTF-8 byte Prefix-LM 데이터 어댑터
+│   ├── model.py                        #   repo-local byte Prefix-LM scaffold
+│   ├── train.py                        #   학습 진입점, checkpoint/resume
+│   ├── generate.py                     #   checkpoint 기반 생성
+│   └── requirements.txt                #   BLT-GEC scaffold 의존성
 ├── scripts/                            # SLURM job 스크립트
 │   ├── train_bart.sh                   #   Baseline 학습 job
-│   └── eval_bart.sh                    #   Baseline 체크포인트 평가 job
+│   ├── eval_bart.sh                    #   Baseline 체크포인트 평가 job
+│   └── train_blt.sh                    #   BLT-GEC scaffold 학습 job
 ├── data/                               # 로컬 데이터/실험 산출물 (.gitignore)
 │   ├── README.md                       #   데이터 파일 규칙
 │   ├── Raw/                            #   원본 코퍼스 (로컬)

@@ -28,7 +28,7 @@
 (주의: 컬럼 헤더 없이 첫 줄부터 바로 데이터가 와야 함. `dataset.py`의 `_read_docs` 참고)
 
 ## 명명 규칙
-`scripts/train_bart.sh` 에서 편하게 데이터셋을 전환할 수 있도록 접두어를 통일합니다.
+`scripts/train_bart.sh`와 `scripts/train_blt.sh`에서 편하게 데이터셋을 전환할 수 있도록 접두어를 통일합니다.
 
 1. **Kor-Native** (원어민)
     - `native_train.tsv`

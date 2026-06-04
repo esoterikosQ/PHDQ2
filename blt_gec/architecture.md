@@ -369,6 +369,7 @@ Phase 1: 데이터 어댑터
   └── 단위 테스트 (바이트 변환 정확성)
 
 Phase 2: 모델 래핑
+  ├── repo-local byte Prefix-LM scaffold 구현 (완료)
   ├── BLT 가중치 로드
   ├── GEC용 loss 함수 (마스크 적용)
   ├── 학습 루프 작성
@@ -400,22 +401,24 @@ Phase 5: 최적화 (성능에 따라)
 ```
 blt_gec/
 ├── architecture.md          # 이 파일
-├── data/
-│   ├── dataset.py           # GecBltDataset
-│   └── utils.py             # 바이트 변환 유틸리티
-├── model/
-│   ├── blt_gec.py           # BLT-GEC 모델 래퍼
-│   └── loss.py              # GEC용 loss 함수
-├── train.py                 # 학습 진입점
-├── generate.py              # 추론/생성
-├── evaluate.py              # 평가 파이프라인
-├── configs/
-│   ├── gec_native.yaml      # native 데이터 학습 설정
-│   └── gec_union.yaml       # union 데이터 학습 설정
-├── scripts/
-│   └── train_blt.sh         # SLURM 학습 스크립트
-└── requirements.txt         # BLT 환경 의존성
+├── __init__.py              # 패키지 초기화
+├── data_adapter.py          # GecBltDataset, byte special token 정의
+├── model.py                 # repo-local byte Prefix-LM scaffold
+├── train.py                 # 학습 진입점, checkpoint/resume 지원
+├── generate.py              # checkpoint 기반 greedy 생성
+└── requirements.txt         # BLT-GEC scaffold 의존성
 ```
+
+SLURM 실행 스크립트:
+
+```
+scripts/train_blt.sh         # Neuron SLURM용 BLT-GEC scaffold 학습 job
+```
+
+현재 `model.py`는 공식 `facebookresearch/blt` 구조를 직접 fine-tuning하는 코드가 아니라,
+동일한 UTF-8 byte Prefix-LM 데이터 경로와 운영 방식(checkpoint/resume)을 검증하기 위한
+경량 causal Transformer scaffold다. 공식 BLT 연결 시에는 `train.py`의 backend/model 생성부를
+`reference_code/blt/bytelatent/model/blt.py`의 `ByteLatentTransformer` 래퍼로 교체한다.
 
 ---
 
