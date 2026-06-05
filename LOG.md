@@ -4,6 +4,40 @@
 > 최신 항목이 위에 오도록 역순으로 기록합니다.
 
 ---
+## [2026-06-05] BART 학습 모드 복구 보강
+
+### 목표
+- BART 학습 로그의 `Modules in train mode: 0`, `Modules in eval mode: 182` 상태가 반복되지 않도록 수정
+
+### 수행 내용
+- `baseline/model.py`에서 KoBART wrapper 초기화 시 `self.model.train()` 호출
+- `on_train_epoch_start()`에서 내부 BART 모델을 명시적으로 train mode로 전환
+- validation generation 중에는 `torch.no_grad()`와 eval mode를 사용하되, generation 전 상태가 train mode였으면 복구하도록 수정
+
+### 결과
+- 다음 BART 제출부터 validation generation이 학습 모드를 계속 eval 상태로 남기는 위험을 줄임
+
+### 다음 단계
+- [ ] 다음 BART 재제출 로그에서 `Modules in train mode`가 0으로 남는지 확인
+
+---
+## [2026-06-05] BART DataLoader worker 수 조정
+
+### 목표
+- `--cpus-per-task=4` 환경에서 BART DataLoader가 8 worker를 생성한다는 경고 제거
+
+### 수행 내용
+- `baseline/run.py`에 `--num_workers` 인자 추가
+- 명시값이 없으면 `SLURM_CPUS_PER_TASK`를 우선 사용하도록 수정
+- `scripts/train_bart.sh`, `scripts/eval_bart.sh`에서 기본 `NUM_WORKERS=4`를 전달
+
+### 결과
+- 다음 BART 제출부터 DataLoader worker 수가 SLURM CPU 요청량과 맞도록 정리됨
+
+### 다음 단계
+- [ ] 현재 실행 중인 job은 그대로 두고, 다음 제출부터 최신 스크립트 사용
+
+---
 ## [2026-06-05] NumPy 의존성 사전 검사 추가
 
 ### 목표

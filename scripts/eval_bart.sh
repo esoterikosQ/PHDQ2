@@ -88,10 +88,12 @@ echo "Dataset: $DATASET_TYPE"
 # 현재 run.py 내에 test() 과정이 포함될 수 있으나, 보통 generation은 별도 스크립트화
 
 # 임시: run.py에 --model_ckpt_path 전달하여 평가
+NUM_WORKERS="${NUM_WORKERS:-4}"
 srun "$PYTHON_BIN" baseline/run.py \
     --name "eval-kobart-${DATASET_TYPE}" \
     --data "$DATASET_TYPE" \
     --model_ckpt_path "$MODEL_CKPT" \
+    --num_workers "$NUM_WORKERS" \
     --train_data_path "$TRAIN_DATA" \
     --val_data_path "$VAL_DATA" \
     --test_data_path "$TEST_DATA" \

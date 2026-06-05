@@ -42,6 +42,7 @@ class KoBARTConditionalGeneration(L.LightningModule):
         self._val_losses = []
 
         self.scores = {}
+        self.model.train()
 
     # ------------------------------------------------------------------
     # Optimizer / Scheduler
@@ -95,6 +96,9 @@ class KoBARTConditionalGeneration(L.LightningModule):
         self.step += 1
         return loss
 
+    def on_train_epoch_start(self):
+        self.model.train()
+
     def on_train_epoch_end(self):
         if self.current_epoch_idx in self.scores:
             self.scores[self.current_epoch_idx]['generation_time'] = self.generation_time
@@ -106,11 +110,15 @@ class KoBARTConditionalGeneration(L.LightningModule):
     # Validation
     # ------------------------------------------------------------------
     def _generate(self, input_ids, labels):
+        was_training = self.model.training
         self.model.eval()
         start = time.time()
-        output = self.model.generate(
-            input_ids, eos_token_id=1,
-            max_length=self.args.max_seq_len, num_beams=4)
+        with torch.no_grad():
+            output = self.model.generate(
+                input_ids, eos_token_id=1,
+                max_length=self.args.max_seq_len, num_beams=4)
+        if was_training:
+            self.model.train()
         output = self.tokenizer.batch_decode(output, skip_special_tokens=True)
         self.generation_time += time.time() - start
 

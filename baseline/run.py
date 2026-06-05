@@ -61,6 +61,8 @@ def parse_args():
     parser.add_argument('--log_every_n_steps', type=int, default=50)
     parser.add_argument('--check_val_every_n_epoch', type=int, default=1)
     parser.add_argument('--warmup_ratio', type=float, default=0.0)
+    parser.add_argument('--num_workers', type=int, default=None,
+                        help='DataLoader workers. Defaults to SLURM_CPUS_PER_TASK when available.')
     return parser.parse_args()
 
 
@@ -94,7 +96,12 @@ def main():
         args.num_workers = 0
         args.batch_size = 16
     else:
-        args.num_workers = min(int(multiprocessing.cpu_count() / 2), 8)
+        if args.num_workers is None:
+            slurm_cpus = os.environ.get('SLURM_CPUS_PER_TASK')
+            if slurm_cpus:
+                args.num_workers = int(slurm_cpus)
+            else:
+                args.num_workers = min(int(multiprocessing.cpu_count() / 2), 8)
 
     args.best = {'gleu': 0, 'prec': 0, 'rec': 0, 'f0.5': 0}
 

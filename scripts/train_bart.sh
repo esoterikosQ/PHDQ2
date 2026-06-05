@@ -109,11 +109,13 @@ elif [[ -n "$RESUME_CKPT" ]]; then
 fi
 
 # 학습 실행 (PL 2.x 호환 run.py)
+NUM_WORKERS="${NUM_WORKERS:-4}"
 srun "$PYTHON_BIN" baseline/run.py \
     --name "kobart-${DATASET_TYPE}" \
     --data "$DATASET_TYPE" \
     --max_epochs 20 \
     --batch_size 32 \
+    --num_workers "$NUM_WORKERS" \
     --lr 5e-5 \
     --max_seq_len 128 \
     --train_data_path "$TRAIN_DATA" \
