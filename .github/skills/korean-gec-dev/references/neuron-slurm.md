@@ -23,11 +23,15 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:1
-#SBATCH --cpus-per-task=10
 #SBATCH --comment=pytorch
 #SBATCH --output=slurm-%x-%j.out
 #SBATCH --error=slurm-%x-%j.err
 ```
+
+CPU core 요청은 파티션별 제한을 따른다.
+
+- BART/H200: `#SBATCH --cpus-per-task=10`
+- BLT/A100: `#SBATCH --cpus-per-task=8`
 
 학습 스크립트는 2시간 제한에 대비해 다음 안전장치를 포함한다.
 

@@ -4,6 +4,23 @@
 > 최신 항목이 위에 오도록 역순으로 기록합니다.
 
 ---
+## [2026-06-05] A100 파티션 CPU 제한 반영
+
+### 목표
+- `amd_a100nv_8` 파티션의 GPU 1개당 CPU core 제한에 맞게 BLT-GEC job 수정
+
+### 수행 내용
+- `scripts/train_blt.sh`: `--cpus-per-task=10` → `--cpus-per-task=8`
+- Neuron SLURM 레퍼런스와 환경 체크리스트에 BART/H200=10 cores, BLT/A100=8 cores로 분리 명시
+
+### 결과
+- `amd_a100nv_8`에서 `Requested CPU cores per node (10) exceed the allowed limit (8)` 오류가 나지 않도록 수정됨
+
+### 다음 단계
+- [ ] 최신 코드 pull 후 `sbatch scripts/train_blt.sh` 재제출
+
+---
+
 ## [2026-06-05] Neuron 파티션 정책 갱신
 
 ### 목표

@@ -187,7 +187,7 @@ git add results/ logs/ && git commit -m "[P5][slurm] 학습 결과" && git push
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:1
-#SBATCH --cpus-per-task=10
+#SBATCH --cpus-per-task=8
 #SBATCH --time=01:55:00
 
 conda activate blt
