@@ -11,14 +11,14 @@
 
 이 파일들은 로컬 실행 또는 원격 실험 재현에만 사용하며, 일반 git 커밋 대상이 아닙니다.
 
-## 파일 형식 (TSV)
-`Standard_Korean_GEC` 코드(BART)의 데이터 가이드에 맞추어, **탭(Tab)으로 구분된 두 개의 컬럼**으로 만들어야 합니다.
+## 파일 형식
+`Standard_Korean_GEC` 코드(BART)의 데이터 가이드에 맞추어, **탭(Tab)으로 구분된 두 개의 컬럼**이어야 합니다.
 
 ```tsv
 오류 문장 (Source)\t교정 문장 (Target)
 ```
 
-예시 (`native_train.tsv`):
+예시 (`native_train.txt`):
 ```text
 안뇽하세요\t안녕하세요.
 이거슨 테스트 문장 입니댜.\t이것은 테스트 문장입니다.
@@ -28,25 +28,38 @@
 (주의: 컬럼 헤더 없이 첫 줄부터 바로 데이터가 와야 함. `dataset.py`의 `_read_docs` 참고)
 
 ## 명명 규칙
-`scripts/train_bart.sh`와 `scripts/train_blt.sh`에서 편하게 데이터셋을 전환할 수 있도록 접두어를 통일합니다.
+현재 프로젝트의 표준 학습 입력은 `data/Preprocessed/<dataset>/` 아래 기존 파일을 그대로 사용합니다.
 
 1. **Kor-Native** (원어민)
-    - `native_train.tsv`
-    - `native_dev.tsv`
-    - `native_test.tsv`
-2. **Kor-Lang8** (학습자)
-    - `lang8_train.tsv`
-    - `lang8_dev.tsv`
-    - `lang8_test.tsv`
-3. **Kor-Learner** (학습자 - 국립국어원 등 특수 코퍼스)
-    - `learner_train.tsv`
-...
+    - `data/Preprocessed/native/native_train.txt`
+    - `data/Preprocessed/native/native_val.txt`
+    - `data/Preprocessed/native/native_test.txt`
+2. **Kor-Learner** (학습자 - 국립국어원 등 특수 코퍼스)
+    - `data/Preprocessed/korean_learner/korean_learner_train.txt`
+    - `data/Preprocessed/korean_learner/korean_learner_val.txt`
+    - `data/Preprocessed/korean_learner/korean_learner_test.txt`
+3. **Union** (통합 데이터)
+    - `data/Preprocessed/union/union_train.txt`
+    - `data/Preprocessed/union/union_val.txt`
+    - `data/Preprocessed/union/union_test.txt`
+
+`scripts/train_bart.sh`와 `scripts/train_blt.sh`는 기본적으로 이 경로를 직접 참조합니다.
+별도 복사본을 `data/` 루트에 만들 필요가 없습니다.
+
+사용 가능한 `DATASET_TYPE`:
+- `native`
+- `korean_learner`
+- `learner` (`korean_learner` 별칭)
+- `union`
 
 ## 사용법
-1. 위 규칙에 맞게 파일을 준비해서 이 디렉토리에 넣습니다.
+1. 위 규칙의 `data/Preprocessed/<dataset>/` 경로에 파일이 있는지 확인합니다.
 2. SLURM 클러스터에서는 Neuron 정책에 맞게 `/scratch/$USER` 아래의 프로젝트 루트로 이동한 후 학습 스크립트를 실행합니다.
    ```bash
    cd /scratch/$USER/PHDQ2
    sbatch scripts/train_bart.sh
-   # (파일 내에서 DATASET_TYPE="native" 설정 확인)
+
+   # 다른 데이터셋
+   DATASET_TYPE=korean_learner sbatch scripts/train_bart.sh
+   DATASET_TYPE=union sbatch scripts/train_blt.sh
    ```

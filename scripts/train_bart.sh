@@ -41,13 +41,21 @@ mkdir -p "$CHECKPOINT_DIR"
 
 # 사용하려는 데이터셋 설정: DATASET_TYPE=native sbatch scripts/train_bart.sh
 DATASET_TYPE="${DATASET_TYPE:-native}"
-TRAIN_DATA="$DATA_DIR/${DATASET_TYPE}_train.tsv"
-VAL_DATA="$DATA_DIR/${DATASET_TYPE}_dev.tsv"
-TEST_DATA="$DATA_DIR/${DATASET_TYPE}_test.tsv"
+DATASET_DIR_NAME="$DATASET_TYPE"
+if [[ "$DATASET_TYPE" == "learner" ]]; then
+    DATASET_DIR_NAME="korean_learner"
+fi
+
+PREPROCESSED_DIR="$DATA_DIR/Preprocessed/$DATASET_DIR_NAME"
+TRAIN_DATA="${TRAIN_DATA:-$PREPROCESSED_DIR/${DATASET_DIR_NAME}_train.txt}"
+VAL_DATA="${VAL_DATA:-$PREPROCESSED_DIR/${DATASET_DIR_NAME}_val.txt}"
+TEST_DATA="${TEST_DATA:-$PREPROCESSED_DIR/${DATASET_DIR_NAME}_test.txt}"
 
 # 데이터 파일 존재 여부 검증
 if [[ ! -f "$TRAIN_DATA" || ! -f "$VAL_DATA" || ! -f "$TEST_DATA" ]]; then
-    echo "Error: Train/Val/Test data not found at $DATA_DIR"
+    echo "Error: Train/Val/Test data not found."
+    echo "DATASET_TYPE=$DATASET_TYPE"
+    echo "DATASET_DIR_NAME=$DATASET_DIR_NAME"
     echo "Expected:"
     echo "  $TRAIN_DATA"
     echo "  $VAL_DATA"
