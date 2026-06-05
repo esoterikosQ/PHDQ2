@@ -1,0 +1,11 @@
+==========================================
+SLURM_JOB_ID = 749688
+SLURM_NODELIST = gpu38
+==========================================
+Job ID: 749688
+Node: gpu38
+CUDA_VISIBLE_DEVICES: 0
+Start Time: Fri Jun  5 10:08:20 KST 2026
+Submit Dir: /scratch/r984a02/PHDQ2
+Auto-resume enabled: no existing last.ckpt found; starting fresh.
+Starting BLT-GEC scaffold training on native dataset...

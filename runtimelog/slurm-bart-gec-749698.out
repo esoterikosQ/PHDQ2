@@ -1,0 +1,19 @@
+==========================================
+SLURM_JOB_ID = 749698
+SLURM_NODELIST = gpu38
+==========================================
+Job ID: 749698
+Node: gpu38
+CUDA_VISIBLE_DEVICES: 0
+Start Time: Fri Jun  5 10:32:25 KST 2026
+Submit Dir: /scratch/r984a02/PHDQ2
+Partition: amd_a100nv_8
+Requested GPUs: 1
+Requested CPU cores per task: 4
+Python: /home01/r984a02/.conda/envs/phdq/bin/python
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+ModuleNotFoundError: No module named 'lightning'
+Error: required BART training packages are not installed in the selected Python environment.
+Install baseline/requirements.txt first, or submit with PYTHON_BIN=/path/to/python or CONDA_ENV=<env_name>.
+Example: CONDA_ENV=phdq_gec sbatch scripts/train_bart.sh

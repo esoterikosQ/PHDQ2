@@ -1,0 +1,34 @@
+[rank: 0] Seed set to 0
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/261 [00:00<?, ?it/s]Loading weights: 100%|██████████| 261/261 [00:00<00:00, 30738.29it/s]
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+/home01/r984a02/.conda/envs/phdq/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/logger_connector/logger_connector.py:76: Starting from v1.9.0, `tensorboardX` has been removed as a dependency of the `lightning.pytorch` package, due to potential conflicts with other packages in the ML ecosystem. For this reason, `logger=True` will use `CSVLogger` as the default logger, unless the `tensorboard` or `tensorboardX` packages are found. Please `pip install lightning[extra]` or one of them to enable TensorBoard support by default
+💡 Tip: For seamless cloud logging and experiment tracking, try installing [litlogger](https://pypi.org/project/litlogger/) to enable LitLogger, which logs metrics and artifacts automatically to the Lightning Experiments platform.
+You are using a CUDA device ('NVIDIA A100-SXM4-80GB') that has Tensor Cores. To properly utilize them, you should set `torch.set_float32_matmul_precision('medium' | 'high')` which will trade-off precision for performance. For more details, read https://pytorch.org/docs/stable/generated/torch.set_float32_matmul_precision.html#torch.set_float32_matmul_precision
+/home01/r984a02/.conda/envs/phdq/lib/python3.10/site-packages/lightning/pytorch/callbacks/model_checkpoint.py:881: Checkpoint directory /scratch/r984a02/PHDQ2/outputs/native exists and is not empty.
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+SLURM auto-requeueing enabled. Setting signal handlers.
+/home01/r984a02/.conda/envs/phdq/lib/python3.10/site-packages/lightning/pytorch/utilities/_pytree.py:21: `isinstance(treespec, LeafSpec)` is deprecated, use `isinstance(treespec, TreeSpec) and treespec.is_leaf()` instead.
+Epoch 0, global step 385: 'val_gleu' reached 44.47850 (best 44.47850), saving model to '/scratch/r984a02/PHDQ2/outputs/native/model_ckpt/native_5e-05_epoch=00_step=385.ckpt' as top 3
+Epoch 1, global step 770: 'val_gleu' reached 52.17270 (best 52.17270), saving model to '/scratch/r984a02/PHDQ2/outputs/native/model_ckpt/native_5e-05_epoch=01_step=770.ckpt' as top 3
+Epoch 2, global step 1155: 'val_gleu' reached 57.44740 (best 57.44740), saving model to '/scratch/r984a02/PHDQ2/outputs/native/model_ckpt/native_5e-05_epoch=02_step=1155-v1.ckpt' as top 3
+Epoch 3, global step 1540: 'val_gleu' reached 54.85000 (best 57.44740), saving model to '/scratch/r984a02/PHDQ2/outputs/native/model_ckpt/native_5e-05_epoch=03_step=1540-v1.ckpt' as top 3
+Epoch 4, global step 1925: 'val_gleu' reached 57.79670 (best 57.79670), saving model to '/scratch/r984a02/PHDQ2/outputs/native/model_ckpt/native_5e-05_epoch=04_step=1925.ckpt' as top 3
+Epoch 5, global step 2310: 'val_gleu' reached 59.94480 (best 59.94480), saving model to '/scratch/r984a02/PHDQ2/outputs/native/model_ckpt/native_5e-05_epoch=05_step=2310-v1.ckpt' as top 3
+Epoch 6, global step 2695: 'val_gleu' reached 57.64500 (best 59.94480), saving model to '/scratch/r984a02/PHDQ2/outputs/native/model_ckpt/native_5e-05_epoch=06_step=2695.ckpt' as top 3
+Epoch 7, global step 3080: 'val_gleu' reached 58.51430 (best 59.94480), saving model to '/scratch/r984a02/PHDQ2/outputs/native/model_ckpt/native_5e-05_epoch=07_step=3080.ckpt' as top 3
+Epoch 8, global step 3465: 'val_gleu' reached 59.53640 (best 59.94480), saving model to '/scratch/r984a02/PHDQ2/outputs/native/model_ckpt/native_5e-05_epoch=08_step=3465.ckpt' as top 3
+Epoch 9, global step 3850: 'val_gleu' reached 59.46160 (best 59.94480), saving model to '/scratch/r984a02/PHDQ2/outputs/native/model_ckpt/native_5e-05_epoch=09_step=3850.ckpt' as top 3
+Epoch 10, global step 4235: 'val_gleu' was not in top 3
+Epoch 11, global step 4620: 'val_gleu' reached 60.40060 (best 60.40060), saving model to '/scratch/r984a02/PHDQ2/outputs/native/model_ckpt/native_5e-05_epoch=11_step=4620.ckpt' as top 3
+Epoch 12, global step 5005: 'val_gleu' was not in top 3
+Epoch 13, global step 5390: 'val_gleu' reached 60.84330 (best 60.84330), saving model to '/scratch/r984a02/PHDQ2/outputs/native/model_ckpt/native_5e-05_epoch=13_step=5390.ckpt' as top 3
+Epoch 14, global step 5775: 'val_gleu' reached 60.62840 (best 60.84330), saving model to '/scratch/r984a02/PHDQ2/outputs/native/model_ckpt/native_5e-05_epoch=14_step=5775.ckpt' as top 3
+Epoch 15, global step 6160: 'val_gleu' reached 61.07260 (best 61.07260), saving model to '/scratch/r984a02/PHDQ2/outputs/native/model_ckpt/native_5e-05_epoch=15_step=6160.ckpt' as top 3
+Epoch 16, global step 6545: 'val_gleu' reached 60.62850 (best 61.07260), saving model to '/scratch/r984a02/PHDQ2/outputs/native/model_ckpt/native_5e-05_epoch=16_step=6545.ckpt' as top 3
+Epoch 17, global step 6930: 'val_gleu' reached 60.70980 (best 61.07260), saving model to '/scratch/r984a02/PHDQ2/outputs/native/model_ckpt/native_5e-05_epoch=17_step=6930.ckpt' as top 3
+Epoch 18, global step 7315: 'val_gleu' reached 61.10160 (best 61.10160), saving model to '/scratch/r984a02/PHDQ2/outputs/native/model_ckpt/native_5e-05_epoch=18_step=7315.ckpt' as top 3
+Epoch 19, global step 7700: 'val_gleu' reached 60.85810 (best 61.10160), saving model to '/scratch/r984a02/PHDQ2/outputs/native/model_ckpt/native_5e-05_epoch=19_step=7700.ckpt' as top 3
+`Trainer.fit` stopped: `max_epochs=20` reached.
+`weights_only` was not set, defaulting to `False`.
