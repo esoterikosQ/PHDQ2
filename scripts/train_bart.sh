@@ -7,7 +7,8 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:1
-#SBATCH --cpus-per-task=10
+# Keep CPU request within the 8-core-per-GPU scheduler limit.
+#SBATCH --cpus-per-task=8
 #SBATCH --time=01:55:00
 #SBATCH --signal=B:TERM@300
 
@@ -30,9 +31,30 @@ echo "Submit Dir: $SLURM_SUBMIT_DIR"
 PROJECT_HOME="$PWD"
 cd "$PROJECT_HOME"
 
-# 가상환경 활성화 (필요 시 주석 해제 및 수정)
-# module load anaconda3/2021.05
-# source activate phdq_gec
+# Python 환경 설정:
+# - PYTHON_BIN=/path/to/python 으로 명시 가능
+# - 또는 CONDA_ENV=phdq_gec 로 conda 환경 활성화 가능
+PYTHON_BIN="${PYTHON_BIN:-python}"
+if [[ -n "${CONDA_ENV:-}" ]]; then
+    if command -v conda >/dev/null 2>&1; then
+        eval "$(conda shell.bash hook)"
+        conda activate "$CONDA_ENV"
+        PYTHON_BIN="python"
+    else
+        echo "Error: CONDA_ENV=$CONDA_ENV was set but conda is not available."
+        exit 1
+    fi
+fi
+
+echo "Python: $($PYTHON_BIN -c 'import sys; print(sys.executable)')"
+if ! "$PYTHON_BIN" -c "import torch; import lightning; import transformers; print('Torch:', torch.__version__)" >/tmp/phdq_bart_env_check.txt 2>&1; then
+    cat /tmp/phdq_bart_env_check.txt
+    echo "Error: required BART training packages are not installed in the selected Python environment."
+    echo "Install baseline/requirements.txt first, or submit with PYTHON_BIN=/path/to/python or CONDA_ENV=<env_name>."
+    echo "Example: CONDA_ENV=phdq_gec sbatch scripts/train_bart.sh"
+    exit 1
+fi
+cat /tmp/phdq_bart_env_check.txt
 
 # 경로 변수 설정
 DATA_DIR="$PROJECT_HOME/data"
@@ -84,7 +106,7 @@ elif [[ -n "$RESUME_CKPT" ]]; then
 fi
 
 # 학습 실행 (PL 2.x 호환 run.py)
-srun python baseline/run.py \
+srun "$PYTHON_BIN" baseline/run.py \
     --name "kobart-${DATASET_TYPE}" \
     --data "$DATASET_TYPE" \
     --max_epochs 20 \

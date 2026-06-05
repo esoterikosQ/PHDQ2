@@ -7,7 +7,8 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:1
-#SBATCH --cpus-per-task=10
+# Keep CPU request within the 8-core-per-GPU scheduler limit.
+#SBATCH --cpus-per-task=8
 #SBATCH --time=02:00:00
 
 set -euo pipefail
@@ -29,8 +30,26 @@ echo "Submit Dir: $SLURM_SUBMIT_DIR"
 PROJECT_HOME="$PWD"
 cd "$PROJECT_HOME"
 
-# TODO: 가상환경 활성화
-# source activate phdq_gec
+PYTHON_BIN="${PYTHON_BIN:-python}"
+if [[ -n "${CONDA_ENV:-}" ]]; then
+    if command -v conda >/dev/null 2>&1; then
+        eval "$(conda shell.bash hook)"
+        conda activate "$CONDA_ENV"
+        PYTHON_BIN="python"
+    else
+        echo "Error: CONDA_ENV=$CONDA_ENV was set but conda is not available."
+        exit 1
+    fi
+fi
+
+echo "Python: $($PYTHON_BIN -c 'import sys; print(sys.executable)')"
+if ! "$PYTHON_BIN" -c "import torch; import lightning; import transformers; print('Torch:', torch.__version__)" >/tmp/phdq_bart_eval_env_check.txt 2>&1; then
+    cat /tmp/phdq_bart_eval_env_check.txt
+    echo "Error: required BART evaluation packages are not installed in the selected Python environment."
+    echo "Install baseline/requirements.txt first, or submit with PYTHON_BIN=/path/to/python or CONDA_ENV=<env_name>."
+    exit 1
+fi
+cat /tmp/phdq_bart_eval_env_check.txt
 
 DATA_DIR="$PROJECT_HOME/data"
 MODEL_CKPT="${1:-}" # 실행 시 $1로 체크포인트 경로 전달
@@ -66,7 +85,7 @@ echo "Dataset: $DATASET_TYPE"
 # 현재 run.py 내에 test() 과정이 포함될 수 있으나, 보통 generation은 별도 스크립트화
 
 # 임시: run.py에 --model_ckpt_path 전달하여 평가
-srun python baseline/run.py \
+srun "$PYTHON_BIN" baseline/run.py \
     --name "eval-kobart-${DATASET_TYPE}" \
     --data "$DATASET_TYPE" \
     --model_ckpt_path "$MODEL_CKPT" \

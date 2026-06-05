@@ -4,13 +4,73 @@
 > 최신 항목이 위에 오도록 역순으로 기록합니다.
 
 ---
+## [2026-06-05] BART CPU 요청량 제한 반영
+
+### 목표
+- BART 계열 job도 GPU 1개당 CPU 8 core 제한을 넘지 않도록 수정
+
+### 수행 내용
+- `scripts/train_bart.sh`: 기존 10 core 요청 → `--cpus-per-task=8`
+- `scripts/eval_bart.sh`: 기존 10 core 요청 → `--cpus-per-task=8`
+- Neuron SLURM 레퍼런스의 BART/H200 CPU 요청량을 8 core로 갱신
+
+### 결과
+- BART 학습/평가 스크립트에 10 core 요청이 남지 않도록 정리됨
+
+### 다음 단계
+- [ ] 클러스터에서 `grep -n "cpus-per-task\\|#SBATCH -p" scripts/train_bart.sh scripts/eval_bart.sh`로 최신 스크립트 반영 여부 확인
+
+---
+## [2026-06-05] SLURM Python 환경 선택 및 사전 검사 추가
+
+### 목표
+- 시스템 Python에 `torch`가 없어 BLT 학습이 실패한 문제를 방지
+
+### 수행 내용
+- `scripts/train_blt.sh`
+  - `PYTHON_BIN` 또는 `CONDA_ENV`로 Python 환경을 지정할 수 있게 수정
+  - 학습 실행 전 `import torch` 사전 검사 추가
+  - `srun "$PYTHON_BIN" -m blt_gec.train`로 선택된 Python 사용
+- `scripts/train_bart.sh`, `scripts/eval_bart.sh`
+  - 동일한 `PYTHON_BIN`/`CONDA_ENV` 선택 방식 추가
+  - `torch`, `lightning`, `transformers` 사전 검사 추가
+- Neuron SLURM 레퍼런스의 제출 예시를 `CONDA_ENV=phdq_gec` / `CONDA_ENV=phdq_blt` 기준으로 갱신
+
+### 결과
+- `ModuleNotFoundError: No module named 'torch'`가 학습 traceback으로 터지기 전에 환경 설정 오류로 명확히 실패하도록 정리됨
+
+### 다음 단계
+- [ ] SLURM에서 `phdq_blt` 또는 원하는 Python 환경에 PyTorch 설치
+- [ ] `CONDA_ENV=phdq_blt sbatch scripts/train_blt.sh`로 재제출
+
+---
+
+## [2026-06-05] BLT A100 요청 리소스 보수화
+
+### 목표
+- `amd_a100nv_8` 제출 오류가 계속 나는 상황에 대비해 BLT-GEC job의 CPU 요청량을 더 낮춤
+
+### 수행 내용
+- `scripts/train_blt.sh`: `--cpus-per-task=8` → `--cpus-per-task=4`
+- 제출 후 로그에서 partition/GPU/CPU 요청량을 바로 확인할 수 있도록 echo 추가
+- Neuron SLURM 레퍼런스와 환경 체크리스트의 BLT/A100 CPU 요청량 갱신
+
+### 결과
+- A100 파티션의 GPU 1개당 CPU 제한을 더 보수적으로 만족하도록 조정됨
+
+### 다음 단계
+- [ ] 클러스터에서 `grep -n "cpus-per-task\\|#SBATCH -p" scripts/train_blt.sh`로 최신 스크립트 반영 여부 확인
+- [ ] 여전히 거절되면 `sbatch` 에러 전문을 기록해 파티션/계정/시간/옵션 문제를 분리
+
+---
+
 ## [2026-06-05] A100 파티션 CPU 제한 반영
 
 ### 목표
 - `amd_a100nv_8` 파티션의 GPU 1개당 CPU core 제한에 맞게 BLT-GEC job 수정
 
 ### 수행 내용
-- `scripts/train_blt.sh`: `--cpus-per-task=10` → `--cpus-per-task=8`
+- `scripts/train_blt.sh`: 기존 10 core 요청 → `--cpus-per-task=8`
 - Neuron SLURM 레퍼런스와 환경 체크리스트에 BART/H200=10 cores, BLT/A100=8 cores로 분리 명시
 
 ### 결과
@@ -123,7 +183,7 @@
   - `sinfo`, `squeue`, `scancel` 기반 모니터링 명령 정리
 - `scripts/train_bart.sh`, `scripts/eval_bart.sh` 수정
   - 기본 파티션 `cas_v100_4`
-  - `--ntasks-per-node=1`, `--cpus-per-task=10`, `--gres=gpu:1`
+  - `--ntasks-per-node=1`, CPU 요청 10 core, `--gres=gpu:1`
   - `srun python ...` 실행 방식 적용
   - `/scratch/$USER` 밖에서 제출하면 오류 처리
 - `env-checklist.md`, `pipeline-reference.md`, `SKILL.md`, `data/README.md`의 SLURM 경로/레퍼런스 설명 갱신

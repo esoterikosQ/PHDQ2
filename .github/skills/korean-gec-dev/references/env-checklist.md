@@ -160,13 +160,13 @@ ssh slurm-node
 cd /scratch/$USER/PHDQ2 && git pull origin main
 
 # BART 학습 job 제출
-sbatch scripts/train_bart.sh
+CONDA_ENV=phdq_gec sbatch scripts/train_bart.sh
 
 # 시간 제한 후 재제출: outputs/<dataset>/last.ckpt에서 자동 재개
-sbatch scripts/train_bart.sh
+CONDA_ENV=phdq_gec sbatch scripts/train_bart.sh
 
 # BLT-GEC scaffold 학습 job 제출
-sbatch scripts/train_blt.sh
+CONDA_ENV=phdq_blt sbatch scripts/train_blt.sh
 
 # job 상태 확인
 squeue -u $USER
@@ -187,7 +187,7 @@ git add results/ logs/ && git commit -m "[P5][slurm] 학습 결과" && git push
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:1
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=4
 #SBATCH --time=01:55:00
 
 conda activate blt
@@ -201,10 +201,10 @@ srun python -m bytelatent.train config=configs/gec_blt.yaml max_time=00:01:50:00
 sbatch scripts/train_blt.sh
 
 # 시간 제한 후 재제출: outputs/blt_gec/<dataset>/last.ckpt에서 자동 재개
-sbatch scripts/train_blt.sh
+CONDA_ENV=phdq_blt sbatch scripts/train_blt.sh
 
 # 새 실험으로 시작
-RESUME_CKPT="" sbatch scripts/train_blt.sh
+RESUME_CKPT="" CONDA_ENV=phdq_blt sbatch scripts/train_blt.sh
 ```
 
 ---

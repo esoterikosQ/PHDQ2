@@ -30,8 +30,8 @@
 
 CPU core 요청은 파티션별 제한을 따른다.
 
-- BART/H200: `#SBATCH --cpus-per-task=10`
-- BLT/A100: `#SBATCH --cpus-per-task=8`
+- BART/H200: `#SBATCH --cpus-per-task=8`
+- BLT/A100: `#SBATCH --cpus-per-task=4` (A100 파티션의 GPU 1개당 CPU 제한을 피하기 위한 보수값)
 
 학습 스크립트는 2시간 제한에 대비해 다음 안전장치를 포함한다.
 
@@ -63,21 +63,21 @@ ls data/Preprocessed/native/native_test.txt
 sinfo
 
 # 학습 제출
-sbatch scripts/train_bart.sh
+CONDA_ENV=phdq_gec sbatch scripts/train_bart.sh
 
 # BLT-GEC scaffold 학습 제출
-sbatch scripts/train_blt.sh
+CONDA_ENV=phdq_blt sbatch scripts/train_blt.sh
 
 # 이어서 학습할 때도 같은 명령 사용: last.ckpt가 있으면 자동 resume
-sbatch scripts/train_bart.sh
-sbatch scripts/train_blt.sh
+CONDA_ENV=phdq_gec sbatch scripts/train_bart.sh
+CONDA_ENV=phdq_blt sbatch scripts/train_blt.sh
 
 # 자동 resume을 끄고 새로 시작
-RESUME_CKPT="" sbatch scripts/train_bart.sh
+RESUME_CKPT="" CONDA_ENV=phdq_gec sbatch scripts/train_bart.sh
 
 # 특정 checkpoint에서 재개
-RESUME_CKPT=outputs/native/model_ckpt/<checkpoint>.ckpt sbatch scripts/train_bart.sh
-RESUME_CKPT=outputs/blt_gec/native/best.ckpt sbatch scripts/train_blt.sh
+RESUME_CKPT=outputs/native/model_ckpt/<checkpoint>.ckpt CONDA_ENV=phdq_gec sbatch scripts/train_bart.sh
+RESUME_CKPT=outputs/blt_gec/native/best.ckpt CONDA_ENV=phdq_blt sbatch scripts/train_blt.sh
 
 # 체크포인트 평가 제출
 sbatch scripts/eval_bart.sh outputs/native/model_ckpt/<checkpoint>.ckpt native
