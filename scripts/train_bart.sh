@@ -3,12 +3,12 @@
 #SBATCH --comment=pytorch
 #SBATCH --output=slurm-%x-%j.out
 #SBATCH --error=slurm-%x-%j.err
-#SBATCH -p eme_h200nv_8
+#SBATCH -p amd_a100nv_8
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:1
-# Keep CPU request within the 8-core-per-GPU scheduler limit.
-#SBATCH --cpus-per-task=8
+# A100 partition rejects high CPU requests per 1 GPU; keep this conservative.
+#SBATCH --cpus-per-task=4
 #SBATCH --time=01:55:00
 #SBATCH --signal=B:TERM@300
 
@@ -27,6 +27,9 @@ echo "Node: $SLURMD_NODENAME"
 echo "CUDA_VISIBLE_DEVICES: $CUDA_VISIBLE_DEVICES"
 echo "Start Time: $(date)"
 echo "Submit Dir: $SLURM_SUBMIT_DIR"
+echo "Partition: amd_a100nv_8"
+echo "Requested GPUs: 1"
+echo "Requested CPU cores per task: 4"
 
 PROJECT_HOME="$PWD"
 cd "$PROJECT_HOME"

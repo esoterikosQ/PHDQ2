@@ -4,6 +4,26 @@
 > 최신 항목이 위에 오도록 역순으로 기록합니다.
 
 ---
+## [2026-06-05] BART PartitionConfig 대응
+
+### 목표
+- `eme_h200nv_8`에서 BART job이 `PENDING (PartitionConfig)`로 고정되는 문제 회피
+
+### 수행 내용
+- `scripts/train_bart.sh`: 기본 파티션을 `eme_h200nv_8` → `amd_a100nv_8`로 변경
+- `scripts/eval_bart.sh`: 기본 파티션을 `eme_h200nv_8` → `amd_a100nv_8`로 변경
+- BART 학습/평가 CPU 요청량을 `--cpus-per-task=4`로 낮춤
+- 제출 로그에 partition/GPU/CPU 요청량을 출력하도록 추가
+- Neuron SLURM 레퍼런스에 `PENDING (PartitionConfig)` 발생 시 A100 기본값으로 제출하도록 기록
+
+### 결과
+- BART도 현재 실행이 확인된 A100 파티션의 보수적 리소스 요청으로 제출되도록 정리됨
+
+### 다음 단계
+- [ ] 기존 `PartitionConfig` 상태의 BART job을 `scancel <JOBID>`로 취소
+- [ ] 최신 코드 pull 후 `CONDA_ENV=phdq_gec sbatch scripts/train_bart.sh`로 재제출
+
+---
 ## [2026-06-05] BART CPU 요청량 제한 반영
 
 ### 목표

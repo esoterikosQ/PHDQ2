@@ -16,7 +16,7 @@
 
 `scripts/train_bart.sh`, `scripts/eval_bart.sh`, `scripts/train_blt.sh`는 Neuron 가이드에 맞춰 다음 기본값을 사용한다.
 
-- BART 학습/평가: `eme_h200nv_8`
+- BART 학습/평가: `amd_a100nv_8`
 - BLT-GEC scaffold 학습: `amd_a100nv_8`
 
 ```bash
@@ -30,8 +30,8 @@
 
 CPU core 요청은 파티션별 제한을 따른다.
 
-- BART/H200: `#SBATCH --cpus-per-task=8`
-- BLT/A100: `#SBATCH --cpus-per-task=4` (A100 파티션의 GPU 1개당 CPU 제한을 피하기 위한 보수값)
+- BART/A100: `#SBATCH --cpus-per-task=4` (A100 파티션의 GPU 1개당 CPU 제한을 피하기 위한 보수값)
+- BLT/A100: `#SBATCH --cpus-per-task=4`
 
 학습 스크립트는 2시간 제한에 대비해 다음 안전장치를 포함한다.
 
@@ -44,8 +44,10 @@ CPU core 요청은 파티션별 제한을 따른다.
 
 BLT-GEC scaffold는 같은 정책을 사용하되 checkpoint 경로가 `outputs/blt_gec/<dataset>/last.ckpt`다.
 
-다른 GPU 파티션을 사용할 경우 스크립트의 `#SBATCH -p ...` 줄을 수정한다.
+다른 GPU 파티션을 사용할 경우 `sbatch -p <partition> <script>`로 제출 시점에 override하거나 스크립트의 `#SBATCH -p ...` 줄을 수정한다.
 예: `cas_v100_4`, `cas_v100nv_4`, `amd_a100nv_8`, `eme_h200nv_8`, `gh200_1`.
+
+`eme_h200nv_8` 제출이 `PENDING (PartitionConfig)`로 고정되면 해당 파티션이 현재 계정/요청 조합을 받지 않는 상태로 보고, 기본값인 `amd_a100nv_8`로 제출한다.
 
 ## 제출 전 체크리스트
 
