@@ -50,9 +50,9 @@ if [[ -n "${CONDA_ENV:-}" ]]; then
 fi
 
 echo "Python: $($PYTHON_BIN -c 'import sys; print(sys.executable)')"
-if ! "$PYTHON_BIN" -c "import torch; print('Torch:', torch.__version__)" >/tmp/phdq_blt_torch_check.txt 2>&1; then
+if ! "$PYTHON_BIN" -c "import torch; import numpy; print('Torch:', torch.__version__); print('NumPy:', numpy.__version__)" >/tmp/phdq_blt_torch_check.txt 2>&1; then
     cat /tmp/phdq_blt_torch_check.txt
-    echo "Error: PyTorch is not installed in the selected Python environment."
+    echo "Error: PyTorch/NumPy is not installed in the selected Python environment."
     echo "Install it first, or submit with PYTHON_BIN=/path/to/python or CONDA_ENV=<env_name>."
     echo "Example: CONDA_ENV=phdq_blt sbatch scripts/train_blt.sh"
     exit 1

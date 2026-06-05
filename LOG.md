@@ -4,6 +4,23 @@
 > 최신 항목이 위에 오도록 역순으로 기록합니다.
 
 ---
+## [2026-06-05] NumPy 의존성 사전 검사 추가
+
+### 목표
+- BLT 학습 로그의 `Failed to initialize NumPy: No module named 'numpy'` 경고 제거
+
+### 수행 내용
+- `blt_gec/requirements.txt`에 `numpy>=1.23.0` 추가
+- `scripts/train_blt.sh`의 환경 사전 검사에 `import numpy` 추가
+- BART 코드도 dataset/metric에서 NumPy를 사용하므로 `scripts/train_bart.sh`, `scripts/eval_bart.sh` 사전 검사에 `import numpy` 추가
+
+### 결과
+- NumPy가 없는 환경에서는 학습 본문에 진입하기 전에 명확히 실패하도록 정리됨
+
+### 다음 단계
+- [ ] 클러스터 환경에서 `pip install -r blt_gec/requirements.txt` 또는 `pip install numpy` 실행
+
+---
 ## [2026-06-05] BART PartitionConfig 대응
 
 ### 목표

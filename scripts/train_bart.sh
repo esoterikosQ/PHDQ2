@@ -50,7 +50,7 @@ if [[ -n "${CONDA_ENV:-}" ]]; then
 fi
 
 echo "Python: $($PYTHON_BIN -c 'import sys; print(sys.executable)')"
-if ! "$PYTHON_BIN" -c "import torch; import lightning; import transformers; print('Torch:', torch.__version__)" >/tmp/phdq_bart_env_check.txt 2>&1; then
+if ! "$PYTHON_BIN" -c "import torch; import numpy; import lightning; import transformers; print('Torch:', torch.__version__); print('NumPy:', numpy.__version__)" >/tmp/phdq_bart_env_check.txt 2>&1; then
     cat /tmp/phdq_bart_env_check.txt
     echo "Error: required BART training packages are not installed in the selected Python environment."
     echo "Install baseline/requirements.txt first, or submit with PYTHON_BIN=/path/to/python or CONDA_ENV=<env_name>."
