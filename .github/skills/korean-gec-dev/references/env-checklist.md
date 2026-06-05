@@ -183,7 +183,7 @@ git add results/ logs/ && git commit -m "[P5][slurm] 학습 결과" && git push
 #SBATCH --comment=pytorch
 #SBATCH --output=slurm-%x-%j.out
 #SBATCH --error=slurm-%x-%j.err
-#SBATCH -p cas_v100_4
+#SBATCH -p amd_a100nv_8
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:1

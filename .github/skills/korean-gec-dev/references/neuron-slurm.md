@@ -16,8 +16,10 @@
 
 `scripts/train_bart.sh`, `scripts/eval_bart.sh`, `scripts/train_blt.sh`는 Neuron 가이드에 맞춰 다음 기본값을 사용한다.
 
+- BART 학습/평가: `eme_h200nv_8`
+- BLT-GEC scaffold 학습: `amd_a100nv_8`
+
 ```bash
-#SBATCH -p cas_v100_4
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:1
@@ -39,7 +41,7 @@
 BLT-GEC scaffold는 같은 정책을 사용하되 checkpoint 경로가 `outputs/blt_gec/<dataset>/last.ckpt`다.
 
 다른 GPU 파티션을 사용할 경우 스크립트의 `#SBATCH -p ...` 줄을 수정한다.
-예: `cas_v100nv_4`, `amd_a100nv_8`, `eme_h200nv_8`, `gh200_1`.
+예: `cas_v100_4`, `cas_v100nv_4`, `amd_a100nv_8`, `eme_h200nv_8`, `gh200_1`.
 
 ## 제출 전 체크리스트
 
@@ -49,7 +51,9 @@ git pull origin main
 mkdir -p data logs
 
 # 데이터 파일 확인
-ls data/native_train.tsv data/native_dev.tsv data/native_test.tsv
+ls data/Preprocessed/native/native_train.txt
+ls data/Preprocessed/native/native_val.txt
+ls data/Preprocessed/native/native_test.txt
 
 # 파티션 상태 확인
 sinfo

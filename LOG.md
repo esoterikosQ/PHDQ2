@@ -4,6 +4,26 @@
 > 최신 항목이 위에 오도록 역순으로 기록합니다.
 
 ---
+## [2026-06-05] Neuron 파티션 정책 갱신
+
+### 목표
+- BART와 BLT-GEC 학습 job을 지정 GPU 파티션으로 분리
+
+### 수행 내용
+- `scripts/train_bart.sh`: BART 학습 파티션을 `eme_h200nv_8`로 변경
+- `scripts/eval_bart.sh`: BART 평가 파티션을 `eme_h200nv_8`로 변경
+- `scripts/train_blt.sh`: BLT-GEC scaffold 학습 파티션을 `amd_a100nv_8`로 변경
+- Neuron SLURM 레퍼런스와 환경 체크리스트의 기본 파티션 설명 갱신
+
+### 결과
+- BART 계열 job은 H200 파티션, BLT-GEC scaffold job은 A100 파티션으로 제출되도록 정리됨
+
+### 다음 단계
+- [ ] Neuron에서 `sinfo`로 두 파티션 상태 확인
+- [ ] 기존 job이 있으면 취소 후 최신 스크립트로 재제출
+
+---
+
 ## [2026-06-05] BLT-GEC 학습 scaffold 구현
 
 ### 목표

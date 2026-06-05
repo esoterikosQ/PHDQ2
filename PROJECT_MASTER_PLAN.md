@@ -284,7 +284,8 @@ Ubuntu RTX 5090:
    - `python serving/app.py --port 7860`
    - 단일/다중 문장 교정 및 diff 출력 확인
 2. SLURM baseline 데이터 경로 정리
-   - `data/` 로컬 파일을 `scripts/train_bart.sh`의 `native_train.tsv`, `native_dev.tsv`, `native_test.tsv` 규칙에 맞게 배치 또는 스크립트 경로 수정
+   - `scripts/train_bart.sh`와 `scripts/train_blt.sh`는 `data/Preprocessed/<dataset>/<dataset>_{train,val,test}.txt`를 직접 사용
+   - 사용 데이터셋은 `DATASET_TYPE=native|korean_learner|union`으로 전환
 3. SLURM baseline 1차 실행
    - `sbatch scripts/train_bart.sh`
    - validation GLEU 산출물과 실패 원인 기록

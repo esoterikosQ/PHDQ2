@@ -3,7 +3,7 @@
 #SBATCH --comment=pytorch
 #SBATCH --output=slurm-%x-%j.out
 #SBATCH --error=slurm-%x-%j.err
-#SBATCH -p cas_v100_4
+#SBATCH -p eme_h200nv_8
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:1
