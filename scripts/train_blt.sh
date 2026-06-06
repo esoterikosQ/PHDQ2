@@ -71,6 +71,12 @@ BATCH_SIZE="${BATCH_SIZE:-4}"
 GRAD_ACCUM_STEPS="${GRAD_ACCUM_STEPS:-4}"
 LR="${LR:-1e-4}"
 MAX_EPOCHS="${MAX_EPOCHS:-40}"
+NUM_WORKERS="${NUM_WORKERS:-4}"
+OUTPUT_DIR="${OUTPUT_DIR:-outputs/blt_gec}"
+MODEL_DIM="${MODEL_DIM:-256}"
+NUM_LAYERS="${NUM_LAYERS:-4}"
+NUM_HEADS="${NUM_HEADS:-8}"
+DROPOUT="${DROPOUT:-0.1}"
 
 PREPROCESSED_DIR="$DATA_DIR/Preprocessed/$DATASET_DIR_NAME"
 TRAIN_DATA="${TRAIN_DATA:-$PREPROCESSED_DIR/${DATASET_DIR_NAME}_train.txt}"
@@ -91,9 +97,9 @@ fi
 RESUME_CKPT="${RESUME_CKPT-auto}"
 RESUME_ARGS=()
 if [[ "$RESUME_CKPT" == "auto" ]]; then
-    if [[ -f "outputs/blt_gec/${DATASET_TYPE}/last.ckpt" ]]; then
-        RESUME_ARGS=(--resume_ckpt_path "outputs/blt_gec/${DATASET_TYPE}/last.ckpt")
-        echo "Auto-resume enabled: outputs/blt_gec/${DATASET_TYPE}/last.ckpt"
+    if [[ -f "$OUTPUT_DIR/${DATASET_TYPE}/last.ckpt" ]]; then
+        RESUME_ARGS=(--resume_ckpt_path "$OUTPUT_DIR/${DATASET_TYPE}/last.ckpt")
+        echo "Auto-resume enabled: $OUTPUT_DIR/${DATASET_TYPE}/last.ckpt"
     else
         echo "Auto-resume enabled: no existing last.ckpt found; starting fresh."
     fi
@@ -113,12 +119,17 @@ srun "$PYTHON_BIN" -m blt_gec.train \
     --train_data_path "$TRAIN_DATA" \
     --val_data_path "$VAL_DATA" \
     --test_data_path "$TEST_DATA" \
-    --output_dir outputs/blt_gec \
+    --output_dir "$OUTPUT_DIR" \
     --max_length "$MAX_LENGTH" \
     --batch_size "$BATCH_SIZE" \
+    --num_workers "$NUM_WORKERS" \
     --grad_accum_steps "$GRAD_ACCUM_STEPS" \
     --max_epochs "$MAX_EPOCHS" \
     --lr "$LR" \
+    --dim "$MODEL_DIM" \
+    --num_layers "$NUM_LAYERS" \
+    --num_heads "$NUM_HEADS" \
+    --dropout "$DROPOUT" \
     --checkpoint_interval_minutes 20 \
     --max_time "00:01:50:00" \
     "${RESUME_ARGS[@]}"

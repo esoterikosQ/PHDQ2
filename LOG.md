@@ -4,6 +4,31 @@
 > 최신 항목이 위에 오도록 역순으로 기록합니다.
 
 ---
+## [2026-06-06] BLT 모델 크기 조절 인자 노출
+
+### 목표
+- BLT scaffold 학습이 정상 진행됨을 확인한 뒤 더 큰 모델 크기로 실험할 수 있게 수정
+
+### 수행 내용
+- `scripts/train_blt.sh`에 모델 크기 관련 환경변수 추가
+  - `MODEL_DIM` 기본값 256
+  - `NUM_LAYERS` 기본값 4
+  - `NUM_HEADS` 기본값 8
+  - `DROPOUT` 기본값 0.1
+- `NUM_WORKERS`도 환경변수로 노출
+- `OUTPUT_DIR` 환경변수 추가
+- auto-resume checkpoint 탐색 경로도 `OUTPUT_DIR` 기준으로 변경
+- 기존 `blt_gec.train`의 `--dim`, `--num_layers`, `--num_heads`, `--dropout`, `--num_workers` 인자로 전달
+
+### 결과
+- `OUTPUT_DIR=outputs/blt_gec_512x8 MODEL_DIM=512 NUM_LAYERS=8 ... sbatch scripts/train_blt.sh`처럼 제출 시점에 크기 조절 가능
+- 모델 크기를 바꾸면 기존 checkpoint와 호환되지 않으므로 큰 모델 실험은 별도 `OUTPUT_DIR`로 새로 시작해야 함
+
+### 다음 단계
+- [ ] 기존 256/4/8 모델은 `MAX_EPOCHS=40`으로 resume 학습
+- [ ] 큰 모델은 `OUTPUT_DIR=outputs/blt_gec_512x8 MODEL_DIM=512 NUM_LAYERS=8 NUM_HEADS=8`로 별도 run 실험
+
+---
 ## [2026-06-06] 학습 epoch 기본값 확장
 
 ### 목표
