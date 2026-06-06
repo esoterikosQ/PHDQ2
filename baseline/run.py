@@ -52,6 +52,8 @@ def parse_args():
     parser.add_argument('--test_data_path', type=str, required=True)
     parser.add_argument('--every_n_epochs', type=int, default=1)
     parser.add_argument('--model_ckpt_path', type=str, default='')
+    parser.add_argument('--init_ckpt_path', type=str, default='',
+                        help='Model-weight checkpoint to initialize from without restoring trainer state.')
     parser.add_argument('--resume_ckpt_path', type=str, default='',
                         help='Training checkpoint to resume from. Use for interrupted SLURM jobs.')
     parser.add_argument('--checkpoint_interval_minutes', type=int, default=20,
@@ -116,6 +118,16 @@ def main():
     dm = GecDataModule(args, tokenizer, KoBARTGecDataset)
     model = KoBARTConditionalGeneration(args, bart_model, tokenizer, dm)
 
+    if args.init_ckpt_path and args.resume_ckpt_path:
+        raise ValueError("--init_ckpt_path and --resume_ckpt_path cannot be used together.")
+
+    if args.init_ckpt_path:
+        checkpoint = torch.load(args.init_ckpt_path, map_location="cpu")
+        state_dict = checkpoint.get("state_dict", checkpoint)
+        missing, unexpected = model.load_state_dict(state_dict, strict=False)
+        print(f"Initialized model weights from {args.init_ckpt_path}")
+        print(f"Missing keys: {len(missing)}, unexpected keys: {len(unexpected)}")
+
     # ---- 콜백 ----
     checkpoint_interval = datetime.timedelta(minutes=args.checkpoint_interval_minutes)
     best_ckpt_callback = ModelCheckpoint(
@@ -127,6 +139,15 @@ def main():
         save_top_k=3,
         every_n_epochs=args.every_n_epochs,
         filename=f'model_ckpt/{args.data}_{args.lr}_' + '{epoch:02d}_{step}')
+    best_alias_callback = ModelCheckpoint(
+        monitor='val_gleu',
+        dirpath=f'outputs/{args.data}/',
+        mode='max',
+        verbose=True,
+        save_last=False,
+        save_top_k=1,
+        every_n_epochs=args.every_n_epochs,
+        filename='best')
     resumable_ckpt_callback = ModelCheckpoint(
         dirpath=f'outputs/{args.data}/',
         verbose=True,
@@ -148,7 +169,7 @@ def main():
         accelerator='auto',
         devices=device_count if device_count > 0 else 'auto',
         strategy='auto',
-        callbacks=[best_ckpt_callback, resumable_ckpt_callback, save_last_on_end],
+        callbacks=[best_ckpt_callback, best_alias_callback, resumable_ckpt_callback, save_last_on_end],
         check_val_every_n_epoch=args.check_val_every_n_epoch,
         log_every_n_steps=log_steps,
         num_sanity_val_steps=0,

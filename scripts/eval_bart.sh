@@ -34,6 +34,7 @@ PROJECT_HOME="$PWD"
 cd "$PROJECT_HOME"
 
 PYTHON_BIN="${PYTHON_BIN:-python}"
+CONDA_ENV="${CONDA_ENV:-phdq}"
 if [[ -n "${CONDA_ENV:-}" ]]; then
     if command -v conda >/dev/null 2>&1; then
         eval "$(conda shell.bash hook)"

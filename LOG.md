@@ -4,6 +4,51 @@
 > 최신 항목이 위에 오도록 역순으로 기록합니다.
 
 ---
+## [2026-06-06] 배치 기본 실행 정책 단순화
+
+### 목표
+- `CONDA_ENV`, `RESUME_CKPT`, `INIT_CKPT`를 매번 명령어에 붙이지 않아도 되도록 배치 스크립트 기본 동작 정리
+
+### 수행 내용
+- `scripts/train_bart.sh`, `scripts/train_blt.sh`, `scripts/eval_bart.sh`의 기본 conda 환경을 `phdq`로 내장
+- BART 학습은 기본적으로 해당 dataset의 best checkpoint를 자동 탐색해 resume
+- 해당 dataset best가 없고 `DATASET_TYPE`이 `native`가 아니면 native best checkpoint 가중치로 자동 초기화
+- BLT 학습은 `best.ckpt`를 우선 resume하고 없으면 `last.ckpt`로 fallback
+- Neuron SLURM 레퍼런스의 제출 예시를 짧은 `sbatch scripts/...` 기준으로 갱신
+
+### 결과
+- native BART 이어학습: `sbatch scripts/train_bart.sh`
+- learner/union BART 학습: `DATASET_TYPE=learner sbatch scripts/train_bart.sh`
+- BLT 이어학습: `sbatch scripts/train_blt.sh`
+
+### 다음 단계
+- [ ] 클러스터에서 `sbatch scripts/train_bart.sh` 제출 시 `Auto-best resume enabled` 로그 확인
+- [ ] learner/union 첫 제출 시 native best 초기화 로그 확인
+
+---
+## [2026-06-06] BART best checkpoint 기반 재개/초기화 분리
+
+### 목표
+- native BART 추가 학습에서 `last.ckpt`가 아니라 best checkpoint를 기준으로 이어가야 하는 문제 반영
+- 다른 데이터셋 학습에서는 trainer state resume이 아니라 best model weight 초기화로 시작하도록 구분
+
+### 수행 내용
+- `baseline/run.py`에 `--init_ckpt_path` 추가
+- `--init_ckpt_path`는 모델 가중치만 로드하고 optimizer/epoch/trainer state는 복원하지 않도록 구현
+- BART best checkpoint 별칭 `outputs/<dataset>/best.ckpt` 저장용 `ModelCheckpoint` 추가
+- `scripts/train_bart.sh`에서 `INIT_CKPT` 환경변수 지원
+- `scripts/train_bart.sh`에서 `RESUME_CKPT=best` 지원
+- Neuron SLURM 레퍼런스에 best resume과 init fine-tune 사용법 추가
+
+### 결과
+- 같은 데이터셋 추가 학습: `RESUME_CKPT=best`
+- 다른 데이터셋 전이 학습: `RESUME_CKPT="" INIT_CKPT=<best checkpoint>`
+
+### 다음 단계
+- [ ] 기존 native run은 `outputs/native/best.ckpt`가 없으므로 `RESUME_CKPT=outputs/native/model_ckpt/native_5e-05_epoch=24_step=9625.ckpt`처럼 명시 경로 사용
+- [ ] learner/union은 native best를 `INIT_CKPT`로 넘기고 `RESUME_CKPT=""`로 새 학습 시작
+
+---
 ## [2026-06-06] BLT 모델 크기 조절 인자 노출
 
 ### 목표

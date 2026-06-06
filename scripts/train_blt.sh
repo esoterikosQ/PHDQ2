@@ -35,9 +35,10 @@ PROJECT_HOME="$PWD"
 cd "$PROJECT_HOME"
 
 # Python 환경 설정:
-# - PYTHON_BIN=/path/to/python 으로 명시 가능
-# - 또는 CONDA_ENV=phdq_blt 로 conda 환경 활성화 가능
+# - 기본 conda 환경은 phdq
+# - 필요할 때만 PYTHON_BIN=/path/to/python 또는 CONDA_ENV=<env>로 override
 PYTHON_BIN="${PYTHON_BIN:-python}"
+CONDA_ENV="${CONDA_ENV:-phdq}"
 if [[ -n "${CONDA_ENV:-}" ]]; then
     if command -v conda >/dev/null 2>&1; then
         eval "$(conda shell.bash hook)"
@@ -54,7 +55,7 @@ if ! "$PYTHON_BIN" -c "import torch; import numpy; print('Torch:', torch.__versi
     cat /tmp/phdq_blt_torch_check.txt
     echo "Error: PyTorch/NumPy is not installed in the selected Python environment."
     echo "Install it first, or submit with PYTHON_BIN=/path/to/python or CONDA_ENV=<env_name>."
-    echo "Example: CONDA_ENV=phdq_blt sbatch scripts/train_blt.sh"
+    echo "Default CONDA_ENV is phdq."
     exit 1
 fi
 cat /tmp/phdq_blt_torch_check.txt
@@ -97,9 +98,12 @@ fi
 RESUME_CKPT="${RESUME_CKPT-auto}"
 RESUME_ARGS=()
 if [[ "$RESUME_CKPT" == "auto" ]]; then
-    if [[ -f "$OUTPUT_DIR/${DATASET_TYPE}/last.ckpt" ]]; then
+    if [[ -f "$OUTPUT_DIR/${DATASET_TYPE}/best.ckpt" ]]; then
+        RESUME_ARGS=(--resume_ckpt_path "$OUTPUT_DIR/${DATASET_TYPE}/best.ckpt")
+        echo "Auto-best resume enabled: $OUTPUT_DIR/${DATASET_TYPE}/best.ckpt"
+    elif [[ -f "$OUTPUT_DIR/${DATASET_TYPE}/last.ckpt" ]]; then
         RESUME_ARGS=(--resume_ckpt_path "$OUTPUT_DIR/${DATASET_TYPE}/last.ckpt")
-        echo "Auto-resume enabled: $OUTPUT_DIR/${DATASET_TYPE}/last.ckpt"
+        echo "Auto-best checkpoint not found; falling back to last checkpoint: $OUTPUT_DIR/${DATASET_TYPE}/last.ckpt"
     else
         echo "Auto-resume enabled: no existing last.ckpt found; starting fresh."
     fi

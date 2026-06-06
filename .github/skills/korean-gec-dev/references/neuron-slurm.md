@@ -18,6 +18,7 @@
 
 - BART 학습/평가: `amd_a100nv_8`
 - BLT-GEC scaffold 학습: `amd_a100nv_8`
+- 기본 conda 환경: `phdq`
 
 ```bash
 #SBATCH --nodes=1
@@ -38,9 +39,11 @@ CPU core 요청은 파티션별 제한을 따른다.
 - SLURM 제한은 `#SBATCH --time=01:55:00`으로 요청한다.
 - Lightning 내부 `--max_time`은 `00:01:50:00`으로 설정해 스케줄러 강제 종료 전에 스스로 멈춘다.
 - 학습 중 20분마다 metric과 무관한 재개용 checkpoint를 `outputs/<dataset>/resume/`에 저장한다.
-- validation GLEU 기준 best checkpoint는 `outputs/<dataset>/model_ckpt/`에 별도로 저장한다.
+- validation GLEU 기준 best checkpoint는 `outputs/<dataset>/model_ckpt/`에 저장하고, 다음 run부터 `outputs/<dataset>/best.ckpt` 별칭도 저장한다.
 - 학습 종료 시 `outputs/<dataset>/last.ckpt`를 한 번 더 저장한다.
-- 다음 제출 시 `outputs/<dataset>/last.ckpt`가 있으면 자동으로 이어서 학습한다.
+- 다음 제출 시 BART는 해당 dataset의 best checkpoint를 자동으로 찾아 이어서 학습한다.
+- 해당 dataset의 best가 없고 `DATASET_TYPE`이 `native`가 아니면 native best 가중치로 자동 초기화해 새 dataset 학습을 시작한다.
+- BLT-GEC scaffold는 `best.ckpt`가 있으면 best에서 이어가고, 없으면 `last.ckpt`로 fallback한다.
 
 BLT-GEC scaffold는 같은 정책을 사용하되 checkpoint 경로가 `outputs/blt_gec/<dataset>/last.ckpt`다.
 
@@ -64,22 +67,22 @@ ls data/Preprocessed/native/native_test.txt
 # 파티션 상태 확인
 sinfo
 
-# 학습 제출
-CONDA_ENV=phdq_gec sbatch scripts/train_bart.sh
+# BART native 학습 제출
+sbatch scripts/train_bart.sh
 
 # BLT-GEC scaffold 학습 제출
-CONDA_ENV=phdq_blt sbatch scripts/train_blt.sh
+sbatch scripts/train_blt.sh
 
-# 이어서 학습할 때도 같은 명령 사용: last.ckpt가 있으면 자동 resume
-CONDA_ENV=phdq_gec sbatch scripts/train_bart.sh
-CONDA_ENV=phdq_blt sbatch scripts/train_blt.sh
+# 이어서 학습할 때도 같은 명령 사용: best checkpoint가 있으면 자동 resume
+sbatch scripts/train_bart.sh
+sbatch scripts/train_blt.sh
 
-# 자동 resume을 끄고 새로 시작
-RESUME_CKPT="" CONDA_ENV=phdq_gec sbatch scripts/train_bart.sh
+# 다른 데이터셋 학습: 해당 dataset best가 없으면 native best로 자동 초기화
+DATASET_TYPE=learner sbatch scripts/train_bart.sh
+DATASET_TYPE=union sbatch scripts/train_bart.sh
 
-# 특정 checkpoint에서 재개
-RESUME_CKPT=outputs/native/model_ckpt/<checkpoint>.ckpt CONDA_ENV=phdq_gec sbatch scripts/train_bart.sh
-RESUME_CKPT=outputs/blt_gec/native/best.ckpt CONDA_ENV=phdq_blt sbatch scripts/train_blt.sh
+# 명시적 checkpoint override가 꼭 필요할 때만 사용
+RESUME_CKPT=outputs/native/model_ckpt/<checkpoint>.ckpt sbatch scripts/train_bart.sh
 
 # 체크포인트 평가 제출
 sbatch scripts/eval_bart.sh outputs/native/model_ckpt/<checkpoint>.ckpt native
@@ -102,7 +105,7 @@ scancel <JOB_ID>
 
 - 2시간 제한이 있는 학습은 하나의 긴 job이 아니라 여러 번의 짧은 job으로 누적 실행한다.
 - 시간 제한으로 중단되었거나 `CANCELLED`, `TIMEOUT` 상태가 되었으면 동일 명령으로 다시 제출한다.
-- `outputs/<dataset>/last.ckpt`가 있으면 `scripts/train_bart.sh`가 자동으로 `--resume_ckpt_path`를 전달한다.
-- `outputs/blt_gec/<dataset>/last.ckpt`가 있으면 `scripts/train_blt.sh`가 자동으로 `--resume_ckpt_path`를 전달한다.
-- 새 실험을 시작하려면 기존 `last.ckpt`를 다른 위치로 옮기거나 `RESUME_CKPT="" sbatch scripts/train_bart.sh` / `RESUME_CKPT="" sbatch scripts/train_blt.sh`를 사용한다.
+- BART는 best checkpoint를 자동 선택해 `--resume_ckpt_path` 또는 `--init_ckpt_path`를 전달한다.
+- BLT는 `best.ckpt`를 우선 선택하고 없으면 `last.ckpt`로 fallback한다.
+- 새 실험을 시작하려면 dataset/output directory를 분리한다.
 - 각 job의 `JOB_ID`, 종료 상태, 마지막 checkpoint, validation GLEU를 `LOG.md` 또는 별도 실험 노트에 기록한다.

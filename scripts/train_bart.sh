@@ -35,9 +35,10 @@ PROJECT_HOME="$PWD"
 cd "$PROJECT_HOME"
 
 # Python 환경 설정:
-# - PYTHON_BIN=/path/to/python 으로 명시 가능
-# - 또는 CONDA_ENV=phdq_gec 로 conda 환경 활성화 가능
+# - 기본 conda 환경은 phdq
+# - 필요할 때만 PYTHON_BIN=/path/to/python 또는 CONDA_ENV=<env>로 override
 PYTHON_BIN="${PYTHON_BIN:-python}"
+CONDA_ENV="${CONDA_ENV:-phdq}"
 if [[ -n "${CONDA_ENV:-}" ]]; then
     if command -v conda >/dev/null 2>&1; then
         eval "$(conda shell.bash hook)"
@@ -54,7 +55,7 @@ if ! "$PYTHON_BIN" -c "import torch; import numpy; import lightning; import tran
     cat /tmp/phdq_bart_env_check.txt
     echo "Error: required BART training packages are not installed in the selected Python environment."
     echo "Install baseline/requirements.txt first, or submit with PYTHON_BIN=/path/to/python or CONDA_ENV=<env_name>."
-    echo "Example: CONDA_ENV=phdq_gec sbatch scripts/train_bart.sh"
+    echo "Default CONDA_ENV is phdq."
     exit 1
 fi
 cat /tmp/phdq_bart_env_check.txt
@@ -90,15 +91,67 @@ fi
 
 echo "Starting KoBART GEC Training on $DATASET_TYPE dataset..."
 
+resolve_best_checkpoint() {
+    local dataset="$1"
+    local alias_path="outputs/${dataset}/best.ckpt"
+    local last_path="outputs/${dataset}/last.ckpt"
+
+    if [[ -f "$alias_path" ]]; then
+        echo "$alias_path"
+        return 0
+    fi
+
+    if [[ -f "$last_path" ]]; then
+        "$PYTHON_BIN" -c "import pathlib, torch; path='$last_path'; ckpt=torch.load(path, map_location='cpu', weights_only=False); callbacks=ckpt.get('callbacks', {}); paths=[]; [paths.append(v.get('best_model_path', '')) for v in callbacks.values() if isinstance(v, dict) and v.get('best_model_path')]; paths=[p for p in paths if p and pathlib.Path(p).exists()]; print(paths[0] if paths else '')"
+    fi
+}
+
+INIT_CKPT="${INIT_CKPT:-}"
+INIT_ARGS=()
 RESUME_CKPT="${RESUME_CKPT-auto}"
 RESUME_ARGS=()
-if [[ "$RESUME_CKPT" == "auto" ]]; then
-    if [[ -f "outputs/${DATASET_TYPE}/last.ckpt" ]]; then
-        RESUME_ARGS=(--resume_ckpt_path "outputs/${DATASET_TYPE}/last.ckpt")
-        echo "Auto-resume enabled: outputs/${DATASET_TYPE}/last.ckpt"
-    else
-        echo "Auto-resume enabled: no existing last.ckpt found; starting fresh."
+BASE_DATASET_TYPE="${BASE_DATASET_TYPE:-native}"
+
+if [[ -n "$INIT_CKPT" && "$RESUME_CKPT" != "" && "$RESUME_CKPT" != "auto" ]]; then
+    echo "Error: INIT_CKPT and explicit RESUME_CKPT cannot be used together."
+    exit 1
+fi
+
+if [[ -n "$INIT_CKPT" ]]; then
+    if [[ "$INIT_CKPT" == "best" ]]; then
+        INIT_CKPT="$(resolve_best_checkpoint "$BASE_DATASET_TYPE")"
     fi
+    if [[ ! -f "$INIT_CKPT" ]]; then
+        echo "Error: INIT_CKPT not found: $INIT_CKPT"
+        exit 1
+    fi
+    INIT_ARGS=(--init_ckpt_path "$INIT_CKPT")
+    echo "Initializing model weights from checkpoint: $INIT_CKPT"
+elif [[ "$RESUME_CKPT" == "auto" ]]; then
+    BEST_CKPT="$(resolve_best_checkpoint "$DATASET_TYPE")"
+    if [[ -n "$BEST_CKPT" ]]; then
+        RESUME_ARGS=(--resume_ckpt_path "$BEST_CKPT")
+        echo "Auto-best resume enabled: $BEST_CKPT"
+    elif [[ "$DATASET_TYPE" != "$BASE_DATASET_TYPE" ]]; then
+        BASE_BEST_CKPT="$(resolve_best_checkpoint "$BASE_DATASET_TYPE")"
+        if [[ -n "$BASE_BEST_CKPT" ]]; then
+            INIT_ARGS=(--init_ckpt_path "$BASE_BEST_CKPT")
+            echo "No ${DATASET_TYPE} best checkpoint found; initializing from ${BASE_DATASET_TYPE} best: $BASE_BEST_CKPT"
+        else
+            echo "No ${DATASET_TYPE} best checkpoint or ${BASE_DATASET_TYPE} best checkpoint found; starting fresh."
+        fi
+    else
+        echo "Auto-best resume enabled: no existing best checkpoint found; starting fresh."
+    fi
+elif [[ "$RESUME_CKPT" == "best" ]]; then
+    BEST_CKPT="$(resolve_best_checkpoint "$DATASET_TYPE")"
+    if [[ -z "$BEST_CKPT" || ! -f "$BEST_CKPT" ]]; then
+        echo "Error: best checkpoint not found: $BEST_CKPT"
+        echo "Use an explicit RESUME_CKPT=outputs/${DATASET_TYPE}/model_ckpt/<checkpoint>.ckpt for older runs."
+        exit 1
+    fi
+    RESUME_ARGS=(--resume_ckpt_path "$BEST_CKPT")
+    echo "Resuming trainer state from best checkpoint: $BEST_CKPT"
 elif [[ -n "$RESUME_CKPT" ]]; then
     if [[ ! -f "$RESUME_CKPT" ]]; then
         echo "Error: RESUME_CKPT not found: $RESUME_CKPT"
@@ -124,6 +177,7 @@ srun "$PYTHON_BIN" baseline/run.py \
     --test_data_path "$TEST_DATA" \
     --checkpoint_interval_minutes 20 \
     --max_time "00:01:50:00" \
+    "${INIT_ARGS[@]}" \
     "${RESUME_ARGS[@]}"
 
 echo "End Time: $(date)"
