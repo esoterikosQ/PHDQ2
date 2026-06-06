@@ -4,6 +4,22 @@
 > 최신 항목이 위에 오도록 역순으로 기록합니다.
 
 ---
+## [2026-06-06] BART checkpoint callback 충돌 수정
+
+### 목표
+- `Found more than one stateful callback of type ModelCheckpoint` 오류 해결
+
+### 수행 내용
+- `outputs/<dataset>/best.ckpt` 별칭 저장을 두 번째 `ModelCheckpoint`로 처리하던 방식을 제거
+- 기존 top-k `ModelCheckpoint`가 선택한 best file을 state 없는 `SaveBestAlias` callback이 복사하도록 수정
+
+### 결과
+- Lightning `ModelCheckpoint` state key 충돌 없이 best checkpoint 별칭을 유지할 수 있게 됨
+
+### 다음 단계
+- [ ] `sbatch scripts/train_bart.sh` 재제출 후 callback 충돌이 사라졌는지 확인
+
+---
 ## [2026-06-06] 배치 기본 실행 정책 단순화
 
 ### 목표
@@ -35,7 +51,7 @@
 ### 수행 내용
 - `baseline/run.py`에 `--init_ckpt_path` 추가
 - `--init_ckpt_path`는 모델 가중치만 로드하고 optimizer/epoch/trainer state는 복원하지 않도록 구현
-- BART best checkpoint 별칭 `outputs/<dataset>/best.ckpt` 저장용 `ModelCheckpoint` 추가
+- BART best checkpoint 별칭 `outputs/<dataset>/best.ckpt` 저장 로직 추가
 - `scripts/train_bart.sh`에서 `INIT_CKPT` 환경변수 지원
 - `scripts/train_bart.sh`에서 `RESUME_CKPT=best` 지원
 - Neuron SLURM 레퍼런스에 best resume과 init fine-tune 사용법 추가

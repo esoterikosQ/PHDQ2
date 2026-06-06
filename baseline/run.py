@@ -11,7 +11,9 @@ import argparse
 import datetime
 import multiprocessing
 import os
+import shutil
 import sys
+from pathlib import Path
 from pprint import pprint
 
 import lightning as L
@@ -35,6 +37,36 @@ class SaveLastOnTrainEnd(Callback):
         os.makedirs(os.path.dirname(self.checkpoint_path), exist_ok=True)
         trainer.save_checkpoint(self.checkpoint_path)
         print(f"Saved final resumable checkpoint: {self.checkpoint_path}")
+
+
+class SaveBestAlias(Callback):
+    """Copy the current best ModelCheckpoint file to a stable best.ckpt path."""
+
+    def __init__(self, checkpoint_callback: ModelCheckpoint, alias_path: str):
+        self.checkpoint_callback = checkpoint_callback
+        self.alias_path = Path(alias_path)
+        self._last_source = ""
+
+    def _sync_alias(self):
+        source = self.checkpoint_callback.best_model_path
+        if not source or source == self._last_source:
+            return
+
+        source_path = Path(source)
+        if not source_path.exists():
+            return
+
+        self.alias_path.parent.mkdir(parents=True, exist_ok=True)
+        if source_path.resolve() != self.alias_path.resolve():
+            shutil.copy2(source_path, self.alias_path)
+        self._last_source = source
+        print(f"Saved best checkpoint alias: {self.alias_path}")
+
+    def on_validation_end(self, trainer, pl_module):
+        self._sync_alias()
+
+    def on_train_end(self, trainer, pl_module):
+        self._sync_alias()
 
 
 def parse_args():
@@ -139,15 +171,7 @@ def main():
         save_top_k=3,
         every_n_epochs=args.every_n_epochs,
         filename=f'model_ckpt/{args.data}_{args.lr}_' + '{epoch:02d}_{step}')
-    best_alias_callback = ModelCheckpoint(
-        monitor='val_gleu',
-        dirpath=f'outputs/{args.data}/',
-        mode='max',
-        verbose=True,
-        save_last=False,
-        save_top_k=1,
-        every_n_epochs=args.every_n_epochs,
-        filename='best')
+    best_alias_callback = SaveBestAlias(best_ckpt_callback, f'outputs/{args.data}/best.ckpt')
     resumable_ckpt_callback = ModelCheckpoint(
         dirpath=f'outputs/{args.data}/',
         verbose=True,
