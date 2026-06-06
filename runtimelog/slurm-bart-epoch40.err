@@ -1,0 +1,36 @@
+[rank: 0] Seed set to 0
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/261 [00:00<?, ?it/s]Loading weights: 100%|██████████| 261/261 [00:00<00:00, 35544.95it/s]
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+/home01/r984a02/.conda/envs/phdq/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/logger_connector/logger_connector.py:76: Starting from v1.9.0, `tensorboardX` has been removed as a dependency of the `lightning.pytorch` package, due to potential conflicts with other packages in the ML ecosystem. For this reason, `logger=True` will use `CSVLogger` as the default logger, unless the `tensorboard` or `tensorboardX` packages are found. Please `pip install lightning[extra]` or one of them to enable TensorBoard support by default
+💡 Tip: For seamless cloud logging and experiment tracking, try installing [litlogger](https://pypi.org/project/litlogger/) to enable LitLogger, which logs metrics and artifacts automatically to the Lightning Experiments platform.
+You are using a CUDA device ('NVIDIA A100-SXM4-80GB') that has Tensor Cores. To properly utilize them, you should set `torch.set_float32_matmul_precision('medium' | 'high')` which will trade-off precision for performance. For more details, read https://pytorch.org/docs/stable/generated/torch.set_float32_matmul_precision.html#torch.set_float32_matmul_precision
+/home01/r984a02/.conda/envs/phdq/lib/python3.10/site-packages/lightning/pytorch/callbacks/model_checkpoint.py:881: Checkpoint directory /scratch/r984a02/PHDQ2/outputs/native exists and is not empty.
+Restoring states from the checkpoint path at outputs/native/last.ckpt
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+Restored all states from the checkpoint at outputs/native/last.ckpt
+SLURM auto-requeueing enabled. Setting signal handlers.
+/home01/r984a02/.conda/envs/phdq/lib/python3.10/site-packages/lightning/pytorch/utilities/_pytree.py:21: `isinstance(treespec, LeafSpec)` is deprecated, use `isinstance(treespec, TreeSpec) and treespec.is_leaf()` instead.
+Epoch 20, global step 8085: 'val_gleu' was not in top 3
+Epoch 21, global step 8470: 'val_gleu' reached 61.53620 (best 61.53620), saving model to '/scratch/r984a02/PHDQ2/outputs/native/model_ckpt/native_5e-05_epoch=21_step=8470.ckpt' as top 3
+Epoch 22, global step 8855: 'val_gleu' reached 61.88450 (best 61.88450), saving model to '/scratch/r984a02/PHDQ2/outputs/native/model_ckpt/native_5e-05_epoch=22_step=8855.ckpt' as top 3
+Epoch 23, global step 9240: 'val_gleu' reached 62.98830 (best 62.98830), saving model to '/scratch/r984a02/PHDQ2/outputs/native/model_ckpt/native_5e-05_epoch=23_step=9240.ckpt' as top 3
+Epoch 24, global step 9625: 'val_gleu' reached 63.38690 (best 63.38690), saving model to '/scratch/r984a02/PHDQ2/outputs/native/model_ckpt/native_5e-05_epoch=24_step=9625.ckpt' as top 3
+Epoch 25, global step 10010: 'val_gleu' reached 62.39950 (best 63.38690), saving model to '/scratch/r984a02/PHDQ2/outputs/native/model_ckpt/native_5e-05_epoch=25_step=10010.ckpt' as top 3
+Epoch 26, global step 10395: 'val_gleu' was not in top 3
+Epoch 27, global step 10780: 'val_gleu' reached 63.04910 (best 63.38690), saving model to '/scratch/r984a02/PHDQ2/outputs/native/model_ckpt/native_5e-05_epoch=27_step=10780.ckpt' as top 3
+Epoch 28, global step 11165: 'val_gleu' was not in top 3
+Epoch 29, global step 11550: 'val_gleu' was not in top 3
+Epoch 30, global step 11935: 'val_gleu' reached 63.01380 (best 63.38690), saving model to '/scratch/r984a02/PHDQ2/outputs/native/model_ckpt/native_5e-05_epoch=30_step=11935.ckpt' as top 3
+Epoch 31, global step 12320: 'val_gleu' was not in top 3
+Epoch 32, global step 12705: 'val_gleu' reached 63.24460 (best 63.38690), saving model to '/scratch/r984a02/PHDQ2/outputs/native/model_ckpt/native_5e-05_epoch=32_step=12705.ckpt' as top 3
+Epoch 33, global step 13090: 'val_gleu' was not in top 3
+Epoch 34, global step 13475: 'val_gleu' was not in top 3
+Epoch 35, global step 13860: 'val_gleu' was not in top 3
+Epoch 36, global step 14245: 'val_gleu' was not in top 3
+Epoch 37, global step 14630: 'val_gleu' was not in top 3
+Epoch 38, global step 15015: 'val_gleu' was not in top 3
+Epoch 39, global step 15400: 'val_gleu' reached 63.06250 (best 63.38690), saving model to '/scratch/r984a02/PHDQ2/outputs/native/model_ckpt/native_5e-05_epoch=39_step=15400.ckpt' as top 3
+`Trainer.fit` stopped: `max_epochs=40` reached.
+`weights_only` was not set, defaulting to `False`.
