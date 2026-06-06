@@ -1,0 +1,18 @@
+[rank: 0] Seed set to 0
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/261 [00:00<?, ?it/s]Loading weights: 100%|██████████| 261/261 [00:00<00:00, 33718.76it/s]
+Traceback (most recent call last):
+  File "/scratch/r984a02/PHDQ2/baseline/run.py", line 193, in <module>
+    main()
+  File "/scratch/r984a02/PHDQ2/baseline/run.py", line 167, in main
+    trainer = L.Trainer(
+  File "/home01/r984a02/.conda/envs/phdq/lib/python3.10/site-packages/lightning/pytorch/utilities/argparse.py", line 70, in insert_env_defaults
+    return fn(self, **kwargs)
+  File "/home01/r984a02/.conda/envs/phdq/lib/python3.10/site-packages/lightning/pytorch/trainer/trainer.py", line 447, in __init__
+    self._callback_connector.on_trainer_init(
+  File "/home01/r984a02/.conda/envs/phdq/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/callback_connector.py", line 85, in on_trainer_init
+    _validate_callbacks_list(self.trainer.callbacks)
+  File "/home01/r984a02/.conda/envs/phdq/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/callback_connector.py", line 273, in _validate_callbacks_list
+    raise RuntimeError(
+RuntimeError: Found more than one stateful callback of type `ModelCheckpoint`. In the current configuration, this callback does not support being saved alongside other instances of the same type. Please consult the documentation of `ModelCheckpoint` regarding valid settings for the callback state to be checkpointable. HINT: The `callback.state_key` must be unique among all callbacks in the Trainer.
+srun: error: gpu40: task 0: Exited with exit code 1

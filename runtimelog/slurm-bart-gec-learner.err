@@ -1,0 +1,48 @@
+[rank: 0] Seed set to 0
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/261 [00:00<?, ?it/s]Loading weights: 100%|██████████| 261/261 [00:00<00:00, 35810.05it/s]
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+/home01/r984a02/.conda/envs/phdq/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/logger_connector/logger_connector.py:76: Starting from v1.9.0, `tensorboardX` has been removed as a dependency of the `lightning.pytorch` package, due to potential conflicts with other packages in the ML ecosystem. For this reason, `logger=True` will use `CSVLogger` as the default logger, unless the `tensorboard` or `tensorboardX` packages are found. Please `pip install lightning[extra]` or one of them to enable TensorBoard support by default
+💡 Tip: For seamless cloud logging and experiment tracking, try installing [litlogger](https://pypi.org/project/litlogger/) to enable LitLogger, which logs metrics and artifacts automatically to the Lightning Experiments platform.
+You are using a CUDA device ('NVIDIA A100-SXM4-80GB') that has Tensor Cores. To properly utilize them, you should set `torch.set_float32_matmul_precision('medium' | 'high')` which will trade-off precision for performance. For more details, read https://pytorch.org/docs/stable/generated/torch.set_float32_matmul_precision.html#torch.set_float32_matmul_precision
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+SLURM auto-requeueing enabled. Setting signal handlers.
+/home01/r984a02/.conda/envs/phdq/lib/python3.10/site-packages/lightning/pytorch/utilities/_pytree.py:21: `isinstance(treespec, LeafSpec)` is deprecated, use `isinstance(treespec, TreeSpec) and treespec.is_leaf()` instead.
+Epoch 0, global step 622: 'val_gleu' reached 40.39600 (best 40.39600), saving model to '/scratch/r984a02/PHDQ2/outputs/learner/model_ckpt/learner_5e-05_epoch=00_step=622.ckpt' as top 3
+Epoch 1, global step 1244: 'val_gleu' reached 41.05070 (best 41.05070), saving model to '/scratch/r984a02/PHDQ2/outputs/learner/model_ckpt/learner_5e-05_epoch=01_step=1244.ckpt' as top 3
+Epoch 2, global step 1866: 'val_gleu' reached 40.95950 (best 41.05070), saving model to '/scratch/r984a02/PHDQ2/outputs/learner/model_ckpt/learner_5e-05_epoch=02_step=1866.ckpt' as top 3
+Epoch 3, global step 2488: 'val_gleu' reached 41.63010 (best 41.63010), saving model to '/scratch/r984a02/PHDQ2/outputs/learner/model_ckpt/learner_5e-05_epoch=03_step=2488.ckpt' as top 3
+Epoch 4, global step 3110: 'val_gleu' reached 41.65430 (best 41.65430), saving model to '/scratch/r984a02/PHDQ2/outputs/learner/model_ckpt/learner_5e-05_epoch=04_step=3110.ckpt' as top 3
+Epoch 5, global step 3732: 'val_gleu' reached 41.27560 (best 41.65430), saving model to '/scratch/r984a02/PHDQ2/outputs/learner/model_ckpt/learner_5e-05_epoch=05_step=3732.ckpt' as top 3
+Epoch 6, global step 4354: 'val_gleu' reached 41.45610 (best 41.65430), saving model to '/scratch/r984a02/PHDQ2/outputs/learner/model_ckpt/learner_5e-05_epoch=06_step=4354.ckpt' as top 3
+Epoch 7, global step 4976: 'val_gleu' was not in top 3
+Epoch 8, global step 5598: 'val_gleu' was not in top 3
+Epoch 9, global step 6220: 'val_gleu' was not in top 3
+Epoch 10, global step 6842: 'val_gleu' was not in top 3
+Epoch 11, global step 7464: 'val_gleu' was not in top 3
+Epoch 12, global step 8086: 'val_gleu' was not in top 3
+Epoch 13, global step 8708: 'val_gleu' was not in top 3
+Epoch 14, global step 9330: 'val_gleu' was not in top 3
+Epoch 15, global step 9952: 'val_gleu' was not in top 3
+Epoch 16, global step 10574: 'val_gleu' was not in top 3
+Epoch 17, global step 11196: 'val_gleu' reached 41.54630 (best 41.65430), saving model to '/scratch/r984a02/PHDQ2/outputs/learner/model_ckpt/learner_5e-05_epoch=17_step=11196.ckpt' as top 3
+Epoch 18, global step 11818: 'val_gleu' reached 41.65310 (best 41.65430), saving model to '/scratch/r984a02/PHDQ2/outputs/learner/model_ckpt/learner_5e-05_epoch=18_step=11818.ckpt' as top 3
+Epoch 19, global step 12440: 'val_gleu' was not in top 3
+Epoch 20, global step 13062: 'val_gleu' was not in top 3
+Epoch 21, global step 13684: 'val_gleu' was not in top 3
+Epoch 22, global step 14306: 'val_gleu' was not in top 3
+Epoch 23, global step 14928: 'val_gleu' was not in top 3
+Epoch 24, global step 15550: 'val_gleu' reached 42.11940 (best 42.11940), saving model to '/scratch/r984a02/PHDQ2/outputs/learner/model_ckpt/learner_5e-05_epoch=24_step=15550.ckpt' as top 3
+Epoch 25, global step 16172: 'val_gleu' reached 41.80060 (best 42.11940), saving model to '/scratch/r984a02/PHDQ2/outputs/learner/model_ckpt/learner_5e-05_epoch=25_step=16172.ckpt' as top 3
+Epoch 26, global step 16794: 'val_gleu' was not in top 3
+Epoch 27, global step 17416: 'val_gleu' was not in top 3
+Epoch 28, global step 18038: 'val_gleu' was not in top 3
+Epoch 29, global step 18660: 'val_gleu' was not in top 3
+Epoch 30, global step 19282: 'val_gleu' was not in top 3
+Epoch 31, global step 19904: 'val_gleu' was not in top 3
+Epoch 32, global step 20526: 'val_gleu' was not in top 3
+Epoch 33, global step 21148: 'val_gleu' was not in top 3
+Epoch 34, global step 21770: 'val_gleu' reached 41.81900 (best 42.11940), saving model to '/scratch/r984a02/PHDQ2/outputs/learner/model_ckpt/learner_5e-05_epoch=34_step=21770.ckpt' as top 3
+Epoch 35, global step 22392: 'val_gleu' was not in top 3
+slurmstepd: error: *** JOB 751315 ON gpu40 CANCELLED AT 2026-06-07T00:49:10 ***
