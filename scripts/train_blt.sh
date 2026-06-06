@@ -70,6 +70,7 @@ MAX_LENGTH="${MAX_LENGTH:-1024}"
 BATCH_SIZE="${BATCH_SIZE:-4}"
 GRAD_ACCUM_STEPS="${GRAD_ACCUM_STEPS:-4}"
 LR="${LR:-1e-4}"
+MAX_EPOCHS="${MAX_EPOCHS:-40}"
 
 PREPROCESSED_DIR="$DATA_DIR/Preprocessed/$DATASET_DIR_NAME"
 TRAIN_DATA="${TRAIN_DATA:-$PREPROCESSED_DIR/${DATASET_DIR_NAME}_train.txt}"
@@ -116,6 +117,7 @@ srun "$PYTHON_BIN" -m blt_gec.train \
     --max_length "$MAX_LENGTH" \
     --batch_size "$BATCH_SIZE" \
     --grad_accum_steps "$GRAD_ACCUM_STEPS" \
+    --max_epochs "$MAX_EPOCHS" \
     --lr "$LR" \
     --checkpoint_interval_minutes 20 \
     --max_time "00:01:50:00" \

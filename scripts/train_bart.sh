@@ -110,10 +110,11 @@ fi
 
 # 학습 실행 (PL 2.x 호환 run.py)
 NUM_WORKERS="${NUM_WORKERS:-4}"
+MAX_EPOCHS="${MAX_EPOCHS:-40}"
 srun "$PYTHON_BIN" baseline/run.py \
     --name "kobart-${DATASET_TYPE}" \
     --data "$DATASET_TYPE" \
-    --max_epochs 20 \
+    --max_epochs "$MAX_EPOCHS" \
     --batch_size 32 \
     --num_workers "$NUM_WORKERS" \
     --lr 5e-5 \

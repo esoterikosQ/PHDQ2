@@ -4,6 +4,24 @@
 > 최신 항목이 위에 오도록 역순으로 기록합니다.
 
 ---
+## [2026-06-06] 학습 epoch 기본값 확장
+
+### 목표
+- 749696(BLT)와 749714(BART) 로그에서 20 epoch 도달로 정상 종료된 뒤 추가 학습 여지가 있는 상황 반영
+
+### 수행 내용
+- `scripts/train_blt.sh`에 `MAX_EPOCHS` 환경변수 추가, 기본값 40으로 설정
+- `scripts/train_bart.sh`에 `MAX_EPOCHS` 환경변수 추가, 기본값 40으로 설정
+- 기존 `last.ckpt`가 있으면 자동 resume 정책으로 20 epoch 이후부터 이어서 학습 가능
+
+### 결과
+- `MAX_EPOCHS=60 sbatch ...`처럼 제출 시점에 총 목표 epoch을 쉽게 늘릴 수 있게 됨
+
+### 다음 단계
+- [ ] BLT는 validation loss가 마지막 epoch까지 개선 중이므로 `MAX_EPOCHS=40` 이상으로 이어서 학습
+- [ ] BART는 GLEU가 15~19 epoch에서 plateau라 `MAX_EPOCHS=30` 또는 40으로 짧게 추가 확인
+
+---
 ## [2026-06-05] BART 학습 모드 복구 보강
 
 ### 목표
