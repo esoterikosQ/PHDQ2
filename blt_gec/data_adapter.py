@@ -1,21 +1,39 @@
-"""Dataset utilities for byte-level Prefix-LM GEC training."""
+"""GEC dataset adapter for the reference Byte Latent Transformer.
+
+The reference BLT tokenizer uses ids 0..3 for special symbols and represents
+raw bytes as byte + OFFSET. We therefore do not invent a new SEP token. GEC
+source and target are separated with a textual sentinel that is encoded as
+ordinary bytes by the BLT tokenizer.
+"""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Protocol
 
 import torch
 from torch.utils.data import Dataset
 
 
-BYTE_VOCAB_SIZE = 256
-BOS_ID = 256
-EOS_ID = 257
-SEP_ID = 258
-PAD_ID = 259
-VOCAB_SIZE = 260
 IGNORE_INDEX = -100
+DEFAULT_GEC_SEPARATOR = "\n<BLT_GEC_SEP>\n"
+
+
+class BltTokenizerProtocol(Protocol):
+    bos_id: int
+    eos_id: int
+
+    def encode(
+        self,
+        text: str,
+        add_bos: bool | None = None,
+        add_eos: bool | None = None,
+    ) -> list[int]:
+        ...
+
+    def decode(self, tokens: list[int], cut_at_eos: bool = False) -> str:
+        ...
 
 
 @dataclass(frozen=True)
@@ -25,24 +43,26 @@ class GecBltExample:
 
 
 class GecBltDataset(Dataset):
-    """
-    BLT(Byte Latent Transformer)를 위한 Prefix-LM 방식의 GEC 데이터셋 어댑터.
-    TSV 파일(오류문 \t 교정문)을 읽어들여 UTF-8 바이트 시퀀스로 변환.
-    [BOS] + [오류문 바이트들] + [SEP] + [교정문 바이트들] + [EOS] 형태로 구성.
-    """
+    """TSV(source<TAB>target) dataset encoded with the reference BLT tokenizer."""
+
     def __init__(
         self,
         tsv_path: str | Path,
-        max_length: int = 1024,
+        tokenizer: BltTokenizerProtocol,
+        *,
+        max_length: int = 2048,
+        separator: str = DEFAULT_GEC_SEPARATOR,
         strict_tsv: bool = False,
     ):
         super().__init__()
         self.tsv_path = Path(tsv_path)
+        self.tokenizer = tokenizer
         self.max_length = max_length
+        self.separator = separator
         self.strict_tsv = strict_tsv
         self.data = self._load_tsv()
 
-    def _load_tsv(self):
+    def _load_tsv(self) -> list[GecBltExample]:
         samples: list[GecBltExample] = []
         with self.tsv_path.open("r", encoding="utf-8") as f:
             for line_no, line in enumerate(f, start=1):
@@ -59,66 +79,75 @@ class GecBltDataset(Dataset):
             raise ValueError(f"No valid TSV examples found in {self.tsv_path}")
         return samples
 
-    @staticmethod
-    def text_to_bytes(text: str) -> list[int]:
-        return list(text.encode("utf-8"))
-
-    @staticmethod
-    def bytes_to_text(byte_ids: list[int]) -> str:
-        valid_bytes = [x for x in byte_ids if 0 <= x < BYTE_VOCAB_SIZE]
-        return bytes(valid_bytes).decode("utf-8", errors="replace")
-
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.data)
 
-    def _build_sequence(self, source: str, target: str) -> tuple[list[int], list[int]]:
-        src_bytes = self.text_to_bytes(source)
-        tgt_bytes = self.text_to_bytes(target)
+    def _encode_pair(self, source: str, target: str) -> tuple[list[int], list[int]]:
+        prefix_ids = self.tokenizer.encode(
+            source + self.separator,
+            add_bos=True,
+            add_eos=False,
+        )
+        target_ids = self.tokenizer.encode(target, add_bos=False, add_eos=True)
 
-        # Keep at least BOS, SEP, one target-or-EOS slot. If the source is too
-        # long, truncate it first; then fit as much target as possible.
-        max_src_len = max(self.max_length - 3, 0)
-        src_bytes = src_bytes[:max_src_len]
-        max_tgt_len = max(self.max_length - len(src_bytes) - 3, 0)
-        tgt_bytes = tgt_bytes[:max_tgt_len]
+        if len(prefix_ids) >= self.max_length:
+            prefix_ids = prefix_ids[: self.max_length - 1]
+            target_ids = [self.tokenizer.eos_id]
 
-        input_ids = [BOS_ID] + src_bytes + [SEP_ID] + tgt_bytes + [EOS_ID]
+        max_target_len = max(self.max_length - len(prefix_ids), 1)
+        target_ids = target_ids[:max_target_len]
+        if target_ids[-1] != self.tokenizer.eos_id:
+            target_ids[-1] = self.tokenizer.eos_id
+
+        input_ids = prefix_ids + target_ids
         labels = [IGNORE_INDEX] * len(input_ids)
-
-        sep_pos = 1 + len(src_bytes)
-        for pos in range(sep_pos, len(input_ids) - 1):
+        target_start = len(prefix_ids)
+        for pos in range(max(target_start - 1, 0), len(input_ids) - 1):
             labels[pos] = input_ids[pos + 1]
-
         return input_ids, labels
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: int) -> dict[str, torch.Tensor]:
         example = self.data[idx]
-        input_seq, labels = self._build_sequence(example.source, example.target)
-
-        pad_len = self.max_length - len(input_seq)
-        if pad_len > 0:
-            input_seq.extend([PAD_ID] * pad_len)
-            labels.extend([IGNORE_INDEX] * pad_len)
-
-        attention_mask = [0 if token_id == PAD_ID else 1 for token_id in input_seq]
-
+        input_ids, labels = self._encode_pair(example.source, example.target)
         return {
-            "input_ids": torch.tensor(input_seq, dtype=torch.long),
+            "input_ids": torch.tensor(input_ids, dtype=torch.long),
             "labels": torch.tensor(labels, dtype=torch.long),
-            "attention_mask": torch.tensor(attention_mask, dtype=torch.bool),
         }
 
-if __name__ == "__main__":
-    import tempfile
 
-    with tempfile.TemporaryDirectory() as tmpdir:
-        dummy_path = Path(tmpdir) / "dummy.tsv"
-        with dummy_path.open("w", encoding="utf-8") as f:
-            f.write("안뇽하세요\t안녕하세요.\n이거슨 테스트\t이것은 테스트.\n")
+class GecBltCollator:
+    """Pads BLT batches with a valid token id while masking padded labels."""
 
-        dataset = GecBltDataset(dummy_path, max_length=32)
-        sample = dataset[0]
+    def __init__(self, pad_token_id: int):
+        # Reference BLT uses PAD_ID=-1, which cannot be passed to embeddings.
+        # EOS is a valid id; labels keep padding out of the loss.
+        self.pad_token_id = pad_token_id
 
-        print("Source \\t Target : 안뇽하세요 \\t 안녕하세요.")
-        print(f"input_ids: {sample['input_ids']}")
-        print(f"labels:    {sample['labels']}")
+    def __call__(self, batch: list[dict[str, torch.Tensor]]) -> dict[str, torch.Tensor]:
+        max_len = max(int(item["input_ids"].numel()) for item in batch)
+        input_batch = []
+        label_batch = []
+        for item in batch:
+            input_ids = item["input_ids"]
+            labels = item["labels"]
+            pad_len = max_len - int(input_ids.numel())
+            if pad_len > 0:
+                input_ids = torch.cat(
+                    [
+                        input_ids,
+                        torch.full((pad_len,), self.pad_token_id, dtype=torch.long),
+                    ]
+                )
+                labels = torch.cat(
+                    [
+                        labels,
+                        torch.full((pad_len,), IGNORE_INDEX, dtype=torch.long),
+                    ]
+                )
+            input_batch.append(input_ids)
+            label_batch.append(labels)
+
+        return {
+            "input_ids": torch.stack(input_batch),
+            "labels": torch.stack(label_batch),
+        }

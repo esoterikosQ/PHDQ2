@@ -69,7 +69,7 @@ input_ids = [tokenizer.bos_token_id] + raw_ids + [tokenizer.eos_token_id]
 output_ids = model.generate(
     torch.tensor([input_ids]).to('cuda'),
     max_length=128, num_beams=4, eos_token_id=1,
-    early_stopping=True, repetition_penalty=2.0
+    early_stopping=True, repetition_penalty=1.0
 )
 corrected = tokenizer.decode(output_ids[0], skip_special_tokens=True)
 ```
@@ -81,6 +81,7 @@ corrected = tokenizer.decode(output_ids[0], skip_special_tokens=True)
 | `num_beams` | 4 | 논문과 동일 |
 | `max_length` | 128 | 토큰 기준 |
 | `eos_token_id` | 1 | KoBART EOS |
+| `repetition_penalty` | 1.0 | GEC 왜곡 방지를 위해 기본 반복 억제 없음 |
 | device | `cuda` | RTX 5090 |
 
 ## 4. 웹 UI 설계

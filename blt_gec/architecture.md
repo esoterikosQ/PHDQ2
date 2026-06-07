@@ -218,13 +218,21 @@ class GecBltDataset:
 | 파라미터 | 값 | 비고 |
 |---------|------|------|
 | `lr` | 1e-05 | fine-tuning이므로 낮게 |
-| `batch_size` | 4~8 | GPU 메모리에 따라 조절 |
+| `batch_size` | 1 | BLT-1B fine-tuning 기본값, GPU 메모리에 따라 조절 |
 | `max_steps` | TBD | 데이터 크기에 따라 |
-| `grad_acc_steps` | 4~8 | effective batch size 확보 |
-| `warmup_ratio` | 0.1 | |
-| `weight_decay` | 0.01 | |
+| `grad_acc_steps` | 8 | effective batch size 확보 |
+| `scheduler` | cosine | warmup 후 cosine decay |
+| `warmup_steps` | 2000 | BLT 논문 pretraining 설정을 fine-tuning 기본 후보로 반영 |
+| `weight_decay` | 0.1 | BLT 논문 기본값을 1차 후보로 사용 |
+| `adam_betas` | (0.9, 0.95) | BLT 논문 optimizer 설정 |
+| `adam_eps` | 1e-8 | BLT 논문 optimizer 설정 |
 | `gradient_clipping` | 1.0 | |
 | `precision` | bf16 | 메모리 절약 |
+| `num_beams` | 4 | BART baseline과 생성 조건 통일 |
+| `eval_every_steps` | 0 | SLURM 기본은 epoch 끝 generation 평가만 수행 |
+
+Optimizer는 bias/norm/RMSNorm 계열 파라미터를 weight decay에서 제외한다.
+test 평가는 기본 자동 실행하지 않으며, `TEST_ONLY=1` 또는 `RUN_TEST_ON_END=1`로 명시한다.
 
 ### 4-3. Loss 함수
 
@@ -359,30 +367,30 @@ BLT는 바이트 0x20의 삽입/삭제를 직접 학습 가능
 
 ---
 
-## 8. 구현 단계 (계획)
+## 8. 구현 단계
 
 ```
 Phase 1: 데이터 어댑터
-  ├── GecBltDataset 구현
-  ├── TSV → 바이트 시퀀스 변환
-  ├── Prefix-LM 형식 마스킹
-  └── 단위 테스트 (바이트 변환 정확성)
+  ├── GecBltDataset 구현 (완료)
+  ├── reference BLT tokenizer 기반 byte id 변환 (완료)
+  ├── Prefix-LM 형식 label masking (완료)
+  └── 새 SEP token 금지: textual separator를 byte로 인코딩
 
 Phase 2: 모델 래핑
-  ├── repo-local byte Prefix-LM scaffold 구현 (완료)
-  ├── BLT 가중치 로드
-  ├── GEC용 loss 함수 (마스크 적용)
-  ├── 학습 루프 작성
-  └── 소량 데이터로 overfitting 테스트
+  ├── reference_code/blt/bytelatent 경로 연결 (완료)
+  ├── ByteLatentTransformer.from_pretrained 로드 (완료)
+  ├── LMTransformer entropy model 로드 (완료)
+  ├── BltTokenizerAndPatcher 기반 dynamic entropy patcher 활성화 (완료)
+  └── dynamic patch_lengths를 forward에 전달 (완료)
 
 Phase 3: 학습
-  ├── SLURM 스크립트 작성
+  ├── SLURM 스크립트 작성 (완료)
   ├── native 데이터로 fine-tuning
-  ├── 에폭별 GLEU 모니터링
-  └── 체크포인트 저장
+  ├── validation loss 모니터링
+  └── best/last 체크포인트 저장
 
 Phase 4: 추론·평가
-  ├── 생성 함수 구현
+  ├── greedy 생성 함수 구현
   ├── GLEU / M2 평가
   ├── baseline(BART)과 비교
   └── 오류 유형별 분석
@@ -402,23 +410,32 @@ Phase 5: 최적화 (성능에 따라)
 blt_gec/
 ├── architecture.md          # 이 파일
 ├── __init__.py              # 패키지 초기화
-├── data_adapter.py          # GecBltDataset, byte special token 정의
-├── model.py                 # repo-local byte Prefix-LM scaffold
-├── train.py                 # 학습 진입점, checkpoint/resume 지원
-├── generate.py              # checkpoint 기반 greedy 생성
-└── requirements.txt         # BLT-GEC scaffold 의존성
+├── data_adapter.py          # reference BLT tokenizer 기반 GEC Prefix-LM dataset
+├── model.py                 # ByteLatentTransformer/entropy model/patcher 로더
+├── train.py                 # reference BLT fine-tuning 진입점, checkpoint/resume
+├── generate.py              # reference BLT 기반 greedy 생성
+└── requirements.txt         # reference BLT wrapper 의존성
+```
+
+레거시 byte-only baseline은 BLT가 아니므로 별도 패키지로 격하한다.
+
+```
+byte_prefix_lm/
+├── data_adapter.py
+├── model.py
+├── train.py
+└── generate.py
 ```
 
 SLURM 실행 스크립트:
 
 ```
-scripts/train_blt.sh         # Neuron SLURM용 BLT-GEC scaffold 학습 job
+scripts/train_blt.sh             # Neuron SLURM용 reference BLT-GEC fine-tuning job
+scripts/train_byte_prefix_lm.sh  # 레거시 byte-only Prefix-LM baseline job
 ```
 
-현재 `model.py`는 공식 `facebookresearch/blt` 구조를 직접 fine-tuning하는 코드가 아니라,
-동일한 UTF-8 byte Prefix-LM 데이터 경로와 운영 방식(checkpoint/resume)을 검증하기 위한
-경량 causal Transformer scaffold다. 공식 BLT 연결 시에는 `train.py`의 backend/model 생성부를
-`reference_code/blt/bytelatent/model/blt.py`의 `ByteLatentTransformer` 래퍼로 교체한다.
+`blt_gec`에서 dynamic entropy patching이 비활성화되거나 reference BLT import/weight load가
+실패하면 학습은 중단되어야 한다. byte-only causal Transformer 결과를 BLT 결과로 기록하지 않는다.
 
 ---
 

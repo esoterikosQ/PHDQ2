@@ -1,4 +1,4 @@
-"""Generate Korean GEC corrections from a trained byte Prefix-LM checkpoint."""
+"""Generate Korean GEC corrections with the reference BLT backend."""
 
 from __future__ import annotations
 
@@ -7,66 +7,60 @@ from pathlib import Path
 
 import torch
 
-from blt_gec.data_adapter import BOS_ID, EOS_ID, SEP_ID, GecBltDataset
-from blt_gec.model import BytePrefixTransformerConfig, BytePrefixTransformerLM
+from blt_gec.data_adapter import DEFAULT_GEC_SEPARATOR
+from blt_gec.generation import generate_correction
+from blt_gec.model import ReferenceBltUnavailable, load_reference_blt_components
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Generate correction with BLT-GEC scaffold")
-    parser.add_argument("--checkpoint", type=str, required=True)
+    parser = argparse.ArgumentParser(description="Generate correction with reference BLT")
+    parser.add_argument("--checkpoint", type=str, default="")
     parser.add_argument("--text", type=str, required=True)
+    parser.add_argument("--reference_code_dir", type=str, default="reference_code/blt")
+    parser.add_argument("--blt_repo", type=str, default="facebook/blt-1b")
+    parser.add_argument("--entropy_repo", type=str, default="facebook/blt-entropy")
+    parser.add_argument("--local_files_only", action="store_true")
     parser.add_argument("--max_gen_len", type=int, default=256)
+    parser.add_argument("--max_length", type=int, default=2048)
+    parser.add_argument("--num_beams", type=int, default=4)
+    parser.add_argument("--precision", type=str, default="bf16", choices=["fp32", "bf16", "fp16"])
+    parser.add_argument("--separator", type=str, default=DEFAULT_GEC_SEPARATOR)
     return parser.parse_args()
-
-
-def build_model_from_checkpoint(checkpoint):
-    ckpt_args = checkpoint.get("args", {})
-    config = BytePrefixTransformerConfig(
-        max_length=int(ckpt_args.get("max_length", 1024)),
-        dim=int(ckpt_args.get("dim", 256)),
-        num_layers=int(ckpt_args.get("num_layers", 4)),
-        num_heads=int(ckpt_args.get("num_heads", 8)),
-        dropout=float(ckpt_args.get("dropout", 0.1)),
-        ffn_dim=int(ckpt_args.get("dim", 256)) * 4,
-    )
-    model = BytePrefixTransformerLM(config)
-    model.load_state_dict(checkpoint["model"])
-    return model
-
-
-@torch.no_grad()
-def generate(model, text: str, max_gen_len: int, device):
-    model.eval()
-    prefix = [BOS_ID] + GecBltDataset.text_to_bytes(text) + [SEP_ID]
-    input_ids = torch.tensor(prefix, dtype=torch.long, device=device).unsqueeze(0)
-    generated: list[int] = []
-
-    for _ in range(max_gen_len):
-        if input_ids.size(1) >= model.config.max_length:
-            break
-        attention_mask = torch.ones_like(input_ids, dtype=torch.bool)
-        logits = model(input_ids, attention_mask=attention_mask)
-        next_id = int(torch.argmax(logits[0, -1]).item())
-        if next_id == EOS_ID:
-            break
-        if 0 <= next_id < 256:
-            generated.append(next_id)
-        else:
-            break
-        next_tensor = torch.tensor([[next_id]], dtype=torch.long, device=device)
-        input_ids = torch.cat([input_ids, next_tensor], dim=1)
-
-    return GecBltDataset.bytes_to_text(generated)
 
 
 def main():
     args = parse_args()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    checkpoint = torch.load(Path(args.checkpoint), map_location=device)
-    model = build_model_from_checkpoint(checkpoint).to(device)
-    print(generate(model, args.text, args.max_gen_len, device))
+    try:
+        components = load_reference_blt_components(
+            reference_code_dir=args.reference_code_dir,
+            blt_repo=args.blt_repo,
+            entropy_repo=args.entropy_repo,
+            local_files_only=args.local_files_only,
+            device=device,
+            precision=args.precision,
+        )
+    except ReferenceBltUnavailable as exc:
+        raise SystemExit(f"Error: {exc}") from exc
+
+    if args.checkpoint:
+        checkpoint = torch.load(Path(args.checkpoint), map_location=device)
+        components.model.load_state_dict(checkpoint["model"], strict=False)
+
+    print(
+        generate_correction(
+            components.model,
+            components.tokenizer,
+            components.patcher,
+            args.text,
+            separator=args.separator,
+            max_length=args.max_length,
+            max_gen_len=args.max_gen_len,
+            num_beams=args.num_beams,
+            device=device,
+        )
+    )
 
 
 if __name__ == "__main__":
     main()
-

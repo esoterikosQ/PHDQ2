@@ -72,13 +72,13 @@ class SaveBestAlias(Callback):
 def parse_args():
     parser = argparse.ArgumentParser(description='KoBART GEC Training')
     parser.add_argument('--data', type=str, default='native')
-    parser.add_argument('--max_epochs', type=int, default=100)
+    parser.add_argument('--max_epochs', type=int, default=10)
     parser.add_argument('--debug', action='store_true')
     parser.add_argument('--name', type=str, default='default_name')
     parser.add_argument('--max_seq_len', type=int, default=128)
     parser.add_argument('--seed', type=int, default=0)
-    parser.add_argument('--batch_size', type=int, default=32)
-    parser.add_argument('--lr', type=float, default=5e-05)
+    parser.add_argument('--batch_size', type=int, default=64)
+    parser.add_argument('--lr', type=float, default=3e-05)
     parser.add_argument('--train_data_path', type=str, required=True)
     parser.add_argument('--val_data_path', type=str, required=True)
     parser.add_argument('--test_data_path', type=str, required=True)
@@ -95,6 +95,12 @@ def parse_args():
     parser.add_argument('--log_every_n_steps', type=int, default=50)
     parser.add_argument('--check_val_every_n_epoch', type=int, default=1)
     parser.add_argument('--warmup_ratio', type=float, default=0.0)
+    parser.add_argument('--num_beams', type=int, default=4,
+                        help='Beam size for validation/test generation. Use 1 for greedy comparison.')
+    parser.add_argument('--adamw_correct_bias', action='store_true',
+                        help='Use AdamW bias correction. Default off to match the reference Korean GEC code.')
+    parser.add_argument('--m2_source_gold_path', type=str, default='',
+                        help='Optional M2 source-gold file for m2scorer. If omitted, M2 is reported as unavailable.')
     parser.add_argument('--num_workers', type=int, default=None,
                         help='DataLoader workers. Defaults to SLURM_CPUS_PER_TASK when available.')
     return parser.parse_args()

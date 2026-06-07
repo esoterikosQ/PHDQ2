@@ -15,10 +15,12 @@ class GecInferenceEngine:
         device: str | None = None,
         num_beams: int = 4,
         max_length: int = 128,
+        repetition_penalty: float = 1.0,
     ):
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
         self.num_beams = num_beams
         self.max_length = max_length
+        self.repetition_penalty = repetition_penalty
 
         print(f"Loading model '{model_name}' on {self.device} ...")
         self.tokenizer = PreTrainedTokenizerFast.from_pretrained(model_name)
@@ -42,7 +44,7 @@ class GecInferenceEngine:
             num_beams=self.num_beams,
             eos_token_id=1,
             early_stopping=True,
-            repetition_penalty=2.0,
+            repetition_penalty=self.repetition_penalty,
         )
         return self.tokenizer.decode(output_ids[0], skip_special_tokens=True)
 

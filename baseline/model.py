@@ -5,19 +5,26 @@ KoBART GEC 모델 (LightningModule).
 주요 변경:
   - training_epoch_end → on_train_epoch_end
   - validation_epoch_end(outputs) → on_validation_epoch_end (수동 축적)
-  - AdamW: transformers.optimization → torch.optim
-  - M2 scorer 호출부 정리 (원본 코드 버그 수정)
+  - M2 scorer optional 연결
 """
 import logging
 import os
+import re
+import subprocess
+import sys
 import time
 from pathlib import Path
 from pprint import pprint
 
 import lightning as L
 import torch
-from torch.optim import AdamW
 from transformers import get_linear_schedule_with_warmup
+
+try:
+    from transformers.optimization import AdamW as TransformersAdamW
+except ImportError:  # pragma: no cover - depends on transformers version
+    TransformersAdamW = None
+from torch.optim import AdamW as TorchAdamW
 
 from metric.gleumodule import run_gleu
 
@@ -57,7 +64,16 @@ class KoBARTConditionalGeneration(L.LightningModule):
                         if any(nd in n for nd in no_decay)],
              'weight_decay': 0.0},
         ]
-        optimizer = AdamW(grouped, lr=self.args.lr)
+        if self.args.adamw_correct_bias:
+            optimizer = TorchAdamW(grouped, lr=self.args.lr)
+        elif TransformersAdamW is not None:
+            optimizer = TransformersAdamW(grouped, lr=self.args.lr, correct_bias=False)
+        else:
+            logging.warning(
+                "transformers.optimization.AdamW is unavailable; falling back to "
+                "torch.optim.AdamW with bias correction enabled."
+            )
+            optimizer = TorchAdamW(grouped, lr=self.args.lr)
 
         data_len = len(self.dm.train_dataloader().dataset)
         num_train_steps = max(
@@ -116,7 +132,7 @@ class KoBARTConditionalGeneration(L.LightningModule):
         with torch.no_grad():
             output = self.model.generate(
                 input_ids, eos_token_id=1,
-                max_length=self.args.max_seq_len, num_beams=4)
+                max_length=self.args.max_seq_len, num_beams=self.args.num_beams)
         if was_training:
             self.model.train()
         output = self.tokenizer.batch_decode(output, skip_special_tokens=True)
@@ -183,9 +199,7 @@ class KoBARTConditionalGeneration(L.LightningModule):
             f.write(f"data: {self.args.data}, epoch: {self.current_epoch_idx}, "
                     f"gleu_out: {gleu_out}, val_loss: {total_loss}\n")
 
-        # M2 scorer (별도 실행 — 원본 코드에서도 주석 처리 상태)
-        # m2 파일이 필요하며, KAGAS를 통해 사전 생성해야 함
-        p, r, f_score = 0, 0, 0
+        p, r, f_score = self._run_m2_scorer(hyp_path)
 
         self.scores[self.current_epoch_idx] = {
             'precision': p, 'recall': r, 'f_score': f_score,
@@ -199,8 +213,44 @@ class KoBARTConditionalGeneration(L.LightningModule):
 
         if self.args.best['gleu'] < gleuscore:
             self.args.best['gleu'] = gleuscore
-            self.args.best['f0.5'] = f_score
-            self.args.best['prec'] = p
-            self.args.best['rec'] = r
+            if f_score is not None:
+                self.args.best['f0.5'] = f_score
+                self.args.best['prec'] = p
+                self.args.best['rec'] = r
 
         pprint(self.scores)
+
+    def _run_m2_scorer(self, hyp_path):
+        source_gold = getattr(self.args, 'm2_source_gold_path', '')
+        if not source_gold:
+            return None, None, None
+
+        source_gold_path = Path(source_gold)
+        if not source_gold_path.exists():
+            logging.warning(f"M2 source-gold file does not exist: {source_gold_path}")
+            return None, None, None
+
+        scorer = Path(__file__).parent / "metric" / "m2scorer" / "scripts" / "m2scorer.py"
+        cmd = [sys.executable, str(scorer), hyp_path, str(source_gold_path)]
+        try:
+            completed = subprocess.run(
+                cmd,
+                check=True,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+        except subprocess.CalledProcessError as exc:
+            logging.warning(f"M2 scorer failed: {exc.stderr or exc.stdout}")
+            return None, None, None
+
+        metrics = {}
+        for line in completed.stdout.splitlines():
+            match = re.match(r"(Precision|Recall|F_0\.5)\s*:\s*([0-9.]+)", line.strip())
+            if match:
+                metrics[match.group(1)] = float(match.group(2))
+
+        if not {"Precision", "Recall", "F_0.5"} <= set(metrics):
+            logging.warning(f"Could not parse M2 scorer output: {completed.stdout}")
+            return None, None, None
+        return metrics["Precision"], metrics["Recall"], metrics["F_0.5"]

@@ -1,71 +1,117 @@
-"""Small byte-level Prefix-LM model for BLT-GEC pipeline smoke training.
-
-This model is intentionally lightweight and repo-local. It exercises the same
-byte Prefix-LM data path that the official BLT wrapper will use, while avoiding
-the heavy bytelatent/xformers/HF-gated dependency chain during early pipeline
-validation.
-"""
+"""Reference BLT loading utilities for Korean GEC fine-tuning."""
 
 from __future__ import annotations
 
+import sys
 from dataclasses import dataclass
+from pathlib import Path
 
 import torch
-from torch import nn
-
-from blt_gec.data_adapter import PAD_ID, VOCAB_SIZE
 
 
-@dataclass
-class BytePrefixTransformerConfig:
-    vocab_size: int = VOCAB_SIZE
-    max_length: int = 1024
-    dim: int = 256
-    num_layers: int = 4
-    num_heads: int = 8
-    dropout: float = 0.1
-    ffn_dim: int = 1024
+@dataclass(frozen=True)
+class ReferenceBltComponents:
+    model: torch.nn.Module
+    tokenizer: object
+    patcher: object
+    entropy_model: torch.nn.Module
 
 
-class BytePrefixTransformerLM(nn.Module):
-    """Causal byte Transformer used as the first trainable BLT-GEC scaffold."""
+class ReferenceBltUnavailable(RuntimeError):
+    """Raised when the reference BLT dependency chain is not available."""
 
-    def __init__(self, config: BytePrefixTransformerConfig):
-        super().__init__()
-        self.config = config
-        self.token_embedding = nn.Embedding(config.vocab_size, config.dim, padding_idx=PAD_ID)
-        self.position_embedding = nn.Embedding(config.max_length, config.dim)
-        encoder_layer = nn.TransformerEncoderLayer(
-            d_model=config.dim,
-            nhead=config.num_heads,
-            dim_feedforward=config.ffn_dim,
-            dropout=config.dropout,
-            activation="gelu",
-            batch_first=True,
-            norm_first=True,
+
+def add_reference_blt_to_path(reference_code_dir: str | Path) -> None:
+    ref_dir = Path(reference_code_dir)
+    if not ref_dir.exists():
+        raise ReferenceBltUnavailable(f"Reference BLT directory not found: {ref_dir}")
+    ref_dir_str = str(ref_dir.resolve())
+    if ref_dir_str not in sys.path:
+        sys.path.insert(0, ref_dir_str)
+
+
+def _bool_local_files_only(value: bool) -> bool:
+    return bool(value)
+
+
+def load_reference_blt_components(
+    *,
+    reference_code_dir: str | Path = "reference_code/blt",
+    blt_repo: str = "facebook/blt-1b",
+    entropy_repo: str = "facebook/blt-entropy",
+    local_files_only: bool = False,
+    device: torch.device | str = "cuda",
+    precision: str = "bf16",
+) -> ReferenceBltComponents:
+    """Load official BLT model, tokenizer, entropy model, and dynamic patcher.
+
+    This intentionally has no mini fallback. If reference BLT cannot be loaded,
+    training must fail instead of silently running a byte-only model.
+    """
+
+    add_reference_blt_to_path(reference_code_dir)
+    try:
+        from bytelatent.data.patcher import to_device
+        from bytelatent.hf import BltTokenizerAndPatcher
+        from bytelatent.model.blt import ByteLatentTransformer
+        from bytelatent.transformer import LMTransformer
+    except Exception as exc:  # pragma: no cover - depends on cluster BLT env
+        raise ReferenceBltUnavailable(
+            "Could not import reference BLT. Install reference_code/blt requirements "
+            "including xformers, or use the BLT conda environment."
+        ) from exc
+
+    local_only = _bool_local_files_only(local_files_only)
+    try:
+        model = ByteLatentTransformer.from_pretrained(
+            blt_repo,
+            local_files_only=local_only,
         )
-        self.transformer = nn.TransformerEncoder(encoder_layer, num_layers=config.num_layers)
-        self.norm = nn.LayerNorm(config.dim)
-        self.lm_head = nn.Linear(config.dim, config.vocab_size, bias=False)
-        self.lm_head.weight = self.token_embedding.weight
-
-    def forward(self, input_ids: torch.Tensor, attention_mask: torch.Tensor | None = None):
-        batch_size, seq_len = input_ids.shape
-        if seq_len > self.config.max_length:
-            raise ValueError(f"seq_len={seq_len} exceeds max_length={self.config.max_length}")
-
-        positions = torch.arange(seq_len, device=input_ids.device).unsqueeze(0).expand(batch_size, -1)
-        hidden = self.token_embedding(input_ids) + self.position_embedding(positions)
-
-        causal_mask = torch.triu(
-            torch.ones(seq_len, seq_len, device=input_ids.device, dtype=torch.bool),
-            diagonal=1,
+        entropy_model = LMTransformer.from_pretrained(
+            entropy_repo,
+            local_files_only=local_only,
         )
-        padding_mask = None
-        if attention_mask is not None:
-            padding_mask = ~attention_mask.bool()
+        tok_and_patcher = BltTokenizerAndPatcher.from_pretrained(
+            blt_repo,
+            local_files_only=local_only,
+        )
+    except Exception as exc:  # pragma: no cover - depends on HF auth/cache
+        raise ReferenceBltUnavailable(
+            f"Could not load BLT weights/tokenizer from blt_repo={blt_repo!r}, "
+            f"entropy_repo={entropy_repo!r}. Ensure HF access is approved and "
+            "weights are cached or available online."
+        ) from exc
 
-        hidden = self.transformer(hidden, mask=causal_mask, src_key_padding_mask=padding_mask)
-        hidden = self.norm(hidden)
-        return self.lm_head(hidden)
+    tokenizer = tok_and_patcher.tokenizer_args.build()
+    patcher_args = tok_and_patcher.patcher_args.model_copy(deep=True)
+    patcher_args.realtime_patching = False
+    patch_device = "cuda" if torch.device(device).type == "cuda" else "cpu"
+    patcher_args.patching_device = patch_device
+    patcher_args.device = patch_device
+    patcher = patcher_args.build()
 
+    dtype = {
+        "fp32": torch.float32,
+        "bf16": torch.bfloat16,
+        "fp16": torch.float16,
+    }[precision]
+    model = model.to(device)
+    entropy_model = entropy_model.eval()
+    for param in model.parameters():
+        param.data = param.data.to(dtype=dtype)
+    for param in entropy_model.parameters():
+        param.requires_grad = False
+
+    patcher.realtime_patching = True
+    patcher.entropy_model, _ = to_device(entropy_model, patcher_args.patching_device)
+    if patcher.patching_mode != "entropy":
+        raise ReferenceBltUnavailable(
+            f"Expected entropy dynamic patching, got patching_mode={patcher.patching_mode!r}"
+        )
+
+    return ReferenceBltComponents(
+        model=model,
+        tokenizer=tokenizer,
+        patcher=patcher,
+        entropy_model=entropy_model,
+    )

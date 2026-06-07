@@ -1,2 +1,1 @@
-"""BLT-GEC training utilities."""
-
+"""Reference Byte Latent Transformer utilities for Korean GEC."""

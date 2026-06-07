@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=blt-gec
+#SBATCH --job-name=byte-prefix-gec
 #SBATCH --comment=pytorch
 #SBATCH --output=slurm-%x-%j.out
 #SBATCH --error=slurm-%x-%j.err
@@ -60,31 +60,6 @@ if ! "$PYTHON_BIN" -c "import torch; import numpy; print('Torch:', torch.__versi
 fi
 cat /tmp/phdq_blt_torch_check.txt
 
-REFERENCE_BLT_DIR="${REFERENCE_BLT_DIR:-$PROJECT_HOME/reference_code/blt}"
-if [[ ! -d "$REFERENCE_BLT_DIR/bytelatent" ]]; then
-    echo "Error: reference BLT code not found: $REFERENCE_BLT_DIR/bytelatent"
-    exit 1
-fi
-
-if ! "$PYTHON_BIN" - "$REFERENCE_BLT_DIR" <<'PY' >/tmp/phdq_blt_ref_check.txt 2>&1
-import sys
-from pathlib import Path
-
-ref = Path(sys.argv[1]).resolve()
-sys.path.insert(0, str(ref))
-from bytelatent.hf import BltTokenizerAndPatcher  # noqa: F401
-from bytelatent.model.blt import ByteLatentTransformer  # noqa: F401
-from bytelatent.transformer import LMTransformer  # noqa: F401
-print("Reference BLT import path:", ref)
-PY
-then
-    cat /tmp/phdq_blt_ref_check.txt
-    echo "Error: reference BLT package cannot be imported."
-    echo "Install reference_code/blt requirements in the selected conda env."
-    exit 1
-fi
-cat /tmp/phdq_blt_ref_check.txt
-
 DATA_DIR="$PROJECT_HOME/data"
 DATASET_TYPE="${DATASET_TYPE:-native}"
 DATASET_DIR_NAME="$DATASET_TYPE"
@@ -92,32 +67,17 @@ if [[ "$DATASET_TYPE" == "learner" ]]; then
     DATASET_DIR_NAME="korean_learner"
 fi
 
-MAX_LENGTH="${MAX_LENGTH:-2048}"
-BATCH_SIZE="${BATCH_SIZE:-1}"
-GRAD_ACCUM_STEPS="${GRAD_ACCUM_STEPS:-8}"
-LR="${LR:-1e-5}"
-WEIGHT_DECAY="${WEIGHT_DECAY:-0.1}"
-ADAM_BETA1="${ADAM_BETA1:-0.9}"
-ADAM_BETA2="${ADAM_BETA2:-0.95}"
-ADAM_EPS="${ADAM_EPS:-1e-8}"
-MAX_EPOCHS="${MAX_EPOCHS:-3}"
-NUM_WORKERS="${NUM_WORKERS:-2}"
-OUTPUT_DIR="${OUTPUT_DIR:-outputs/blt_gec}"
-BLT_REPO="${BLT_REPO:-facebook/blt-1b}"
-ENTROPY_REPO="${ENTROPY_REPO:-facebook/blt-entropy}"
-PRECISION="${PRECISION:-bf16}"
-LOCAL_FILES_ONLY="${LOCAL_FILES_ONLY:-0}"
-SCHEDULER="${SCHEDULER:-cosine}"
-WARMUP_STEPS="${WARMUP_STEPS:-2000}"
-WARMUP_RATIO="${WARMUP_RATIO:-0.0}"
-BLT_NUM_BEAMS="${BLT_NUM_BEAMS:-4}"
-MAX_GEN_LEN="${MAX_GEN_LEN:-256}"
-EVAL_GENERATION="${EVAL_GENERATION:-1}"
-EVAL_MAX_EXAMPLES="${EVAL_MAX_EXAMPLES:-0}"
-EVAL_EVERY_STEPS="${EVAL_EVERY_STEPS:-0}"
-M2_SOURCE_GOLD_PATH="${M2_SOURCE_GOLD_PATH:-}"
-RUN_TEST_ON_END="${RUN_TEST_ON_END:-0}"
-TEST_ONLY="${TEST_ONLY:-0}"
+MAX_LENGTH="${MAX_LENGTH:-1024}"
+BATCH_SIZE="${BATCH_SIZE:-4}"
+GRAD_ACCUM_STEPS="${GRAD_ACCUM_STEPS:-4}"
+LR="${LR:-1e-4}"
+MAX_EPOCHS="${MAX_EPOCHS:-40}"
+NUM_WORKERS="${NUM_WORKERS:-4}"
+OUTPUT_DIR="${OUTPUT_DIR:-outputs/byte_prefix_lm}"
+MODEL_DIM="${MODEL_DIM:-256}"
+NUM_LAYERS="${NUM_LAYERS:-4}"
+NUM_HEADS="${NUM_HEADS:-8}"
+DROPOUT="${DROPOUT:-0.1}"
 
 PREPROCESSED_DIR="$DATA_DIR/Preprocessed/$DATASET_DIR_NAME"
 TRAIN_DATA="${TRAIN_DATA:-$PREPROCESSED_DIR/${DATASET_DIR_NAME}_train.txt}"
@@ -156,71 +116,26 @@ elif [[ -n "$RESUME_CKPT" ]]; then
     echo "Resuming from explicit checkpoint: $RESUME_CKPT"
 fi
 
-LOCAL_FILES_ARGS=()
-if [[ "$LOCAL_FILES_ONLY" == "1" || "$LOCAL_FILES_ONLY" == "true" ]]; then
-    LOCAL_FILES_ARGS=(--local_files_only)
-fi
-GEN_EVAL_ARGS=()
-if [[ "$EVAL_GENERATION" == "1" || "$EVAL_GENERATION" == "true" ]]; then
-    GEN_EVAL_ARGS=(--eval_generation)
-fi
-M2_ARGS=()
-if [[ -n "$M2_SOURCE_GOLD_PATH" ]]; then
-    if [[ ! -f "$M2_SOURCE_GOLD_PATH" ]]; then
-        echo "Error: M2_SOURCE_GOLD_PATH not found: $M2_SOURCE_GOLD_PATH"
-        exit 1
-    fi
-    M2_ARGS=(--m2_source_gold_path "$M2_SOURCE_GOLD_PATH")
-fi
-TEST_ARGS=()
-if [[ "$RUN_TEST_ON_END" == "1" || "$RUN_TEST_ON_END" == "true" ]]; then
-    TEST_ARGS+=(--run_test_on_end)
-fi
-if [[ "$TEST_ONLY" == "1" || "$TEST_ONLY" == "true" ]]; then
-    TEST_ARGS+=(--test_only)
-fi
+echo "Starting byte Prefix-LM baseline training on $DATASET_TYPE dataset..."
 
-echo "Starting reference BLT-GEC fine-tuning on $DATASET_TYPE dataset..."
-echo "BLT lr: $LR"
-echo "BLT weight_decay: $WEIGHT_DECAY"
-echo "BLT Adam betas: ($ADAM_BETA1, $ADAM_BETA2)"
-echo "BLT scheduler: $SCHEDULER"
-echo "BLT warmup_steps: $WARMUP_STEPS"
-echo "BLT num_beams: $BLT_NUM_BEAMS"
-
-srun "$PYTHON_BIN" -m blt_gec.train \
+srun "$PYTHON_BIN" -m byte_prefix_lm.train \
     --data "$DATASET_TYPE" \
     --train_data_path "$TRAIN_DATA" \
     --val_data_path "$VAL_DATA" \
     --test_data_path "$TEST_DATA" \
     --output_dir "$OUTPUT_DIR" \
-    --reference_code_dir "$REFERENCE_BLT_DIR" \
-    --blt_repo "$BLT_REPO" \
-    --entropy_repo "$ENTROPY_REPO" \
     --max_length "$MAX_LENGTH" \
     --batch_size "$BATCH_SIZE" \
     --num_workers "$NUM_WORKERS" \
     --grad_accum_steps "$GRAD_ACCUM_STEPS" \
     --max_epochs "$MAX_EPOCHS" \
     --lr "$LR" \
-    --weight_decay "$WEIGHT_DECAY" \
-    --adam_beta1 "$ADAM_BETA1" \
-    --adam_beta2 "$ADAM_BETA2" \
-    --adam_eps "$ADAM_EPS" \
-    --precision "$PRECISION" \
-    --scheduler "$SCHEDULER" \
-    --warmup_steps "$WARMUP_STEPS" \
-    --warmup_ratio "$WARMUP_RATIO" \
-    --num_beams "$BLT_NUM_BEAMS" \
-    --max_gen_len "$MAX_GEN_LEN" \
-    --eval_max_examples "$EVAL_MAX_EXAMPLES" \
-    --eval_every_steps "$EVAL_EVERY_STEPS" \
+    --dim "$MODEL_DIM" \
+    --num_layers "$NUM_LAYERS" \
+    --num_heads "$NUM_HEADS" \
+    --dropout "$DROPOUT" \
     --checkpoint_interval_minutes 20 \
     --max_time "00:01:50:00" \
-    "${LOCAL_FILES_ARGS[@]}" \
-    "${GEN_EVAL_ARGS[@]}" \
-    "${M2_ARGS[@]}" \
-    "${TEST_ARGS[@]}" \
     "${RESUME_ARGS[@]}"
 
 echo "End Time: $(date)"

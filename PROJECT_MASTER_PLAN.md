@@ -1,7 +1,7 @@
 # 한국어 GEC 프로젝트 종합 실행 계획 (Master Plan)
 
 작성일: 2026-04-22
-최종 업데이트: 2026-05-27
+최종 업데이트: 2026-06-07
 기준 저장소: esoterikosQ/PHDQ2 (현재 workspace)
 
 ---
@@ -33,15 +33,25 @@
   - `serving/requirements.txt`: 서빙 의존성
 - Track 2 SLURM 실행 스크립트 초안 작성 완료
   - `scripts/train_bart.sh`, `scripts/eval_bart.sh`
-- Track 3 BLT 데이터 어댑터 초안 작성 완료
-  - `blt_gec/data_adapter.py`: TSV -> UTF-8 byte Prefix-LM 입력 변환
+- Track 3 BLT reference wrapper 작성 완료
+  - `blt_gec/data_adapter.py`: reference BLT tokenizer 기반 GEC Prefix-LM 입력 변환
+  - `blt_gec/model.py`: `reference_code/blt/bytelatent`의 `ByteLatentTransformer`, entropy model, dynamic patcher 로드
+  - `blt_gec/train.py`: batch별 entropy patching 후 BLT fine-tuning
+- 기존 byte-only causal Transformer는 BLT가 아니므로 `byte_prefix_lm/` baseline으로 격하
+- 비교 신뢰성 개선 반영
+  - BART baseline은 `BART_PROFILE=paper`와 `BART_PROFILE=tuned` run을 분리
+  - BLT-GEC는 validation generation + GLEU 평가를 수행
+  - BART/BLT 모두 기본 beam size 4로 생성 조건을 맞춤
+  - BLT optimizer는 AdamW betas `(0.9, 0.95)`, bias/norm no-decay 정책 사용
+  - BLT test-only/final test 평가 경로 추가
+  - M2는 source-gold 파일이 제공될 때만 실행하며, KAGAS 기반 M2 생성은 별도 준비 필요
 - `data/README.md`와 실제 `.gitignore` 정책 정합성 반영
 - 프로젝트 관리 문서(SKILL, pipeline-reference, LOG) 정비 완료
 
 미완료 (핵심 실행 단계):
 - Track 1: Ubuntu RTX 5090에서 실제 배포/접속 테스트 및 운영 안정화
 - Track 2: SLURM에서 데이터 경로 확정, 학습 실행, GLEU/M2 결과 확정
-- Track 3: BLT 모델 래퍼, 학습 루프, 생성/평가 파이프라인 구현 및 실험
+- Track 3: reference BLT 환경 구축, HF 가중치 접근/cache 확인, 생성/평가 파이프라인 실험
 - 최종 비교 분석 및 보고서 정리
 
 주의:
@@ -55,7 +65,7 @@
 필수 목표:
 - Serving: RTX 5090에서 웹 UI 응답형 GEC 서비스 정상 동작
 - Baseline: 최소 1개 데이터셋(Kor-Native)에서 학습 재현 + GLEU/M2 확보
-- BLT-GEC: 동일 평가셋에서 BLT 결과 산출 + Baseline과 정량 비교
+- BLT-GEC: 동일 평가셋, 동일 decoding 조건에서 BLT GLEU 산출 + Baseline과 정량 비교
 
 권장 목표:
 - 3개 데이터셋(Kor-Native, Kor-Lang8, Kor-Learner) 모두 결과 확보
@@ -77,7 +87,7 @@
 | M1. Serving MVP | W1-W2 (4/22-5/5) | 웹 UI에서 단일 문장 교정 가능 |
 | M2. Baseline 1차 재현 | W2-W5 (4/29-5/26) | Kor-Native 학습/평가 수치 확보 |
 | M3. Baseline 확장 | W5-W6 (5/20-6/2) | 3개 데이터셋 결과 확보 |
-| M4. BLT-GEC 1차 구현 | W4-W7 (5/13-6/9) | Prefix-LM 학습 코드 실행 성공 |
+| M4. BLT-GEC 1차 구현 | W4-W7 (5/13-6/9) | reference BLT dynamic patching 학습 코드 실행 성공 |
 | M5. BLT-GEC 실험 완료 | W7-W10 (6/3-6/30) | BLT 결과 수치 확보 |
 | M6. 최종 비교/보고 | W10-W12 (6/24-7/14) | 비교표, 분석, 결론 문서 완료 |
 | Buffer | W13-W14 (7/15-7/28) | 재실험/튜닝/배포 안정화 |
@@ -185,12 +195,13 @@
 
 세부 작업:
 1. 데이터 어댑터 구현 (1주)
-   - TSV -> UTF-8 bytes
-   - [BOS][src][SEP][tgt][EOS]
-   - loss mask(SEP 이후만)
+   - TSV -> reference BLT tokenizer byte ids
+   - 별도 SEP token 생성 금지, textual separator를 byte로 인코딩
+   - target 구간만 next-byte loss 계산
 2. BLT 학습 코드 결합 (1주)
-   - bytelatent train loop 연결
-   - patching(entropy) 통합
+   - `reference_code/blt/bytelatent`의 `ByteLatentTransformer` 연결
+   - `LMTransformer` entropy model + `BltTokenizerAndPatcher` realtime patching 통합
+   - `patch_lengths`를 매 forward에 전달
 3. 소규모 스모크 실험 (3-4일)
    - 작은 subset으로 overfit 확인
 4. 본 학습 실험 (2주)
@@ -201,13 +212,16 @@
 
 산출물:
 - blt_gec 학습 코드
+- byte_prefix_lm baseline 코드(기존 byte-only 결과 재분류용)
 - 실험 로그/체크포인트
 - 비교표 (Baseline vs BLT)
 
 리스크:
 - BLT 가중치 접근 승인/학습 비용/패칭 민감도
+- BLT generation 평가 비용이 큼
 대응:
 - blt-1b로 시작, 실험 수를 단계적으로 확장
+- smoke run에서는 `EVAL_MAX_EXAMPLES`로 generation 평가 샘플 수를 제한하고, 최종 비교에서 full validation/test GLEU를 산출
 
 ---
 

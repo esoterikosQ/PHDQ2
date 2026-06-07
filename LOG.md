@@ -4,6 +4,92 @@
 > 최신 항목이 위에 오도록 역순으로 기록합니다.
 
 ---
+## [2026-06-07] BLT optimizer/test/generation 정리
+
+### 목표
+- BLT 논문 optimizer 설정과 fine-tuning 안정성 지적 반영
+- generation/test 평가 유지보수 리스크 축소
+
+### 수행 내용
+- BLT-GEC AdamW 설정 변경
+  - `betas=(0.9, 0.95)`, `eps=1e-8`
+  - bias/norm/RMSNorm 계열 파라미터를 weight decay에서 제외
+- `blt_gec/generation.py` 공용 generation helper 추가
+  - `train.py` validation generation과 `generate.py` CLI가 같은 beam search 구현 사용
+- `GecBltCollator`에서 사용하지 않는 `attention_mask` 제거
+- BLT test 평가 경로 추가
+  - `TEST_ONLY=1`로 checkpoint test-only 평가
+  - `RUN_TEST_ON_END=1`로 학습 종료 후 test 평가
+
+### 결과
+- BLT optimizer 기본값이 논문 설정과 더 가까워짐
+- generation 구현이 단일화되어 BART/BLT decoding 비교 조건 관리가 쉬워짐
+
+### 다음 단계
+- [ ] `TEST_ONLY=1 RESUME_CKPT=<best.ckpt> EVAL_MAX_EXAMPLES=100 sbatch scripts/train_blt.sh`로 test 평가 smoke run 확인
+
+---
+## [2026-06-07] 비교 신뢰성 개선 항목 반영
+
+### 목표
+- BART/BLT 비교가 loss-only 또는 서로 다른 decoding 조건에 의존하지 않도록 평가/학습 기본값 정리
+
+### 수행 내용
+- BLT-GEC에 generation 기반 GLEU 평가 추가
+  - validation source/reference/hypothesis 파일 저장
+  - baseline `run_gleu` 재사용
+  - optional `M2_SOURCE_GOLD_PATH`가 있으면 m2scorer 실행
+  - SLURM 기본은 epoch 끝 평가이며, step 중 평가는 `EVAL_EVERY_STEPS`로 명시
+- BLT-GEC decoding에 beam search 추가
+  - `BLT_NUM_BEAMS` 기본값 4
+  - `blt_gec/generate.py`도 동일 beam search 사용
+- BLT-GEC optimizer schedule 추가
+  - `SCHEDULER=cosine`, `WARMUP_STEPS=2000`, `WEIGHT_DECAY=0.1` 기본값
+- BART baseline profile 분리
+  - `BART_PROFILE=paper`: lr 3e-5, batch 64, epoch 10
+  - `BART_PROFILE=tuned`: lr 5e-5, batch 32, epoch 40
+  - output run name을 `native_paper`처럼 profile별로 분리
+- BART baseline의 `num_beams`, `M2_SOURCE_GOLD_PATH`, AdamW `correct_bias` 옵션 반영
+- Serving repetition penalty 기본값을 2.0에서 1.0으로 변경
+
+### 결과
+- BART/BLT의 1차 비교는 beam=4 GLEU 기준으로 맞출 수 있음
+- M2는 source-gold 파일이 있을 때만 계산하며, 없으면 unavailable로 기록
+
+### 다음 단계
+- [ ] BLT reference 환경에서 `EVAL_MAX_EXAMPLES`를 작게 둔 smoke run으로 generation 평가 속도 확인
+- [ ] KAGAS로 validation/test source-gold M2 파일 생성 후 `M2_SOURCE_GOLD_PATH` 연결
+
+---
+## [2026-06-07] BLT 구현 구조 정정 및 byte-only baseline 격하
+
+### 목표
+- dynamic patching 없는 byte-only 모델을 BLT로 오인하지 않도록 코드와 실행 경로 정정
+
+### 수행 내용
+- 기존 `blt_gec`의 causal byte Prefix-LM 코드를 `byte_prefix_lm/` 패키지로 이동해 baseline/smoke-test 용도로 격하
+- `scripts/train_byte_prefix_lm.sh` 추가
+  - 기존 byte-only 학습은 이 스크립트로만 실행
+  - 출력 기본 경로를 `outputs/byte_prefix_lm`로 변경
+- `blt_gec/`를 reference BLT wrapper로 재작성
+  - `reference_code/blt/bytelatent` import 경로 연결
+  - `ByteLatentTransformer.from_pretrained`
+  - `LMTransformer` entropy model
+  - `BltTokenizerAndPatcher` 기반 realtime entropy patcher
+  - batch마다 `patcher.patch(..., include_next_token=True)`로 `patch_lengths`를 계산해 forward에 전달
+- reference BLT vocabulary와 충돌하지 않도록 별도 SEP token을 만들지 않고 textual separator를 byte로 인코딩
+- `scripts/train_blt.sh`에서 mini 모델 크기 인자(`MODEL_DIM`, `NUM_LAYERS` 등)를 제거하고 reference BLT/HF repo 설정으로 교체
+
+### 결과
+- `blt_gec`는 dynamic entropy patching이 없으면 실행 실패
+- 기존 512x8 결과는 BLT 결과가 아니라 byte Prefix-LM baseline 결과로 재분류해야 함
+
+### 다음 단계
+- [ ] 클러스터 BLT 전용 conda 환경에 `reference_code/blt/requirements.txt` 설치
+- [ ] Hugging Face `facebook/blt-1b`, `facebook/blt-entropy` 접근 승인 및 cache 확인
+- [ ] `sbatch scripts/train_blt.sh`로 reference BLT smoke run 실행
+
+---
 ## [2026-06-06] BART checkpoint callback 충돌 수정
 
 ### 목표

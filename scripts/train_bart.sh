@@ -89,7 +89,40 @@ if [[ ! -f "$TRAIN_DATA" || ! -f "$VAL_DATA" || ! -f "$TEST_DATA" ]]; then
     exit 1
 fi
 
+BART_PROFILE="${BART_PROFILE:-paper}"
+case "$BART_PROFILE" in
+    paper)
+        BART_BATCH_SIZE="${BART_BATCH_SIZE:-64}"
+        BART_LR="${BART_LR:-3e-5}"
+        MAX_EPOCHS="${MAX_EPOCHS:-10}"
+        ;;
+    tuned)
+        BART_BATCH_SIZE="${BART_BATCH_SIZE:-32}"
+        BART_LR="${BART_LR:-5e-5}"
+        MAX_EPOCHS="${MAX_EPOCHS:-40}"
+        ;;
+    custom)
+        BART_BATCH_SIZE="${BART_BATCH_SIZE:-32}"
+        BART_LR="${BART_LR:-5e-5}"
+        MAX_EPOCHS="${MAX_EPOCHS:-10}"
+        ;;
+    *)
+        echo "Error: unknown BART_PROFILE=$BART_PROFILE (expected paper, tuned, custom)"
+        exit 1
+        ;;
+esac
+BART_NUM_BEAMS="${BART_NUM_BEAMS:-4}"
+SEED="${SEED:-0}"
+M2_SOURCE_GOLD_PATH="${M2_SOURCE_GOLD_PATH:-}"
+BART_RUN_NAME="${BART_RUN_NAME:-${DATASET_TYPE}_${BART_PROFILE}}"
+
 echo "Starting KoBART GEC Training on $DATASET_TYPE dataset..."
+echo "BART run name: $BART_RUN_NAME"
+echo "BART profile: $BART_PROFILE"
+echo "BART lr: $BART_LR"
+echo "BART batch size: $BART_BATCH_SIZE"
+echo "BART max epochs: $MAX_EPOCHS"
+echo "BART num_beams: $BART_NUM_BEAMS"
 
 resolve_best_checkpoint() {
     local dataset="$1"
@@ -111,6 +144,7 @@ INIT_ARGS=()
 RESUME_CKPT="${RESUME_CKPT-auto}"
 RESUME_ARGS=()
 BASE_DATASET_TYPE="${BASE_DATASET_TYPE:-native}"
+BASE_RUN_NAME="${BASE_RUN_NAME:-${BASE_DATASET_TYPE}_${BART_PROFILE}}"
 
 if [[ -n "$INIT_CKPT" && "$RESUME_CKPT" != "" && "$RESUME_CKPT" != "auto" ]]; then
     echo "Error: INIT_CKPT and explicit RESUME_CKPT cannot be used together."
@@ -119,7 +153,7 @@ fi
 
 if [[ -n "$INIT_CKPT" ]]; then
     if [[ "$INIT_CKPT" == "best" ]]; then
-        INIT_CKPT="$(resolve_best_checkpoint "$BASE_DATASET_TYPE")"
+        INIT_CKPT="$(resolve_best_checkpoint "$BASE_RUN_NAME")"
     fi
     if [[ ! -f "$INIT_CKPT" ]]; then
         echo "Error: INIT_CKPT not found: $INIT_CKPT"
@@ -128,26 +162,26 @@ if [[ -n "$INIT_CKPT" ]]; then
     INIT_ARGS=(--init_ckpt_path "$INIT_CKPT")
     echo "Initializing model weights from checkpoint: $INIT_CKPT"
 elif [[ "$RESUME_CKPT" == "auto" ]]; then
-    BEST_CKPT="$(resolve_best_checkpoint "$DATASET_TYPE")"
+    BEST_CKPT="$(resolve_best_checkpoint "$BART_RUN_NAME")"
     if [[ -n "$BEST_CKPT" ]]; then
         RESUME_ARGS=(--resume_ckpt_path "$BEST_CKPT")
         echo "Auto-best resume enabled: $BEST_CKPT"
     elif [[ "$DATASET_TYPE" != "$BASE_DATASET_TYPE" ]]; then
-        BASE_BEST_CKPT="$(resolve_best_checkpoint "$BASE_DATASET_TYPE")"
+        BASE_BEST_CKPT="$(resolve_best_checkpoint "$BASE_RUN_NAME")"
         if [[ -n "$BASE_BEST_CKPT" ]]; then
             INIT_ARGS=(--init_ckpt_path "$BASE_BEST_CKPT")
-            echo "No ${DATASET_TYPE} best checkpoint found; initializing from ${BASE_DATASET_TYPE} best: $BASE_BEST_CKPT"
+            echo "No ${BART_RUN_NAME} best checkpoint found; initializing from ${BASE_RUN_NAME} best: $BASE_BEST_CKPT"
         else
-            echo "No ${DATASET_TYPE} best checkpoint or ${BASE_DATASET_TYPE} best checkpoint found; starting fresh."
+            echo "No ${BART_RUN_NAME} best checkpoint or ${BASE_RUN_NAME} best checkpoint found; starting fresh."
         fi
     else
         echo "Auto-best resume enabled: no existing best checkpoint found; starting fresh."
     fi
 elif [[ "$RESUME_CKPT" == "best" ]]; then
-    BEST_CKPT="$(resolve_best_checkpoint "$DATASET_TYPE")"
+    BEST_CKPT="$(resolve_best_checkpoint "$BART_RUN_NAME")"
     if [[ -z "$BEST_CKPT" || ! -f "$BEST_CKPT" ]]; then
         echo "Error: best checkpoint not found: $BEST_CKPT"
-        echo "Use an explicit RESUME_CKPT=outputs/${DATASET_TYPE}/model_ckpt/<checkpoint>.ckpt for older runs."
+        echo "Use an explicit RESUME_CKPT=outputs/${BART_RUN_NAME}/model_ckpt/<checkpoint>.ckpt for older runs."
         exit 1
     fi
     RESUME_ARGS=(--resume_ckpt_path "$BEST_CKPT")
@@ -163,20 +197,31 @@ fi
 
 # 학습 실행 (PL 2.x 호환 run.py)
 NUM_WORKERS="${NUM_WORKERS:-4}"
-MAX_EPOCHS="${MAX_EPOCHS:-40}"
+M2_ARGS=()
+if [[ -n "$M2_SOURCE_GOLD_PATH" ]]; then
+    if [[ ! -f "$M2_SOURCE_GOLD_PATH" ]]; then
+        echo "Error: M2_SOURCE_GOLD_PATH not found: $M2_SOURCE_GOLD_PATH"
+        exit 1
+    fi
+    M2_ARGS=(--m2_source_gold_path "$M2_SOURCE_GOLD_PATH")
+fi
+
 srun "$PYTHON_BIN" baseline/run.py \
-    --name "kobart-${DATASET_TYPE}" \
-    --data "$DATASET_TYPE" \
+    --name "kobart-${BART_RUN_NAME}" \
+    --data "$BART_RUN_NAME" \
     --max_epochs "$MAX_EPOCHS" \
-    --batch_size 32 \
+    --batch_size "$BART_BATCH_SIZE" \
     --num_workers "$NUM_WORKERS" \
-    --lr 5e-5 \
+    --lr "$BART_LR" \
+    --seed "$SEED" \
+    --num_beams "$BART_NUM_BEAMS" \
     --max_seq_len 128 \
     --train_data_path "$TRAIN_DATA" \
     --val_data_path "$VAL_DATA" \
     --test_data_path "$TEST_DATA" \
     --checkpoint_interval_minutes 20 \
     --max_time "00:01:50:00" \
+    "${M2_ARGS[@]}" \
     "${INIT_ARGS[@]}" \
     "${RESUME_ARGS[@]}"
 
