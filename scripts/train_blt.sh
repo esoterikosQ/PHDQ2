@@ -15,6 +15,7 @@
 set -euo pipefail
 
 export BLT_SUPPRESS_ATTN_ERROR="${BLT_SUPPRESS_ATTN_ERROR:-1}"
+export BLT_ALLOW_MISSING_FLEX_ATTENTION="${BLT_ALLOW_MISSING_FLEX_ATTENTION:-1}"
 
 if [[ "$PWD" != /scratch/"$USER"/* ]]; then
     echo "Error: Neuron jobs must be submitted from /scratch/$USER."
