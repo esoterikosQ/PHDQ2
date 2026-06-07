@@ -104,7 +104,7 @@ ADAM_BETA1="${ADAM_BETA1:-0.9}"
 ADAM_BETA2="${ADAM_BETA2:-0.95}"
 ADAM_EPS="${ADAM_EPS:-1e-8}"
 MAX_EPOCHS="${MAX_EPOCHS:-3}"
-NUM_WORKERS="${NUM_WORKERS:-2}"
+NUM_WORKERS="${NUM_WORKERS:-0}"
 OUTPUT_DIR="${OUTPUT_DIR:-outputs/blt_gec}"
 BLT_REPO="${BLT_REPO:-facebook/blt-1b}"
 ENTROPY_REPO="${ENTROPY_REPO:-facebook/blt-entropy}"
@@ -118,6 +118,8 @@ MAX_GEN_LEN="${MAX_GEN_LEN:-256}"
 EVAL_GENERATION="${EVAL_GENERATION:-1}"
 EVAL_MAX_EXAMPLES="${EVAL_MAX_EXAMPLES:-0}"
 EVAL_EVERY_STEPS="${EVAL_EVERY_STEPS:-0}"
+MAX_STEPS="${MAX_STEPS:-0}"
+LOG_EVERY_STEPS="${LOG_EVERY_STEPS:-10}"
 M2_SOURCE_GOLD_PATH="${M2_SOURCE_GOLD_PATH:-}"
 RUN_TEST_ON_END="${RUN_TEST_ON_END:-0}"
 TEST_ONLY="${TEST_ONLY:-0}"
@@ -191,6 +193,8 @@ echo "BLT scheduler: $SCHEDULER"
 echo "BLT warmup_steps: $WARMUP_STEPS"
 echo "BLT num_beams: $BLT_NUM_BEAMS"
 
+export PYTHONUNBUFFERED=1
+
 srun "$PYTHON_BIN" -m blt_gec.train \
     --data "$DATASET_TYPE" \
     --train_data_path "$TRAIN_DATA" \
@@ -218,6 +222,8 @@ srun "$PYTHON_BIN" -m blt_gec.train \
     --max_gen_len "$MAX_GEN_LEN" \
     --eval_max_examples "$EVAL_MAX_EXAMPLES" \
     --eval_every_steps "$EVAL_EVERY_STEPS" \
+    --max_steps "$MAX_STEPS" \
+    --log_every_steps "$LOG_EVERY_STEPS" \
     --checkpoint_interval_minutes 20 \
     --max_time "00:01:50:00" \
     "${LOCAL_FILES_ARGS[@]}" \

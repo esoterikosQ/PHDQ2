@@ -75,7 +75,7 @@ def parse_args():
     parser.add_argument("--local_files_only", action="store_true")
     parser.add_argument("--max_length", type=int, default=2048)
     parser.add_argument("--batch_size", type=int, default=1)
-    parser.add_argument("--num_workers", type=int, default=2)
+    parser.add_argument("--num_workers", type=int, default=0)
     parser.add_argument("--max_epochs", type=int, default=3)
     parser.add_argument("--lr", type=float, default=1e-5)
     parser.add_argument("--weight_decay", type=float, default=0.1)
@@ -102,6 +102,8 @@ def parse_args():
     parser.add_argument("--run_test_on_end", action="store_true")
     parser.add_argument("--test_only", action="store_true")
     parser.add_argument("--separator", type=str, default=DEFAULT_GEC_SEPARATOR)
+    parser.add_argument("--max_steps", type=int, default=0,
+                        help="Stop training after this many optimizer steps. 0 means no limit.")
     parser.add_argument("--seed", type=int, default=0)
     return parser.parse_args()
 
@@ -449,9 +451,11 @@ def main():
                 global_step += 1
 
                 if global_step % args.log_every_steps == 0:
+                    elapsed_min = (time.time() - start_time) / 60
                     print(
                         f"epoch={epoch} step={global_step} "
-                        f"loss={loss.item() * args.grad_accum_steps:.4f}"
+                        f"loss={loss.item() * args.grad_accum_steps:.4f} "
+                        f"elapsed={elapsed_min:.1f}m"
                     )
 
                 if args.eval_every_steps > 0 and global_step % args.eval_every_steps == 0:
@@ -506,6 +510,21 @@ def main():
                         args=args,
                     )
                     last_checkpoint_time = now
+
+                if args.max_steps > 0 and global_step >= args.max_steps:
+                    print(f"Reached max_steps={args.max_steps}. Stopping.")
+                    save_checkpoint(
+                        run_dir / "last.ckpt",
+                        model=model,
+                        optimizer=optimizer,
+                        scheduler=scheduler,
+                        epoch=epoch,
+                        global_step=global_step,
+                        best_val_loss=best_val_loss,
+                        best_val_gleu=best_val_gleu,
+                        args=args,
+                    )
+                    return
 
                 elapsed = now - start_time
                 if STOP_REQUESTED or elapsed > max_seconds - 300:

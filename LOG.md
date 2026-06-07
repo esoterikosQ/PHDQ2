@@ -4,6 +4,27 @@
 > 최신 항목이 위에 오도록 역순으로 기록합니다.
 
 ---
+## [2026-06-07] BLT attention 호환성 실행 플래그 추가
+
+### 목표
+- Neuron SLURM 환경의 PyTorch/xformers/flex_attention 조합 차이로 BLT reference 실행이 중단되는 문제를 완화
+
+### 수행 내용
+- `scripts/train_blt.sh`에 BLT attention 호환성 환경변수 기본값 추가
+  - `BLT_SUPPRESS_ATTN_ERROR=1`
+  - `BLT_ALLOW_MISSING_FLEX_ATTENTION=1`
+- `blt_gec/model.py`의 reference BLT 로딩 후 attention 구현을 `sdpa`로 강제하고, flex attention 기반 cross-attention 경로를 우회하도록 한 기존 fallback과 맞춤
+- 쉘 구문 확인
+  - `bash -n scripts/train_blt.sh scripts/train_bart.sh scripts/eval_bart.sh scripts/train_byte_prefix_lm.sh`
+
+### 결과
+- BLT용 torch/xformers/flex_attention 세부 구현이 클러스터 환경과 완전히 일치하지 않아도, 가능한 경우 PyTorch SDPA 경로로 우회해 smoke run을 시도할 수 있음
+- 여전히 BLT 전용 환경은 `phdq_blt`로 분리하고, torch nightly/xformers reference 조합을 우선 맞추는 것이 기본 방침
+
+### 다음 단계
+- [ ] `CONDA_ENV=phdq_blt EVAL_MAX_EXAMPLES=20 sbatch scripts/train_blt.sh`로 실제 SLURM smoke run에서 attention fallback 동작 확인
+
+---
 ## [2026-06-07] BLT optimizer/test/generation 정리
 
 ### 목표
