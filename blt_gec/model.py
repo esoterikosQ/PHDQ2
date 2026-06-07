@@ -110,6 +110,8 @@ def load_reference_blt_components(
         )
 
     _override_attn_impl(model, "sdpa")
+    if hasattr(model, "cross_attn_use_flex_attention"):
+        model.cross_attn_use_flex_attention = False
 
     return ReferenceBltComponents(
         model=model,
