@@ -151,6 +151,8 @@ def _cross_attention_forward_sdpa(self, x, kv, mask=None):
 
     xq, xk, xv = (e.transpose(1, 2) for e in (xq, xk, xv))
     attn_mask = mask if isinstance(mask, torch.Tensor) else None
+    if attn_mask is not None:
+        attn_mask = attn_mask.to(dtype=xq.dtype)
     output = torch.nn.functional.scaled_dot_product_attention(
         xq, xk, xv, attn_mask=attn_mask,
     )
