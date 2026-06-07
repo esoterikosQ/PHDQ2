@@ -109,9 +109,18 @@ def load_reference_blt_components(
             f"Expected entropy dynamic patching, got patching_mode={patcher.patching_mode!r}"
         )
 
+    _override_attn_impl(model, "sdpa")
+
     return ReferenceBltComponents(
         model=model,
         tokenizer=tokenizer,
         patcher=patcher,
         entropy_model=entropy_model,
     )
+
+
+def _override_attn_impl(module: torch.nn.Module, impl: str = "sdpa") -> None:
+    if hasattr(module, "attn_impl"):
+        module.attn_impl = impl
+    for child in module.children():
+        _override_attn_impl(child, impl)
