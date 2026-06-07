@@ -144,7 +144,7 @@ def save_checkpoint(
 
 
 def load_checkpoint(path: Path, model: torch.nn.Module, optimizer: torch.optim.Optimizer, scheduler, device):
-    checkpoint = torch.load(path, map_location=device)
+    checkpoint = torch.load(path, map_location=device, weights_only=False)
     model.load_state_dict(checkpoint["model"], strict=False)
     optimizer.load_state_dict(checkpoint["optimizer"])
     if scheduler is not None and checkpoint.get("scheduler") is not None:

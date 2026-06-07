@@ -140,21 +140,70 @@ if [[ ! -f "$TRAIN_DATA" || ! -f "$VAL_DATA" || ! -f "$TEST_DATA" ]]; then
     exit 1
 fi
 
+checkpoint_is_loadable() {
+    local checkpoint_path="$1"
+    "$PYTHON_BIN" - "$checkpoint_path" <<'PY'
+import sys
+from pathlib import Path
+
+import torch
+
+path = Path(sys.argv[1])
+try:
+    checkpoint = torch.load(path, map_location="cpu", weights_only=False)
+except Exception as exc:
+    print(f"Invalid checkpoint {path}: {exc}")
+    raise SystemExit(1)
+
+if not isinstance(checkpoint, dict) or "model" not in checkpoint:
+    print(f"Invalid checkpoint {path}: missing model state")
+    raise SystemExit(1)
+
+print(f"Checkpoint is loadable: {path}")
+PY
+}
+
+quarantine_checkpoint() {
+    local checkpoint_path="$1"
+    local quarantined="${checkpoint_path}.corrupt.$(date +%Y%m%d%H%M%S)"
+    mv "$checkpoint_path" "$quarantined"
+    echo "Moved corrupt checkpoint to: $quarantined"
+}
+
 RESUME_CKPT="${RESUME_CKPT-auto}"
 RESUME_ARGS=()
 if [[ "$RESUME_CKPT" == "auto" ]]; then
-    if [[ -f "$OUTPUT_DIR/${DATASET_TYPE}/best.ckpt" ]]; then
-        RESUME_ARGS=(--resume_ckpt_path "$OUTPUT_DIR/${DATASET_TYPE}/best.ckpt")
-        echo "Auto-best resume enabled: $OUTPUT_DIR/${DATASET_TYPE}/best.ckpt"
-    elif [[ -f "$OUTPUT_DIR/${DATASET_TYPE}/last.ckpt" ]]; then
-        RESUME_ARGS=(--resume_ckpt_path "$OUTPUT_DIR/${DATASET_TYPE}/last.ckpt")
-        echo "Auto-best checkpoint not found; falling back to last checkpoint: $OUTPUT_DIR/${DATASET_TYPE}/last.ckpt"
-    else
-        echo "Auto-resume enabled: no existing last.ckpt found; starting fresh."
+    BEST_CKPT="$OUTPUT_DIR/${DATASET_TYPE}/best.ckpt"
+    LAST_CKPT="$OUTPUT_DIR/${DATASET_TYPE}/last.ckpt"
+
+    if [[ -f "$BEST_CKPT" ]]; then
+        if checkpoint_is_loadable "$BEST_CKPT"; then
+            RESUME_ARGS=(--resume_ckpt_path "$BEST_CKPT")
+            echo "Auto-best resume enabled: $BEST_CKPT"
+        else
+            quarantine_checkpoint "$BEST_CKPT"
+        fi
+    fi
+
+    if [[ ${#RESUME_ARGS[@]} -eq 0 && -f "$LAST_CKPT" ]]; then
+        if checkpoint_is_loadable "$LAST_CKPT"; then
+            RESUME_ARGS=(--resume_ckpt_path "$LAST_CKPT")
+            echo "Auto-best checkpoint not found or invalid; falling back to last checkpoint: $LAST_CKPT"
+        else
+            quarantine_checkpoint "$LAST_CKPT"
+        fi
+    fi
+
+    if [[ ${#RESUME_ARGS[@]} -eq 0 ]]; then
+        echo "Auto-resume enabled: no loadable checkpoint found; starting fresh."
     fi
 elif [[ -n "$RESUME_CKPT" ]]; then
     if [[ ! -f "$RESUME_CKPT" ]]; then
         echo "Error: RESUME_CKPT not found: $RESUME_CKPT"
+        exit 1
+    fi
+    if ! checkpoint_is_loadable "$RESUME_CKPT"; then
+        echo "Error: explicit RESUME_CKPT is not loadable: $RESUME_CKPT"
         exit 1
     fi
     RESUME_ARGS=(--resume_ckpt_path "$RESUME_CKPT")

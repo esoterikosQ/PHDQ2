@@ -4,6 +4,31 @@
 > 최신 항목이 위에 오도록 역순으로 기록합니다.
 
 ---
+## [2026-06-07] BLT auto-resume corrupt checkpoint 방어 추가
+
+### 목표
+- SLURM 중단/부분 저장으로 깨진 BLT checkpoint가 있을 때 auto-resume이 `PytorchStreamReader failed reading zip archive`로 중단되는 문제 해결
+
+### 원인
+- `scripts/train_blt.sh`가 `outputs/blt_gec/<dataset>/best.ckpt` 또는 `last.ckpt` 파일 존재만 확인하고 `--resume_ckpt_path`로 전달
+- 깨진 zip checkpoint를 `torch.load`가 읽으면서 `failed finding central directory` 발생
+
+### 수행 내용
+- `scripts/train_blt.sh`에 checkpoint 사전 검증 추가
+  - `torch.load(..., map_location="cpu", weights_only=False)`로 load 가능 여부 확인
+  - auto-resume에서 깨진 `best.ckpt`는 `*.corrupt.<timestamp>`로 이동 후 `last.ckpt` 후보 확인
+  - `last.ckpt`도 깨졌으면 격리하고 fresh start
+  - 명시적 `RESUME_CKPT`가 깨졌으면 즉시 실패
+- `blt_gec/train.py`의 실제 checkpoint load도 `weights_only=False`를 명시해 PyTorch 2.6+ 호환성 확보
+
+### 결과
+- 깨진 auto checkpoint 때문에 BLT smoke run 전체가 중단되는 상황을 방지
+- 명시적 resume 경로가 잘못된 경우에는 조용히 새로 시작하지 않고 오류로 알려줌
+
+### 다음 단계
+- [ ] 클러스터에서 최신 코드 pull 후 `CONDA_ENV=phdq_blt EVAL_MAX_EXAMPLES=20 sbatch scripts/train_blt.sh` 재실행
+
+---
 ## [2026-06-07] BLT attention 호환성 실행 플래그 추가
 
 ### 목표
