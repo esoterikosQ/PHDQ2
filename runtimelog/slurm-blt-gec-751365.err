@@ -1,0 +1,3 @@
+/scratch/r984a02/PHDQ2/blt_gec/model.py:47: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  self.transformer = nn.TransformerEncoder(encoder_layer, num_layers=config.num_layers)
+slurmstepd: error: *** JOB 751365 ON gpu40 CANCELLED AT 2026-06-07T08:44:50 ***
