@@ -28,6 +28,10 @@ def parse_args():
     return parser.parse_args()
 
 
+def strip_module_prefix(state: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
+    return {key.removeprefix("module."): value for key, value in state.items()}
+
+
 def main():
     args = parse_args()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -44,8 +48,8 @@ def main():
         raise SystemExit(f"Error: {exc}") from exc
 
     if args.checkpoint:
-        checkpoint = torch.load(Path(args.checkpoint), map_location=device)
-        components.model.load_state_dict(checkpoint["model"], strict=False)
+        checkpoint = torch.load(Path(args.checkpoint), map_location=device, weights_only=False)
+        components.model.load_state_dict(strip_module_prefix(checkpoint["model"]), strict=False)
 
     print(
         generate_correction(

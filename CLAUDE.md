@@ -16,6 +16,88 @@ A demoted `byte_prefix_lm/` package exists for byte-only causal Transformer expe
 
 Code is written on **Mac**, trained on **SLURM** (Neuron cluster, A100), served on **Ubuntu RTX 5090**. All sync via `esoterikosQ/PHDQ2` git repo. Code changes happen on Mac; SLURM/Ubuntu always `git pull` before execution.
 
+## Neuron SLURM Cluster Reference
+
+### GPU Partitions
+
+| Partition | GPU | GPUs/Node | CPUs/Node | Mem | Nodes | Max Active/Running |
+|-----------|-----|-----------|-----------|-----|-------|--------------------|
+| **amd_a100nv_8** | A100 80GB | 8 | 64 | 768GB | gpu[35-43] | 20 / 10 |
+| amd_a100_4 | A100 80GB | 4 | 64 | 768GB | gpu45 | 2 / 2 |
+| amd_h100_2 | H100 | 2 | 48 | 576GB | gpu[57-59] | 2 / 1 |
+| eme_h200nv_8 | H200 | 8 | 96 | 1.1TB | gpu47 | 4 / 2 |
+| amd_h200nv_8 | H200 | 8 | 96 | 1.1TB | gpu56 | 4 / 2 |
+| gh200_1 | GH200 | 1 | 72 | 864GB | gpu52 | 12 / 6 |
+| cas_v100nv_8 | V100 | 8 | 32 | 384GB | gpu[01-05] | 12 / 10 |
+| cas_v100nv_4 | V100 | 4 | 40 | 480GB | gpu[06-09] | 8 / 4 |
+| cas_v100_4 | V100 | 4 | 40 | 480GB | gpu[10-20] | 20 / 10 |
+| cas_v100_2 | V100 | 2 | 32 | 384GB | gpu[25-26] | 12 / 6 |
+
+**현재 사용 중**: `amd_a100nv_8` (A100 80GB × 8, 64 cores, 768GB)
+
+### CPU-per-GPU 할당 규칙
+
+노드의 CPU/GPU 비율로 자동 계산: `cpus-per-gpu = (총 코어 / 총 GPU) × 요청 GPU 수`
+
+| Partition | 계산 | GPU 1개당 CPU |
+|-----------|------|---------------|
+| amd_a100nv_8 | 64 / 8 | **8** |
+| amd_a100_4 | 64 / 4 | 16 |
+| cas_v100nv_8 | 32 / 8 | 4 |
+| cas_v100nv_4 | 40 / 4 | 10 |
+| cas_v100_4 | 40 / 4 | 10 |
+
+`amd_a100nv_8`에서 GPU 1개 요청 시 최대 **8 CPU cores**. 스크립트의 `--cpus-per-task=4`는 이 범위 내.
+
+### 시간 제한 및 정책
+
+- 기본 wall time: **48시간** (배치), 24시간(Jupyter), 8시간(인터랙티브)
+- 현재 스크립트: `--time=01:55:00` (안전 마진 포함)
+- 노드 공유 정책: 한 노드에 여러 작업 동시 실행 (shared node)
+- `--exclusive` 사용 시 노드 독점 가능하나 대기 시간 증가
+
+### 스토리지
+
+- **작업 디렉토리**: `/scratch/$USER/` — 모든 연산은 여기서 수행, sbatch 제출도 여기서만 가능
+- **홈 디렉토리**: `/home01/$USER/` — 설정 파일, conda 환경 기본 경로
+- **자동 삭제**: /scratch에서 **15일간 미접근 파일 자동 삭제** (ToBeDelete_ 접두어 후 20-30일 유예)
+- **백업 없음**: Neuron 시스템에 별도 백업 없음
+- 용량 확인: `quotainfo`
+
+### Conda 환경
+
+```bash
+# x86_64 초기화 (최초 1회)
+source /apps/applications/Miniconda/23.3.1/etc/profile.d/conda.sh
+conda init && source ~/.bashrc
+
+# AArch64 (gh200_1 노드)
+source /apps/ARM_node/ARM_applications/Miniconda/24.5.0/etc/profile.d/conda.sh
+```
+
+기본 저장 경로: `~/.conda/envs/`, `~/.conda/pkgs/`. scratch로 변경 가능:
+```bash
+export CONDA_ENVS_PATH=/scratch/$USER/.conda/envs
+export CONDA_PKGS_DIRS=/scratch/$USER/.conda/pkgs
+```
+
+### SBATCH 필수 지시자
+
+- `--comment=pytorch` — 애플리케이션 유형 필수 명시 (pytorch, tensorflow 등)
+- `-p <partition>` — 파티션 선택
+- `--gres=gpu:<N>` — GPU 수 요청
+- `--cpus-per-task` — 파티션의 CPU-per-GPU 한도 이내로 설정
+
+### 주요 명령어
+
+```bash
+sbatch script.sh          # 작업 제출
+squeue -u $USER           # 내 작업 확인
+scancel <JOB_ID>          # 작업 취소
+sinfo -Nel                # 노드/파티션 상태
+scontrol show job <ID>    # 작업 상세 정보
+```
+
 ## Commands
 
 ### SLURM Training (from `/scratch/$USER/PHDQ2`)

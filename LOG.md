@@ -4,6 +4,43 @@
 > 최신 항목이 위에 오도록 역순으로 기록합니다.
 
 ---
+## [2026-06-08] BLT generation 평가 분리 및 single-node DDP 준비
+
+### 목표
+- SLURM 2시간 제한에서 BLT 학습과 generation 평가가 서로 막지 않도록 작업 분리
+- single-node multi-GPU DDP 학습을 위한 코드 경로 추가
+
+### 수행 내용
+- `blt_gec/metrics.py` 추가
+  - GLEU/M2 계산을 학습/평가 공용 유틸로 분리
+- `blt_gec/eval.py` 추가
+  - checkpoint 기반 val/test generation 평가를 standalone CLI로 분리
+  - `start_index`/`max_examples` shard 평가와 aggregate 모드 지원
+  - shard range gap/overlap 및 source/reference/hypothesis 누락 검사 추가
+- `scripts/eval_blt.sh` 추가
+  - SLURM array 기반 BLT generation shard 평가 지원
+  - aggregate 모드 지원
+- `scripts/train_blt.sh` 수정
+  - 기본 `EVAL_GENERATION=0`으로 변경
+  - `NUM_GPUS>1`일 때 `torch.distributed.run` 기반 single-node DDP 실행
+  - 실제 CUDA visible GPU 수와 `NUM_GPUS` 불일치 fail-fast 추가
+- `blt_gec/train.py` 수정
+  - `DistributedSampler`, DDP, `no_sync()` gradient accumulation 지원
+  - rank 0 전용 logging/checkpoint/validation 처리
+  - DDP checkpoint 저장/로드 호환성 확보
+- `blt_gec/generate.py` 수정
+  - DDP checkpoint의 `module.` prefix 제거 후 로드
+
+### 결과
+- 학습 job은 validation loss 중심으로 2시간 제한 안에서 돌리고, GLEU generation은 별도 shard job으로 분리 가능
+- single GPU 기존 실행과 single-node multi-GPU DDP 실행 경로가 공존
+
+### 다음 단계
+- [ ] `CONDA_ENV=phdq_blt EVAL_GENERATION=0 sbatch scripts/train_blt.sh`로 단일 GPU 하위 호환 확인
+- [ ] `CONDA_ENV=phdq_blt CKPT_PATH=outputs/blt_gec/native/best.ckpt sbatch --array=0-1 scripts/eval_blt.sh`로 shard 평가 smoke test
+- [ ] `CONDA_ENV=phdq_blt NUM_GPUS=2 sbatch --gres=gpu:2 scripts/train_blt.sh`로 DDP smoke test
+
+---
 ## [2026-06-07] BLT auto-resume corrupt checkpoint 방어 추가
 
 ### 목표

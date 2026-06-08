@@ -31,8 +31,9 @@ echo "CUDA_VISIBLE_DEVICES: $CUDA_VISIBLE_DEVICES"
 echo "Start Time: $(date)"
 echo "Submit Dir: $SLURM_SUBMIT_DIR"
 echo "Partition: amd_a100nv_8"
-echo "Requested GPUs: 1"
-echo "Requested CPU cores per task: 4"
+NUM_GPUS="${NUM_GPUS:-1}"
+echo "Requested GPUs: $NUM_GPUS"
+echo "Requested CPU cores per task: ${SLURM_CPUS_PER_TASK:-4}"
 
 PROJECT_HOME="$PWD"
 cd "$PROJECT_HOME"
@@ -62,6 +63,23 @@ if ! "$PYTHON_BIN" -c "import torch; import numpy; print('Torch:', torch.__versi
     exit 1
 fi
 cat /tmp/phdq_blt_torch_check.txt
+
+if [[ "$NUM_GPUS" -lt 1 ]]; then
+    echo "Error: NUM_GPUS must be >= 1, got $NUM_GPUS."
+    exit 1
+fi
+
+ACTUAL_GPUS="$("$PYTHON_BIN" -c 'import torch; print(torch.cuda.device_count())')"
+echo "Visible CUDA device count: $ACTUAL_GPUS"
+if [[ "$ACTUAL_GPUS" -lt "$NUM_GPUS" ]]; then
+    echo "Error: NUM_GPUS=$NUM_GPUS but only $ACTUAL_GPUS CUDA device(s) are visible."
+    echo "Submit with: NUM_GPUS=$NUM_GPUS sbatch --gres=gpu:$NUM_GPUS --cpus-per-task=16 scripts/train_blt.sh"
+    exit 1
+fi
+if [[ "$NUM_GPUS" -gt 1 && "${SLURM_NNODES:-1}" -ne 1 ]]; then
+    echo "Error: this script supports single-node DDP only. SLURM_NNODES=${SLURM_NNODES:-1}"
+    exit 1
+fi
 
 REFERENCE_BLT_DIR="${REFERENCE_BLT_DIR:-$PROJECT_HOME/reference_code/blt}"
 if [[ ! -d "$REFERENCE_BLT_DIR/bytelatent" ]]; then
@@ -115,7 +133,7 @@ WARMUP_STEPS="${WARMUP_STEPS:-2000}"
 WARMUP_RATIO="${WARMUP_RATIO:-0.0}"
 BLT_NUM_BEAMS="${BLT_NUM_BEAMS:-4}"
 MAX_GEN_LEN="${MAX_GEN_LEN:-256}"
-EVAL_GENERATION="${EVAL_GENERATION:-1}"
+EVAL_GENERATION="${EVAL_GENERATION:-0}"
 EVAL_MAX_EXAMPLES="${EVAL_MAX_EXAMPLES:-0}"
 EVAL_EVERY_STEPS="${EVAL_EVERY_STEPS:-0}"
 MAX_STEPS="${MAX_STEPS:-0}"
@@ -241,10 +259,22 @@ echo "BLT Adam betas: ($ADAM_BETA1, $ADAM_BETA2)"
 echo "BLT scheduler: $SCHEDULER"
 echo "BLT warmup_steps: $WARMUP_STEPS"
 echo "BLT num_beams: $BLT_NUM_BEAMS"
+echo "BLT NUM_GPUS: $NUM_GPUS"
 
 export PYTHONUNBUFFERED=1
 
-srun "$PYTHON_BIN" -m blt_gec.train \
+if [[ "$NUM_GPUS" -gt 1 ]]; then
+    LAUNCHER=(
+        srun "$PYTHON_BIN" -m torch.distributed.run
+        --standalone
+        --nproc_per_node "$NUM_GPUS"
+        -m blt_gec.train
+    )
+else
+    LAUNCHER=(srun "$PYTHON_BIN" -m blt_gec.train)
+fi
+
+"${LAUNCHER[@]}" \
     --data "$DATASET_TYPE" \
     --train_data_path "$TRAIN_DATA" \
     --val_data_path "$VAL_DATA" \
