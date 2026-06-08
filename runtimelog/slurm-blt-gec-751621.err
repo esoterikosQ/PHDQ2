@@ -1,0 +1,53 @@
+/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/scratch/r984a02/PHDQ2/blt_gec/train.py", line 590, in <module>
+    main()
+  File "/scratch/r984a02/PHDQ2/blt_gec/train.py", line 462, in main
+    gen_metrics = evaluate_generation(
+                  ^^^^^^^^^^^^^^^^^^^^
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/r984a02/PHDQ2/blt_gec/train.py", line 275, in evaluate_generation
+    generate_correction(
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/r984a02/PHDQ2/blt_gec/generation.py", line 45, in generate_correction
+    logits = model(tokens, patch_lengths=patch_lengths)[:, -1].float()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/r984a02/PHDQ2/reference_code/blt/bytelatent/model/blt.py", line 973, in forward
+    (h_encoder, h_cross), cache_encoder = self.local_encoder(
+                                          ^^^^^^^^^^^^^^^^^^^
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/r984a02/PHDQ2/reference_code/blt/bytelatent/model/local_models.py", line 280, in forward
+    patch_embeds = self.apply_cross_attention(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/r984a02/PHDQ2/reference_code/blt/bytelatent/model/local_models.py", line 306, in apply_cross_attention
+    patch_embeds_cross = self.cross_attn_layers[layer_idx](
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/r984a02/PHDQ2/blt_gec/model.py", line 154, in _cross_attention_forward_sdpa
+    output = torch.nn.functional.scaled_dot_product_attention(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: invalid dtype for bias - should match query's dtype
+srun: error: gpu40: task 0: Exited with exit code 1

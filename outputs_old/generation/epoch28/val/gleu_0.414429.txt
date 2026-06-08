@@ -1,0 +1,1 @@
+data: learner, epoch: 28, gleu_out: 0.414429, val_loss: 0.8166688680648804

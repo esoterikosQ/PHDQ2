@@ -1,0 +1,290 @@
+/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+unknown:0: unknown: block: [0,0,0], thread: [353,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [354,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [355,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [356,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [357,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [358,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [359,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [360,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [361,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [362,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [363,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [364,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [365,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [366,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [367,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [368,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [369,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [370,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [371,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [372,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [373,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [374,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [375,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [376,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [377,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [378,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [379,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [380,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [381,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [382,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [383,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [481,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [482,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [483,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [484,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [485,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [486,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [487,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [488,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [489,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [490,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [491,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [492,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [493,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [494,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [495,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [496,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [497,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [498,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [499,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [500,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [501,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [502,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [503,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [504,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [505,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [506,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [507,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [508,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [509,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [510,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [511,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [225,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [226,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [227,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [228,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [229,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [230,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [231,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [232,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [233,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [234,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [235,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [236,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [237,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [238,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [239,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [240,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [241,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [242,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [243,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [244,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [245,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [246,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [247,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [248,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [249,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [250,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [251,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [252,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [253,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [254,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [255,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [97,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [98,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [99,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [100,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [101,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [102,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [103,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [104,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [105,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [106,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [107,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [108,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [109,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [110,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [111,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [112,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [113,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [114,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [115,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [116,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [117,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [118,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [119,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [120,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [121,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [122,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [123,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [124,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [125,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [126,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [0,0,0], thread: [127,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [481,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [482,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [483,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [484,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [485,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [486,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [487,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [488,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [489,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [490,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [491,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [492,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [493,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [494,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [495,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [496,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [497,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [498,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [499,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [500,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [501,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [502,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [503,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [504,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [505,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [506,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [507,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [508,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [509,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [510,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [511,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [353,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [354,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [355,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [356,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [357,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [358,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [359,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [360,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [361,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [362,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [363,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [364,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [365,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [366,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [367,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [368,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [369,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [370,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [371,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [372,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [373,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [374,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [375,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [376,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [377,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [378,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [379,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [380,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [381,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [382,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [383,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [225,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [226,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [227,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [228,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [229,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [230,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [231,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [232,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [233,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [234,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [235,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [236,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [237,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [238,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [239,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [240,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [241,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [242,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [243,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [244,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [245,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [246,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [247,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [248,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [249,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [250,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [251,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [252,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [253,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [254,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [255,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [97,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [98,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [99,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [100,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [101,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [102,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [103,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [104,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [105,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [106,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [107,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [108,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [109,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [110,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [111,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [112,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [113,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [114,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [115,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [116,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [117,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [118,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [119,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [120,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [121,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [122,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [123,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [124,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [125,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [126,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+unknown:0: unknown: block: [1,0,0], thread: [127,0,0] Assertion `index out of bounds: r1 % 128 < 97` failed.
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/scratch/r984a02/PHDQ2/blt_gec/train.py", line 590, in <module>
+    main()
+  File "/scratch/r984a02/PHDQ2/blt_gec/train.py", line 439, in main
+    logits = model(input_ids, patch_lengths=patch_lengths)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/r984a02/PHDQ2/reference_code/blt/bytelatent/model/blt.py", line 934, in forward
+    cross_attn_mask_enc = cross_attn_mask(
+                          ^^^^^^^^^^^^^^^^
+  File "/scratch/r984a02/PHDQ2/reference_code/blt/bytelatent/model/blt.py", line 272, in cross_attn_mask
+    block_mask = create_block_mask(
+                 ^^^^^^^^^^^^^^^^^^
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/nn/attention/flex_attention.py", line 853, in create_block_mask
+    block_mask = _create_sparse_block_from_block_mask(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/nn/attention/flex_attention.py", line 691, in _create_sparse_block_from_block_mask
+    partial_bm = _dense_to_ordered(partial_blocks)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/nn/attention/flex_attention.py", line 179, in _dense_to_ordered
+    col_indices = torch.argsort(dense_mask, dim=-1, descending=True, stable=True)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/_higher_order_ops/flex_attention.py", line 85, in __torch_function__
+    return func(*args, **(kwargs or {}))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: CUDA error: device-side assert triggered
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+srun: error: gpu40: task 0: Exited with exit code 1

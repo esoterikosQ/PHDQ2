@@ -1,0 +1,38 @@
+==========================================
+SLURM_JOB_ID = 751393
+SLURM_NODELIST = gpu39
+==========================================
+Job ID: 751393
+Node: gpu39
+CUDA_VISIBLE_DEVICES: 0
+Start Time: Sun Jun  7 11:05:36 KST 2026
+Submit Dir: /scratch/r984a02/PHDQ2
+Partition: amd_a100nv_8
+Requested GPUs: 1
+Requested CPU cores per task: 4
+Python: /home01/r984a02/.conda/envs/phdq_blt/bin/python
+/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Torch: 2.6.0.dev20241112+cu121
+NumPy: 2.4.6
+/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Reference BLT import path: /scratch/r984a02/PHDQ2/reference_code/blt
+Auto-resume enabled: no existing last.ckpt found; starting fresh.
+Starting reference BLT-GEC fine-tuning on native dataset...
+BLT lr: 1e-5
+BLT weight_decay: 0.1
+BLT Adam betas: (0.9, 0.95)
+BLT scheduler: cosine
+BLT warmup_steps: 2000
+BLT num_beams: 4
+Device: cuda
+Backend: reference_blt
+Reference BLT code: /scratch/r984a02/PHDQ2/reference_code/blt
+BLT repo: facebook/blt-1b
+Entropy repo: facebook/blt-entropy
+Train: /scratch/r984a02/PHDQ2/data/Preprocessed/native/native_train.txt
+Val:   /scratch/r984a02/PHDQ2/data/Preprocessed/native/native_val.txt
+Test:  /scratch/r984a02/PHDQ2/data/Preprocessed/native/native_test.txt

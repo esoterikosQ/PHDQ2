@@ -1,0 +1,1 @@
+data: native, epoch: 11, gleu_out: 0.604006, val_loss: 0.2412930428981781

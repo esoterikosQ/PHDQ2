@@ -34,6 +34,7 @@ env/
 *.bin
 *.safetensors
 outputs/
+outputs_lod/
 hf-weights/
 
 # Data (too large for git; keep existing tracked docs, ignore local corpora/outputs)
