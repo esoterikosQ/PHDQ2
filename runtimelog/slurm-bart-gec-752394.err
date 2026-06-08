@@ -1,0 +1,31 @@
+/home01/r984a02/.conda/envs/phdq/lib/python3.10/site-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[rank: 0] Seed set to 0
+Loading weights:   0%|          | 0/261 [00:00<?, ?it/s]Loading weights: 100%|██████████| 261/261 [00:00<00:00, 34398.99it/s]
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+/home01/r984a02/.conda/envs/phdq/lib/python3.10/site-packages/lightning/pytorch/trainer/connectors/logger_connector/logger_connector.py:76: Starting from v1.9.0, `tensorboardX` has been removed as a dependency of the `lightning.pytorch` package, due to potential conflicts with other packages in the ML ecosystem. For this reason, `logger=True` will use `CSVLogger` as the default logger, unless the `tensorboard` or `tensorboardX` packages are found. Please `pip install lightning[extra]` or one of them to enable TensorBoard support by default
+💡 Tip: For seamless cloud logging and experiment tracking, try installing [litlogger](https://pypi.org/project/litlogger/) to enable LitLogger, which logs metrics and artifacts automatically to the Lightning Experiments platform.
+/home01/r984a02/.conda/envs/phdq/lib/python3.10/site-packages/google/api_core/_python_version_support.py:255: FutureWarning: You are using a Python version (3.10.20) which Google will stop supporting in new releases of google.api_core once it reaches its end of life (2026-10-04). Please upgrade to the latest Python version, or at least Python 3.11, to continue receiving updates for google.api_core past that date.
+  warnings.warn(message, FutureWarning)
+/home01/r984a02/.conda/envs/phdq/lib/python3.10/site-packages/google/api_core/_python_version_support.py:255: FutureWarning: You are using a Python version (3.10.20) which Google will stop supporting in new releases of google.cloud._storage_v2 once it reaches its end of life (2026-10-04). Please upgrade to the latest Python version, or at least Python 3.11, to continue receiving updates for google.cloud._storage_v2 past that date.
+  warnings.warn(message, FutureWarning)
+/home01/r984a02/.conda/envs/phdq/lib/python3.10/site-packages/google/api_core/_python_version_support.py:255: FutureWarning: You are using a Python version (3.10.20) which Google will stop supporting in new releases of google.cloud.storage_control_v2 once it reaches its end of life (2026-10-04). Please upgrade to the latest Python version, or at least Python 3.11, to continue receiving updates for google.cloud.storage_control_v2 past that date.
+  warnings.warn(message, FutureWarning)
+You are using a CUDA device ('NVIDIA A100-SXM4-80GB') that has Tensor Cores. To properly utilize them, you should set `torch.set_float32_matmul_precision('medium' | 'high')` which will trade-off precision for performance. For more details, read https://pytorch.org/docs/stable/generated/torch.set_float32_matmul_precision.html#torch.set_float32_matmul_precision
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+WARNING:root:transformers.optimization.AdamW is unavailable; falling back to torch.optim.AdamW with bias correction enabled.
+SLURM auto-requeueing enabled. Setting signal handlers.
+/home01/r984a02/.conda/envs/phdq/lib/python3.10/site-packages/lightning/pytorch/utilities/_pytree.py:21: `isinstance(treespec, LeafSpec)` is deprecated, use `isinstance(treespec, TreeSpec) and treespec.is_leaf()` instead.
+Epoch 0, global step 311: 'val_gleu' reached 35.06370 (best 35.06370), saving model to '/scratch/r984a02/PHDQ2/outputs/learner_clean/model_ckpt/learner_clean_3e-05_epoch=00_step=311.ckpt' as top 3
+Epoch 1, global step 622: 'val_gleu' reached 35.05510 (best 35.06370), saving model to '/scratch/r984a02/PHDQ2/outputs/learner_clean/model_ckpt/learner_clean_3e-05_epoch=01_step=622.ckpt' as top 3
+Epoch 2, global step 933: 'val_gleu' reached 36.73410 (best 36.73410), saving model to '/scratch/r984a02/PHDQ2/outputs/learner_clean/model_ckpt/learner_clean_3e-05_epoch=02_step=933.ckpt' as top 3
+Epoch 3, global step 1244: 'val_gleu' reached 37.39380 (best 37.39380), saving model to '/scratch/r984a02/PHDQ2/outputs/learner_clean/model_ckpt/learner_clean_3e-05_epoch=03_step=1244.ckpt' as top 3
+Epoch 4, global step 1555: 'val_gleu' reached 37.86910 (best 37.86910), saving model to '/scratch/r984a02/PHDQ2/outputs/learner_clean/model_ckpt/learner_clean_3e-05_epoch=04_step=1555.ckpt' as top 3
+Epoch 5, global step 1866: 'val_gleu' reached 38.15090 (best 38.15090), saving model to '/scratch/r984a02/PHDQ2/outputs/learner_clean/model_ckpt/learner_clean_3e-05_epoch=05_step=1866.ckpt' as top 3
+Epoch 6, global step 2177: 'val_gleu' reached 38.96980 (best 38.96980), saving model to '/scratch/r984a02/PHDQ2/outputs/learner_clean/model_ckpt/learner_clean_3e-05_epoch=06_step=2177.ckpt' as top 3
+Epoch 7, global step 2488: 'val_gleu' reached 38.49540 (best 38.96980), saving model to '/scratch/r984a02/PHDQ2/outputs/learner_clean/model_ckpt/learner_clean_3e-05_epoch=07_step=2488.ckpt' as top 3
+Epoch 8, global step 2799: 'val_gleu' reached 38.31530 (best 38.96980), saving model to '/scratch/r984a02/PHDQ2/outputs/learner_clean/model_ckpt/learner_clean_3e-05_epoch=08_step=2799.ckpt' as top 3
+Epoch 9, global step 3110: 'val_gleu' was not in top 3
+`Trainer.fit` stopped: `max_epochs=10` reached.
+`weights_only` was not set, defaulting to `False`.

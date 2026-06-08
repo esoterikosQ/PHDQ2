@@ -1,0 +1,454 @@
+==========================================
+SLURM_JOB_ID = 752393
+SLURM_NODELIST = gpu38
+==========================================
+Job ID: 752393
+Node: gpu38
+CUDA_VISIBLE_DEVICES: 0
+Start Time: Tue Jun  9 02:02:47 KST 2026
+Submit Dir: /scratch/r984a02/PHDQ2
+Partition: amd_a100nv_8
+Requested GPUs: 1
+Requested CPU cores per task: 4
+Python: /home01/r984a02/.conda/envs/phdq/bin/python
+/home01/r984a02/.conda/envs/phdq/lib/python3.10/site-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Torch: 2.12.0+cu130
+NumPy: 2.2.6
+Starting KoBART GEC Training on native dataset...
+BART run name: native_clean
+BART profile: paper
+BART lr: 3e-5
+BART batch size: 64
+BART max epochs: 10
+BART num_beams: 4
+Auto-best resume enabled: no existing best checkpoint found; starting fresh.
+Arguments:
+{'adamw_correct_bias': False,
+ 'batch_size': 64,
+ 'best': {'f0.5': 0, 'gleu': 0, 'prec': 0, 'rec': 0},
+ 'check_val_every_n_epoch': 1,
+ 'checkpoint_interval_minutes': 20,
+ 'data': 'native_clean',
+ 'debug': False,
+ 'every_n_epochs': 1,
+ 'init_ckpt_path': '',
+ 'log_every_n_steps': 50,
+ 'lr': 3e-05,
+ 'm2_source_gold_path': '',
+ 'max_epochs': 10,
+ 'max_seq_len': 128,
+ 'max_time': '00:01:50:00',
+ 'model_ckpt_path': '',
+ 'name': 'kobart-native_clean',
+ 'num_beams': 4,
+ 'num_workers': 4,
+ 'resume_ckpt_path': '',
+ 'seed': 0,
+ 'test_data_path': '/scratch/r984a02/PHDQ2/data/Preprocessed/native/native_test.txt',
+ 'train_data_path': '/scratch/r984a02/PHDQ2/data/Preprocessed/native/native_train.txt',
+ 'val_data_path': '/scratch/r984a02/PHDQ2/data/Preprocessed/native/native_val.txt',
+ 'warmup_ratio': 0.0}
+┏━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
+┃   ┃ Name  ┃ Type                         ┃ Params ┃ Mode  ┃ FLOPs ┃
+┡━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
+│ 0 │ model │ BartForConditionalGeneration │  123 M │ train │     0 │
+└───┴───────┴──────────────────────────────┴────────┴───────┴───────┘
+Trainable params: 123 M                                                         
+Non-trainable params: 0                                                         
+Total params: 123 M                                                             
+Total estimated model params size (MB): 495.440                                 
+Modules in train mode: 182                                                      
+Modules in eval mode: 0                                                         
+Total FLOPs: 0                                                                  
+
+
+EPOCH 0 / VAL_LOSS 0.33 / GLEU 36.21
+
+{0: {'f_score': None,
+     'gleu': 36.205999999999996,
+     'loss': 0.32565823197364807,
+     'precision': None,
+     'recall': None}}
+
+Generation time: 34.087719202041626
+
+
+EPOCH 1 / VAL_LOSS 0.27 / GLEU 39.76
+
+{0: {'f_score': None,
+     'generation_time': 34.087719202041626,
+     'gleu': 36.205999999999996,
+     'loss': 0.32565823197364807,
+     'precision': None,
+     'recall': None},
+ 1: {'f_score': None,
+     'gleu': 39.7568,
+     'loss': 0.2703855633735657,
+     'precision': None,
+     'recall': None}}
+Saved best checkpoint alias: outputs/native_clean/best.ckpt
+
+Generation time: 23.865575313568115
+
+
+EPOCH 2 / VAL_LOSS 0.25 / GLEU 43.53
+
+{0: {'f_score': None,
+     'generation_time': 34.087719202041626,
+     'gleu': 36.205999999999996,
+     'loss': 0.32565823197364807,
+     'precision': None,
+     'recall': None},
+ 1: {'f_score': None,
+     'generation_time': 23.865575313568115,
+     'gleu': 39.7568,
+     'loss': 0.2703855633735657,
+     'precision': None,
+     'recall': None},
+ 2: {'f_score': None,
+     'gleu': 43.5291,
+     'loss': 0.2480434775352478,
+     'precision': None,
+     'recall': None}}
+Saved best checkpoint alias: outputs/native_clean/best.ckpt
+
+Generation time: 27.957016468048096
+
+
+EPOCH 3 / VAL_LOSS 0.23 / GLEU 45.69
+
+{0: {'f_score': None,
+     'generation_time': 34.087719202041626,
+     'gleu': 36.205999999999996,
+     'loss': 0.32565823197364807,
+     'precision': None,
+     'recall': None},
+ 1: {'f_score': None,
+     'generation_time': 23.865575313568115,
+     'gleu': 39.7568,
+     'loss': 0.2703855633735657,
+     'precision': None,
+     'recall': None},
+ 2: {'f_score': None,
+     'generation_time': 27.957016468048096,
+     'gleu': 43.5291,
+     'loss': 0.2480434775352478,
+     'precision': None,
+     'recall': None},
+ 3: {'f_score': None,
+     'gleu': 45.6949,
+     'loss': 0.23014922440052032,
+     'precision': None,
+     'recall': None}}
+Saved best checkpoint alias: outputs/native_clean/best.ckpt
+
+Generation time: 28.335224151611328
+
+
+EPOCH 4 / VAL_LOSS 0.23 / GLEU 47.7
+
+{0: {'f_score': None,
+     'generation_time': 34.087719202041626,
+     'gleu': 36.205999999999996,
+     'loss': 0.32565823197364807,
+     'precision': None,
+     'recall': None},
+ 1: {'f_score': None,
+     'generation_time': 23.865575313568115,
+     'gleu': 39.7568,
+     'loss': 0.2703855633735657,
+     'precision': None,
+     'recall': None},
+ 2: {'f_score': None,
+     'generation_time': 27.957016468048096,
+     'gleu': 43.5291,
+     'loss': 0.2480434775352478,
+     'precision': None,
+     'recall': None},
+ 3: {'f_score': None,
+     'generation_time': 28.335224151611328,
+     'gleu': 45.6949,
+     'loss': 0.23014922440052032,
+     'precision': None,
+     'recall': None},
+ 4: {'f_score': None,
+     'gleu': 47.700900000000004,
+     'loss': 0.2304195761680603,
+     'precision': None,
+     'recall': None}}
+Saved best checkpoint alias: outputs/native_clean/best.ckpt
+
+Generation time: 41.367697954177856
+
+
+EPOCH 5 / VAL_LOSS 0.22 / GLEU 48.51
+
+{0: {'f_score': None,
+     'generation_time': 34.087719202041626,
+     'gleu': 36.205999999999996,
+     'loss': 0.32565823197364807,
+     'precision': None,
+     'recall': None},
+ 1: {'f_score': None,
+     'generation_time': 23.865575313568115,
+     'gleu': 39.7568,
+     'loss': 0.2703855633735657,
+     'precision': None,
+     'recall': None},
+ 2: {'f_score': None,
+     'generation_time': 27.957016468048096,
+     'gleu': 43.5291,
+     'loss': 0.2480434775352478,
+     'precision': None,
+     'recall': None},
+ 3: {'f_score': None,
+     'generation_time': 28.335224151611328,
+     'gleu': 45.6949,
+     'loss': 0.23014922440052032,
+     'precision': None,
+     'recall': None},
+ 4: {'f_score': None,
+     'generation_time': 41.367697954177856,
+     'gleu': 47.700900000000004,
+     'loss': 0.2304195761680603,
+     'precision': None,
+     'recall': None},
+ 5: {'f_score': None,
+     'gleu': 48.507099999999994,
+     'loss': 0.21962636709213257,
+     'precision': None,
+     'recall': None}}
+Saved best checkpoint alias: outputs/native_clean/best.ckpt
+
+Generation time: 29.24615478515625
+
+
+EPOCH 6 / VAL_LOSS 0.22 / GLEU 47.64
+
+{0: {'f_score': None,
+     'generation_time': 34.087719202041626,
+     'gleu': 36.205999999999996,
+     'loss': 0.32565823197364807,
+     'precision': None,
+     'recall': None},
+ 1: {'f_score': None,
+     'generation_time': 23.865575313568115,
+     'gleu': 39.7568,
+     'loss': 0.2703855633735657,
+     'precision': None,
+     'recall': None},
+ 2: {'f_score': None,
+     'generation_time': 27.957016468048096,
+     'gleu': 43.5291,
+     'loss': 0.2480434775352478,
+     'precision': None,
+     'recall': None},
+ 3: {'f_score': None,
+     'generation_time': 28.335224151611328,
+     'gleu': 45.6949,
+     'loss': 0.23014922440052032,
+     'precision': None,
+     'recall': None},
+ 4: {'f_score': None,
+     'generation_time': 41.367697954177856,
+     'gleu': 47.700900000000004,
+     'loss': 0.2304195761680603,
+     'precision': None,
+     'recall': None},
+ 5: {'f_score': None,
+     'generation_time': 29.24615478515625,
+     'gleu': 48.507099999999994,
+     'loss': 0.21962636709213257,
+     'precision': None,
+     'recall': None},
+ 6: {'f_score': None,
+     'gleu': 47.6358,
+     'loss': 0.22433419525623322,
+     'precision': None,
+     'recall': None}}
+Saved best checkpoint alias: outputs/native_clean/best.ckpt
+
+Generation time: 24.57926368713379
+
+
+EPOCH 7 / VAL_LOSS 0.22 / GLEU 49.42
+
+{0: {'f_score': None,
+     'generation_time': 34.087719202041626,
+     'gleu': 36.205999999999996,
+     'loss': 0.32565823197364807,
+     'precision': None,
+     'recall': None},
+ 1: {'f_score': None,
+     'generation_time': 23.865575313568115,
+     'gleu': 39.7568,
+     'loss': 0.2703855633735657,
+     'precision': None,
+     'recall': None},
+ 2: {'f_score': None,
+     'generation_time': 27.957016468048096,
+     'gleu': 43.5291,
+     'loss': 0.2480434775352478,
+     'precision': None,
+     'recall': None},
+ 3: {'f_score': None,
+     'generation_time': 28.335224151611328,
+     'gleu': 45.6949,
+     'loss': 0.23014922440052032,
+     'precision': None,
+     'recall': None},
+ 4: {'f_score': None,
+     'generation_time': 41.367697954177856,
+     'gleu': 47.700900000000004,
+     'loss': 0.2304195761680603,
+     'precision': None,
+     'recall': None},
+ 5: {'f_score': None,
+     'generation_time': 29.24615478515625,
+     'gleu': 48.507099999999994,
+     'loss': 0.21962636709213257,
+     'precision': None,
+     'recall': None},
+ 6: {'f_score': None,
+     'generation_time': 24.57926368713379,
+     'gleu': 47.6358,
+     'loss': 0.22433419525623322,
+     'precision': None,
+     'recall': None},
+ 7: {'f_score': None,
+     'gleu': 49.4245,
+     'loss': 0.21750816702842712,
+     'precision': None,
+     'recall': None}}
+
+Generation time: 28.784735441207886
+
+
+EPOCH 8 / VAL_LOSS 0.22 / GLEU 49.76
+
+{0: {'f_score': None,
+     'generation_time': 34.087719202041626,
+     'gleu': 36.205999999999996,
+     'loss': 0.32565823197364807,
+     'precision': None,
+     'recall': None},
+ 1: {'f_score': None,
+     'generation_time': 23.865575313568115,
+     'gleu': 39.7568,
+     'loss': 0.2703855633735657,
+     'precision': None,
+     'recall': None},
+ 2: {'f_score': None,
+     'generation_time': 27.957016468048096,
+     'gleu': 43.5291,
+     'loss': 0.2480434775352478,
+     'precision': None,
+     'recall': None},
+ 3: {'f_score': None,
+     'generation_time': 28.335224151611328,
+     'gleu': 45.6949,
+     'loss': 0.23014922440052032,
+     'precision': None,
+     'recall': None},
+ 4: {'f_score': None,
+     'generation_time': 41.367697954177856,
+     'gleu': 47.700900000000004,
+     'loss': 0.2304195761680603,
+     'precision': None,
+     'recall': None},
+ 5: {'f_score': None,
+     'generation_time': 29.24615478515625,
+     'gleu': 48.507099999999994,
+     'loss': 0.21962636709213257,
+     'precision': None,
+     'recall': None},
+ 6: {'f_score': None,
+     'generation_time': 24.57926368713379,
+     'gleu': 47.6358,
+     'loss': 0.22433419525623322,
+     'precision': None,
+     'recall': None},
+ 7: {'f_score': None,
+     'generation_time': 28.784735441207886,
+     'gleu': 49.4245,
+     'loss': 0.21750816702842712,
+     'precision': None,
+     'recall': None},
+ 8: {'f_score': None,
+     'gleu': 49.757,
+     'loss': 0.21743392944335938,
+     'precision': None,
+     'recall': None}}
+Saved best checkpoint alias: outputs/native_clean/best.ckpt
+
+Generation time: 28.51757025718689
+
+
+EPOCH 9 / VAL_LOSS 0.22 / GLEU 49.66
+
+{0: {'f_score': None,
+     'generation_time': 34.087719202041626,
+     'gleu': 36.205999999999996,
+     'loss': 0.32565823197364807,
+     'precision': None,
+     'recall': None},
+ 1: {'f_score': None,
+     'generation_time': 23.865575313568115,
+     'gleu': 39.7568,
+     'loss': 0.2703855633735657,
+     'precision': None,
+     'recall': None},
+ 2: {'f_score': None,
+     'generation_time': 27.957016468048096,
+     'gleu': 43.5291,
+     'loss': 0.2480434775352478,
+     'precision': None,
+     'recall': None},
+ 3: {'f_score': None,
+     'generation_time': 28.335224151611328,
+     'gleu': 45.6949,
+     'loss': 0.23014922440052032,
+     'precision': None,
+     'recall': None},
+ 4: {'f_score': None,
+     'generation_time': 41.367697954177856,
+     'gleu': 47.700900000000004,
+     'loss': 0.2304195761680603,
+     'precision': None,
+     'recall': None},
+ 5: {'f_score': None,
+     'generation_time': 29.24615478515625,
+     'gleu': 48.507099999999994,
+     'loss': 0.21962636709213257,
+     'precision': None,
+     'recall': None},
+ 6: {'f_score': None,
+     'generation_time': 24.57926368713379,
+     'gleu': 47.6358,
+     'loss': 0.22433419525623322,
+     'precision': None,
+     'recall': None},
+ 7: {'f_score': None,
+     'generation_time': 28.784735441207886,
+     'gleu': 49.4245,
+     'loss': 0.21750816702842712,
+     'precision': None,
+     'recall': None},
+ 8: {'f_score': None,
+     'generation_time': 28.51757025718689,
+     'gleu': 49.757,
+     'loss': 0.21743392944335938,
+     'precision': None,
+     'recall': None},
+ 9: {'f_score': None,
+     'gleu': 49.6571,
+     'loss': 0.21791687607765198,
+     'precision': None,
+     'recall': None}}
+Saved best checkpoint alias: outputs/native_clean/best.ckpt
+
+Generation time: 30.8903546333313
+Saved final resumable checkpoint: outputs/native_clean/last.ckpt
+Epoch 9/9  ━━━━━━━━━━━━━━━━━━━━ 193/193 0:01:15 • 0:00:00 2.57it/s v_num: 12.000
+End Time: Tue Jun  9 02:24:52 KST 2026
