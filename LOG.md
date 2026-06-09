@@ -4,6 +4,30 @@
 > 최신 항목이 위에 오도록 역순으로 기록합니다.
 
 ---
+## [2026-06-09] BART union resume max_time 타이머 상태 방어
+
+### 목표
+- BART union clean run을 `last.ckpt`에서 이어서 학습할 때 짧은 시간만 돌고 중단되는 원인 확인 및 방어
+
+### 원인
+- `runtimelog/slurm-bart-gec-752910.*` 확인 결과 실제 SLURM 실행 시간은 약 16분이었지만 Lightning이 `Time limit reached. Elapsed time is 1:50:00`으로 판단
+- `last.ckpt`로 Trainer 전체 상태를 복원하면서 Lightning `Timer` callback의 누적 `max_time` 상태까지 복원된 것으로 판단
+- 이 상태에서는 새 SLURM job이어도 이전 job의 elapsed time을 이어받아 조기 종료될 수 있음
+
+### 수행 내용
+- `baseline/run.py`에 `strip_timer_state_from_resume_checkpoint()` 추가
+  - resume checkpoint의 `callbacks`에서 key에 `timer`가 포함된 callback state 제거
+  - 같은 디렉토리에 `*.resume_no_timer.ckpt` 임시 checkpoint 저장
+  - Trainer resume은 이 sanitized checkpoint를 사용
+- `init_ckpt_path` 로딩도 PyTorch 2.6+ 호환을 위해 `weights_only=False` 명시
+
+### 결과
+- BART는 optimizer/epoch/trainer state는 유지하면서 SLURM job마다 `max_time` 타이머를 새로 시작할 수 있음
+
+### 다음 단계
+- [ ] 최신 코드 반영 후 `RESUME_CKPT=outputs/union_clean/last.ckpt`로 BART union 재개
+
+---
 ## [2026-06-08] BLT generation 평가 분리 및 single-node DDP 준비
 
 ### 목표

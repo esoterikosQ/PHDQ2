@@ -69,6 +69,31 @@ class SaveBestAlias(Callback):
         self._sync_alias()
 
 
+def strip_timer_state_from_resume_checkpoint(checkpoint_path: str) -> str:
+    """Remove Lightning Timer callback state so each SLURM resume gets a fresh time window."""
+
+    path = Path(checkpoint_path)
+    checkpoint = torch.load(path, map_location="cpu", weights_only=False)
+    callbacks = checkpoint.get("callbacks")
+    if not isinstance(callbacks, dict):
+        return checkpoint_path
+
+    removed_keys = [key for key in list(callbacks) if "timer" in str(key).lower()]
+    if not removed_keys:
+        return checkpoint_path
+
+    for key in removed_keys:
+        callbacks.pop(key, None)
+
+    sanitized_path = path.with_name(f"{path.stem}.resume_no_timer.ckpt")
+    torch.save(checkpoint, sanitized_path)
+    print(
+        "Removed Lightning Timer state from resume checkpoint: "
+        f"{removed_keys} -> {sanitized_path}"
+    )
+    return str(sanitized_path)
+
+
 def parse_args():
     parser = argparse.ArgumentParser(description='KoBART GEC Training')
     parser.add_argument('--data', type=str, default='native')
@@ -160,7 +185,7 @@ def main():
         raise ValueError("--init_ckpt_path and --resume_ckpt_path cannot be used together.")
 
     if args.init_ckpt_path:
-        checkpoint = torch.load(args.init_ckpt_path, map_location="cpu")
+        checkpoint = torch.load(args.init_ckpt_path, map_location="cpu", weights_only=False)
         state_dict = checkpoint.get("state_dict", checkpoint)
         missing, unexpected = model.load_state_dict(state_dict, strict=False)
         print(f"Initialized model weights from {args.init_ckpt_path}")
@@ -209,6 +234,7 @@ def main():
     if args.model_ckpt_path == '':
         ckpt_path = args.resume_ckpt_path or None
         if ckpt_path:
+            ckpt_path = strip_timer_state_from_resume_checkpoint(ckpt_path)
             print(f"Resuming training from {ckpt_path}...")
         trainer.fit(model, dm, ckpt_path=ckpt_path)
     else:
