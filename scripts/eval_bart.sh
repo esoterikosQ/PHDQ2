@@ -55,18 +55,37 @@ if ! "$PYTHON_BIN" -c "import torch; import numpy; import lightning; import tran
 fi
 cat /tmp/phdq_bart_eval_env_check.txt
 
+# 경로 변수 설정
 DATA_DIR="$PROJECT_HOME/data"
-MODEL_CKPT="${1:-}" # 실행 시 $1로 체크포인트 경로 전달
-DATASET_TYPE="${2:-native}"
 
-if [ -z "$MODEL_CKPT" ]; then
-    echo "Usage: sbatch scripts/eval_bart.sh <path_to_checkpoint.ckpt> [dataset_type]"
+# 사용법:
+#   DATASET_TYPE=native BART_RUN_NAME=native_clean sbatch scripts/eval_bart.sh
+#   DATASET_TYPE=learner BART_RUN_NAME=learner_clean SPLIT=test sbatch scripts/eval_bart.sh
+#   MODEL_CKPT=outputs/native_clean/best.ckpt DATASET_TYPE=native sbatch scripts/eval_bart.sh
+DATASET_TYPE="${DATASET_TYPE:-${2:-native}}"
+DATASET_DIR_NAME="$DATASET_TYPE"
+if [[ "$DATASET_TYPE" == "learner" ]]; then
+    DATASET_DIR_NAME="korean_learner"
+fi
+
+BART_RUN_NAME="${BART_RUN_NAME:-${DATASET_TYPE}_clean}"
+MODEL_CKPT="${MODEL_CKPT:-${1:-outputs/${BART_RUN_NAME}/best.ckpt}}"
+SPLIT="${SPLIT:-test}"
+if [[ "$SPLIT" != "val" && "$SPLIT" != "test" ]]; then
+    echo "Error: SPLIT must be val or test, got: $SPLIT"
     exit 1
 fi
 
-TRAIN_DATA="$DATA_DIR/${DATASET_TYPE}_train.tsv"
-VAL_DATA="$DATA_DIR/${DATASET_TYPE}_dev.tsv"
-TEST_DATA="$DATA_DIR/${DATASET_TYPE}_test.tsv"
+PREPROCESSED_DIR="$DATA_DIR/Preprocessed/$DATASET_DIR_NAME"
+TRAIN_DATA="${TRAIN_DATA:-$PREPROCESSED_DIR/${DATASET_DIR_NAME}_train.txt}"
+VAL_DATA="${VAL_DATA:-$PREPROCESSED_DIR/${DATASET_DIR_NAME}_val.txt}"
+TEST_DATA="${TEST_DATA:-$PREPROCESSED_DIR/${DATASET_DIR_NAME}_test.txt}"
+
+if [[ "$SPLIT" == "test" ]]; then
+    EVAL_DATA="$TEST_DATA"
+else
+    EVAL_DATA="$VAL_DATA"
+fi
 
 if [[ ! -f "$MODEL_CKPT" ]]; then
     echo "Error: checkpoint not found: $MODEL_CKPT"
@@ -74,7 +93,9 @@ if [[ ! -f "$MODEL_CKPT" ]]; then
 fi
 
 if [[ ! -f "$TRAIN_DATA" || ! -f "$VAL_DATA" || ! -f "$TEST_DATA" ]]; then
-    echo "Error: Train/Val/Test data not found at $DATA_DIR"
+    echo "Error: Train/Val/Test data not found."
+    echo "DATASET_TYPE=$DATASET_TYPE"
+    echo "DATASET_DIR_NAME=$DATASET_DIR_NAME"
     echo "Expected:"
     echo "  $TRAIN_DATA"
     echo "  $VAL_DATA"
@@ -84,20 +105,34 @@ fi
 
 echo "Evaluating Checkpoint: $MODEL_CKPT"
 echo "Dataset: $DATASET_TYPE"
+echo "BART run name: $BART_RUN_NAME"
+echo "Split: $SPLIT"
+echo "Eval data: $EVAL_DATA"
 
-# 추론 및 생성 (test 파이프라인) -- test 모드 스크립트 작성 필요 시 활용
-# 현재 run.py 내에 test() 과정이 포함될 수 있으나, 보통 generation은 별도 스크립트화
-
-# 임시: run.py에 --model_ckpt_path 전달하여 평가
 NUM_WORKERS="${NUM_WORKERS:-4}"
+BART_NUM_BEAMS="${BART_NUM_BEAMS:-4}"
+M2_SOURCE_GOLD_PATH="${M2_SOURCE_GOLD_PATH:-}"
+M2_ARGS=()
+if [[ -n "$M2_SOURCE_GOLD_PATH" ]]; then
+    if [[ ! -f "$M2_SOURCE_GOLD_PATH" ]]; then
+        echo "Error: M2_SOURCE_GOLD_PATH not found: $M2_SOURCE_GOLD_PATH"
+        exit 1
+    fi
+    M2_ARGS=(--m2_source_gold_path "$M2_SOURCE_GOLD_PATH")
+fi
+
+# baseline/run.py는 model_ckpt_path가 있으면 validate()를 실행한다.
+# SPLIT=test일 때 test file을 val_data_path에 넣어 test generation GLEU를 계산한다.
 srun "$PYTHON_BIN" baseline/run.py \
-    --name "eval-kobart-${DATASET_TYPE}" \
-    --data "$DATASET_TYPE" \
+    --name "eval-${BART_RUN_NAME}-${SPLIT}" \
+    --data "${BART_RUN_NAME}_${SPLIT}" \
     --model_ckpt_path "$MODEL_CKPT" \
     --num_workers "$NUM_WORKERS" \
+    --num_beams "$BART_NUM_BEAMS" \
     --train_data_path "$TRAIN_DATA" \
-    --val_data_path "$VAL_DATA" \
+    --val_data_path "$EVAL_DATA" \
     --test_data_path "$TEST_DATA" \
-    --max_epochs 0
+    --max_epochs 0 \
+    "${M2_ARGS[@]}"
 
 echo "Evaluation End: $(date)"
