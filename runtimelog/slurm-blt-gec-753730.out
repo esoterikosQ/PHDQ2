@@ -1,0 +1,328 @@
+==========================================
+SLURM_JOB_ID = 753730
+SLURM_NODELIST = gpu43
+==========================================
+Job ID: 753730
+Node: gpu43
+CUDA_VISIBLE_DEVICES: 0
+Start Time: Tue Jun  9 23:02:41 KST 2026
+Submit Dir: /scratch/r984a02/PHDQ2
+Partition: amd_a100nv_8
+Requested GPUs: 1
+Requested CPU cores per task: 4
+Python: /home01/r984a02/.conda/envs/phdq_blt/bin/python
+/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Torch: 2.5.1+cu121
+NumPy: 2.4.6
+Visible CUDA device count: 1
+/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Reference BLT import path: /scratch/r984a02/PHDQ2/reference_code/blt
+Checkpoint is loadable: outputs/blt_gec/learner/last.ckpt
+Resuming from explicit checkpoint: outputs/blt_gec/learner/last.ckpt
+Starting reference BLT-GEC fine-tuning on learner dataset...
+BLT lr: 1e-5
+BLT weight_decay: 0.1
+BLT Adam betas: (0.9, 0.95)
+BLT scheduler: cosine
+BLT warmup_steps: 2000
+BLT num_beams: 4
+BLT NUM_GPUS: 1
+Device: cuda
+Distributed: False rank=0 world_size=1
+Backend: reference_blt
+Reference BLT code: /scratch/r984a02/PHDQ2/reference_code/blt
+BLT repo: facebook/blt-1b
+Entropy repo: facebook/blt-entropy
+Train: /scratch/r984a02/PHDQ2/data/Preprocessed/korean_learner/korean_learner_train.txt
+Val:   /scratch/r984a02/PHDQ2/data/Preprocessed/korean_learner/korean_learner_val.txt
+Test:  /scratch/r984a02/PHDQ2/data/Preprocessed/korean_learner/korean_learner_test.txt
+Loaded checkpoint: outputs/blt_gec/learner/last.ckpt (epoch=3, global_step=7464)
+epoch=3 step=7470 loss=0.1497 elapsed=0.2m
+epoch=3 step=7480 loss=0.1054 elapsed=0.6m
+epoch=3 step=7490 loss=0.0361 elapsed=0.9m
+epoch=3 step=7500 loss=0.1652 elapsed=1.2m
+epoch=3 step=7510 loss=0.2783 elapsed=1.5m
+epoch=3 step=7520 loss=0.1105 elapsed=1.8m
+epoch=3 step=7530 loss=0.1880 elapsed=2.2m
+epoch=3 step=7540 loss=0.0622 elapsed=2.5m
+epoch=3 step=7550 loss=0.0030 elapsed=2.8m
+epoch=3 step=7560 loss=0.0714 elapsed=3.1m
+epoch=3 step=7570 loss=0.1136 elapsed=3.4m
+epoch=3 step=7580 loss=0.0459 elapsed=3.8m
+epoch=3 step=7590 loss=0.1934 elapsed=4.1m
+epoch=3 step=7600 loss=0.0632 elapsed=4.4m
+epoch=3 step=7610 loss=0.2578 elapsed=4.7m
+epoch=3 step=7620 loss=0.0409 elapsed=5.0m
+epoch=3 step=7630 loss=0.4028 elapsed=5.4m
+epoch=3 step=7640 loss=0.0973 elapsed=5.7m
+epoch=3 step=7650 loss=0.0243 elapsed=6.0m
+epoch=3 step=7660 loss=0.0329 elapsed=6.3m
+epoch=3 step=7670 loss=0.1976 elapsed=6.6m
+epoch=3 step=7680 loss=0.0531 elapsed=7.0m
+epoch=3 step=7690 loss=0.1275 elapsed=7.3m
+epoch=3 step=7700 loss=0.5869 elapsed=7.6m
+epoch=3 step=7710 loss=0.1089 elapsed=7.9m
+epoch=3 step=7720 loss=0.2459 elapsed=8.2m
+epoch=3 step=7730 loss=0.0215 elapsed=8.6m
+epoch=3 step=7740 loss=0.0591 elapsed=8.9m
+epoch=3 step=7750 loss=0.2278 elapsed=9.2m
+epoch=3 step=7760 loss=0.2201 elapsed=9.5m
+epoch=3 step=7770 loss=0.7385 elapsed=9.8m
+epoch=3 step=7780 loss=0.0994 elapsed=10.2m
+epoch=3 step=7790 loss=0.0044 elapsed=10.5m
+epoch=3 step=7800 loss=0.0870 elapsed=10.8m
+epoch=3 step=7810 loss=0.1776 elapsed=11.1m
+epoch=3 step=7820 loss=0.2670 elapsed=11.4m
+epoch=3 step=7830 loss=0.1206 elapsed=11.8m
+epoch=3 step=7840 loss=0.0810 elapsed=12.1m
+epoch=3 step=7850 loss=0.1359 elapsed=12.4m
+epoch=3 step=7860 loss=0.5291 elapsed=12.7m
+epoch=3 step=7870 loss=0.0217 elapsed=13.0m
+epoch=3 step=7880 loss=0.0930 elapsed=13.4m
+epoch=3 step=7890 loss=0.1676 elapsed=13.7m
+epoch=3 step=7900 loss=0.1950 elapsed=14.0m
+epoch=3 step=7910 loss=0.0932 elapsed=14.3m
+epoch=3 step=7920 loss=0.0073 elapsed=14.6m
+epoch=3 step=7930 loss=0.0254 elapsed=15.0m
+epoch=3 step=7940 loss=0.0615 elapsed=15.3m
+epoch=3 step=7950 loss=0.0337 elapsed=15.6m
+epoch=3 step=7960 loss=0.1248 elapsed=15.9m
+epoch=3 step=7970 loss=0.0807 elapsed=16.2m
+epoch=3 step=7980 loss=0.0827 elapsed=16.5m
+epoch=3 step=7990 loss=0.1427 elapsed=16.9m
+epoch=3 step=8000 loss=0.1061 elapsed=17.2m
+epoch=3 step=8010 loss=0.0941 elapsed=17.5m
+epoch=3 step=8020 loss=0.0701 elapsed=17.8m
+epoch=3 step=8030 loss=0.0203 elapsed=18.1m
+epoch=3 step=8040 loss=0.0746 elapsed=18.5m
+epoch=3 step=8050 loss=0.0125 elapsed=18.8m
+epoch=3 step=8060 loss=0.1313 elapsed=19.1m
+epoch=3 step=8070 loss=0.2085 elapsed=19.4m
+epoch=3 step=8080 loss=0.0890 elapsed=19.7m
+Saved checkpoint: outputs/blt_gec/learner/last.ckpt
+epoch=3 step=8090 loss=0.0758 elapsed=20.9m
+epoch=3 step=8100 loss=0.0450 elapsed=21.2m
+epoch=3 step=8110 loss=0.0240 elapsed=21.5m
+epoch=3 step=8120 loss=0.0425 elapsed=21.8m
+epoch=3 step=8130 loss=0.0283 elapsed=22.1m
+epoch=3 step=8140 loss=0.0549 elapsed=22.5m
+epoch=3 step=8150 loss=0.0775 elapsed=22.8m
+epoch=3 step=8160 loss=0.0932 elapsed=23.1m
+epoch=3 step=8170 loss=0.0699 elapsed=23.4m
+epoch=3 step=8180 loss=0.4404 elapsed=23.7m
+epoch=3 step=8190 loss=0.0054 elapsed=24.1m
+epoch=3 step=8200 loss=0.1253 elapsed=24.4m
+epoch=3 step=8210 loss=0.1453 elapsed=24.7m
+epoch=3 step=8220 loss=0.0798 elapsed=25.0m
+epoch=3 step=8230 loss=0.1032 elapsed=25.3m
+epoch=3 step=8240 loss=0.1311 elapsed=25.7m
+epoch=3 step=8250 loss=0.0430 elapsed=26.0m
+epoch=3 step=8260 loss=0.0179 elapsed=26.3m
+epoch=3 step=8270 loss=0.2428 elapsed=26.6m
+epoch=3 step=8280 loss=0.1374 elapsed=26.9m
+epoch=3 step=8290 loss=0.0806 elapsed=27.3m
+epoch=3 step=8300 loss=0.0657 elapsed=27.6m
+epoch=3 step=8310 loss=0.0515 elapsed=27.9m
+epoch=3 step=8320 loss=0.2474 elapsed=28.2m
+epoch=3 step=8330 loss=0.1896 elapsed=28.5m
+epoch=3 step=8340 loss=0.0446 elapsed=28.9m
+epoch=3 step=8350 loss=0.1110 elapsed=29.2m
+epoch=3 step=8360 loss=0.0562 elapsed=29.5m
+epoch=3 step=8370 loss=0.2589 elapsed=29.8m
+epoch=3 step=8380 loss=0.1272 elapsed=30.1m
+epoch=3 step=8390 loss=0.0949 elapsed=30.4m
+epoch=3 step=8400 loss=0.0485 elapsed=30.8m
+epoch=3 step=8410 loss=0.1278 elapsed=31.1m
+epoch=3 step=8420 loss=0.1236 elapsed=31.4m
+epoch=3 step=8430 loss=0.2832 elapsed=31.7m
+epoch=3 step=8440 loss=0.1704 elapsed=32.0m
+epoch=3 step=8450 loss=0.1552 elapsed=32.4m
+epoch=3 step=8460 loss=0.0350 elapsed=32.7m
+epoch=3 step=8470 loss=0.1467 elapsed=33.0m
+epoch=3 step=8480 loss=0.1913 elapsed=33.3m
+epoch=3 step=8490 loss=0.2392 elapsed=33.6m
+epoch=3 step=8500 loss=0.1700 elapsed=34.0m
+epoch=3 step=8510 loss=0.1231 elapsed=34.3m
+epoch=3 step=8520 loss=0.0363 elapsed=34.6m
+epoch=3 step=8530 loss=0.0437 elapsed=34.9m
+epoch=3 step=8540 loss=0.0974 elapsed=35.2m
+epoch=3 step=8550 loss=0.0629 elapsed=35.5m
+epoch=3 step=8560 loss=0.2146 elapsed=35.9m
+epoch=3 step=8570 loss=0.0607 elapsed=36.2m
+epoch=3 step=8580 loss=0.0664 elapsed=36.5m
+epoch=3 step=8590 loss=0.0986 elapsed=36.8m
+epoch=3 step=8600 loss=0.0663 elapsed=37.1m
+epoch=3 step=8610 loss=0.0624 elapsed=37.5m
+epoch=3 step=8620 loss=0.0481 elapsed=37.8m
+epoch=3 step=8630 loss=0.0116 elapsed=38.1m
+epoch=3 step=8640 loss=0.1538 elapsed=38.4m
+epoch=3 step=8650 loss=0.2018 elapsed=38.7m
+epoch=3 step=8660 loss=0.1420 elapsed=39.1m
+epoch=3 step=8670 loss=0.2799 elapsed=39.4m
+epoch=3 step=8680 loss=0.0737 elapsed=39.7m
+epoch=3 step=8690 loss=0.0314 elapsed=40.0m
+Saved checkpoint: outputs/blt_gec/learner/last.ckpt
+epoch=3 step=8700 loss=0.3925 elapsed=41.1m
+epoch=3 step=8710 loss=0.0604 elapsed=41.4m
+epoch=3 step=8720 loss=0.0629 elapsed=41.7m
+epoch=3 step=8730 loss=0.0305 elapsed=42.0m
+epoch=3 step=8740 loss=0.0801 elapsed=42.4m
+epoch=3 step=8750 loss=0.0401 elapsed=42.7m
+epoch=3 step=8760 loss=0.0642 elapsed=43.0m
+epoch=3 step=8770 loss=0.1653 elapsed=43.3m
+epoch=3 step=8780 loss=0.1889 elapsed=43.6m
+epoch=3 step=8790 loss=0.4105 elapsed=44.0m
+epoch=3 step=8800 loss=0.2926 elapsed=44.3m
+epoch=3 step=8810 loss=0.0991 elapsed=44.6m
+epoch=3 step=8820 loss=0.2511 elapsed=44.9m
+epoch=3 step=8830 loss=0.0596 elapsed=45.2m
+epoch=3 step=8840 loss=0.0902 elapsed=45.5m
+epoch=3 step=8850 loss=0.1436 elapsed=45.9m
+epoch=3 step=8860 loss=0.0569 elapsed=46.2m
+epoch=3 step=8870 loss=0.1812 elapsed=46.5m
+epoch=3 step=8880 loss=0.0887 elapsed=46.8m
+epoch=3 step=8890 loss=0.4054 elapsed=47.1m
+epoch=3 step=8900 loss=0.0194 elapsed=47.5m
+epoch=3 step=8910 loss=0.2418 elapsed=47.8m
+epoch=3 step=8920 loss=0.1284 elapsed=48.1m
+epoch=3 step=8930 loss=0.1170 elapsed=48.4m
+epoch=3 step=8940 loss=0.0983 elapsed=48.7m
+epoch=3 step=8950 loss=0.0562 elapsed=49.1m
+epoch=3 step=8960 loss=0.1856 elapsed=49.4m
+epoch=3 step=8970 loss=0.0801 elapsed=49.7m
+epoch=3 step=8980 loss=0.0824 elapsed=50.0m
+epoch=3 step=8990 loss=0.0333 elapsed=50.3m
+epoch=3 step=9000 loss=0.0719 elapsed=50.6m
+epoch=3 step=9010 loss=0.1018 elapsed=51.0m
+epoch=3 step=9020 loss=0.2042 elapsed=51.3m
+epoch=3 step=9030 loss=0.0564 elapsed=51.6m
+epoch=3 step=9040 loss=0.0380 elapsed=51.9m
+epoch=3 step=9050 loss=0.0278 elapsed=52.2m
+epoch=3 step=9060 loss=0.2376 elapsed=52.6m
+epoch=3 step=9070 loss=0.0266 elapsed=52.9m
+epoch=3 step=9080 loss=0.0415 elapsed=53.2m
+epoch=3 step=9090 loss=0.1427 elapsed=53.5m
+epoch=3 step=9100 loss=0.0675 elapsed=53.8m
+epoch=3 step=9110 loss=0.1345 elapsed=54.2m
+epoch=3 step=9120 loss=0.1174 elapsed=54.5m
+epoch=3 step=9130 loss=0.1004 elapsed=54.8m
+epoch=3 step=9140 loss=0.1593 elapsed=55.1m
+epoch=3 step=9150 loss=0.3419 elapsed=55.4m
+epoch=3 step=9160 loss=0.0477 elapsed=55.7m
+epoch=3 step=9170 loss=0.1034 elapsed=56.1m
+epoch=3 step=9180 loss=0.1114 elapsed=56.4m
+epoch=3 step=9190 loss=0.0456 elapsed=56.7m
+epoch=3 step=9200 loss=0.3186 elapsed=57.0m
+epoch=3 step=9210 loss=0.3154 elapsed=57.3m
+epoch=3 step=9220 loss=0.0318 elapsed=57.7m
+epoch=3 step=9230 loss=0.0731 elapsed=58.0m
+epoch=3 step=9240 loss=0.4143 elapsed=58.3m
+epoch=3 step=9250 loss=0.0682 elapsed=58.6m
+epoch=3 step=9260 loss=0.2061 elapsed=58.9m
+epoch=3 step=9270 loss=0.0701 elapsed=59.3m
+epoch=3 step=9280 loss=0.1601 elapsed=59.6m
+epoch=3 step=9290 loss=0.1204 elapsed=59.9m
+Saved checkpoint: outputs/blt_gec/learner/last.ckpt
+epoch=3 step=9300 loss=0.0200 elapsed=61.0m
+epoch=3 step=9310 loss=0.0380 elapsed=61.3m
+epoch=3 step=9320 loss=0.1618 elapsed=61.6m
+epoch=3 step=9330 loss=0.1094 elapsed=61.9m
+epoch=3 step=9340 loss=0.0478 elapsed=62.2m
+epoch=3 step=9350 loss=0.0379 elapsed=62.6m
+epoch=3 step=9360 loss=0.0530 elapsed=62.9m
+epoch=3 step=9370 loss=0.0666 elapsed=63.3m
+epoch=3 step=9380 loss=0.1108 elapsed=63.6m
+epoch=3 step=9390 loss=0.2212 elapsed=63.9m
+epoch=3 step=9400 loss=0.1513 elapsed=64.2m
+epoch=3 step=9410 loss=0.1268 elapsed=64.6m
+epoch=3 step=9420 loss=0.0614 elapsed=64.9m
+epoch=3 step=9430 loss=0.0412 elapsed=65.2m
+epoch=3 step=9440 loss=0.0273 elapsed=65.5m
+epoch=3 step=9450 loss=0.0359 elapsed=65.8m
+epoch=3 step=9460 loss=0.1251 elapsed=66.2m
+epoch=3 step=9470 loss=0.0358 elapsed=66.5m
+epoch=3 step=9480 loss=0.1765 elapsed=66.8m
+epoch=3 step=9490 loss=0.0395 elapsed=67.1m
+epoch=3 step=9500 loss=0.0365 elapsed=67.4m
+epoch=3 step=9510 loss=0.0282 elapsed=67.8m
+epoch=3 step=9520 loss=0.1027 elapsed=68.1m
+epoch=3 step=9530 loss=0.0926 elapsed=68.4m
+epoch=3 step=9540 loss=0.0748 elapsed=68.7m
+epoch=3 step=9550 loss=0.0332 elapsed=69.0m
+epoch=3 step=9560 loss=0.0661 elapsed=69.3m
+epoch=3 step=9570 loss=0.0929 elapsed=69.7m
+epoch=3 step=9580 loss=0.0521 elapsed=70.0m
+epoch=3 step=9590 loss=0.1858 elapsed=70.3m
+epoch=3 step=9600 loss=0.3775 elapsed=70.6m
+epoch=3 step=9610 loss=0.0750 elapsed=70.9m
+epoch=3 step=9620 loss=0.0855 elapsed=71.3m
+epoch=3 step=9630 loss=0.1334 elapsed=71.6m
+epoch=3 step=9640 loss=0.0355 elapsed=71.9m
+epoch=3 step=9650 loss=0.1826 elapsed=72.2m
+epoch=3 step=9660 loss=0.0026 elapsed=72.5m
+epoch=3 step=9670 loss=0.0803 elapsed=72.9m
+epoch=3 step=9680 loss=0.0998 elapsed=73.2m
+epoch=3 step=9690 loss=0.0506 elapsed=73.5m
+epoch=3 step=9700 loss=0.1378 elapsed=73.8m
+epoch=3 step=9710 loss=0.0652 elapsed=74.1m
+epoch=3 step=9720 loss=0.1346 elapsed=74.5m
+epoch=3 step=9730 loss=0.0435 elapsed=74.8m
+epoch=3 step=9740 loss=0.0406 elapsed=75.1m
+epoch=3 step=9750 loss=0.0274 elapsed=75.4m
+epoch=3 step=9760 loss=0.0774 elapsed=75.7m
+epoch=3 step=9770 loss=0.0974 elapsed=76.1m
+epoch=3 step=9780 loss=0.0699 elapsed=76.4m
+epoch=3 step=9790 loss=0.1272 elapsed=76.7m
+epoch=3 step=9800 loss=0.0337 elapsed=77.0m
+epoch=3 step=9810 loss=0.2887 elapsed=77.3m
+epoch=3 step=9820 loss=0.1098 elapsed=77.6m
+epoch=3 step=9830 loss=0.2614 elapsed=78.0m
+epoch=3 step=9840 loss=0.0132 elapsed=78.3m
+epoch=3 step=9850 loss=0.1921 elapsed=78.6m
+epoch=3 step=9860 loss=0.1802 elapsed=78.9m
+epoch=3 step=9870 loss=0.0820 elapsed=79.2m
+epoch=3 step=9880 loss=0.0196 elapsed=79.6m
+epoch=3 step=9890 loss=0.0521 elapsed=79.9m
+Saved checkpoint: outputs/blt_gec/learner/last.ckpt
+epoch=3 step=9900 loss=0.0842 elapsed=81.0m
+epoch=3 step=9910 loss=0.1633 elapsed=81.3m
+epoch=3 step=9920 loss=0.0767 elapsed=81.6m
+epoch=3 step=9930 loss=0.0750 elapsed=81.9m
+epoch=3 step=9940 loss=0.0723 elapsed=82.2m
+epoch=3 step=9950 loss=0.1278 elapsed=82.6m
+epoch=3 validation loss=0.1293
+Saved checkpoint: outputs/blt_gec/learner/best.ckpt
+Saved checkpoint: outputs/blt_gec/learner/last.ckpt
+epoch=4 step=9960 loss=0.0308 elapsed=94.9m
+epoch=4 step=9970 loss=0.0368 elapsed=95.2m
+epoch=4 step=9980 loss=0.0877 elapsed=95.5m
+epoch=4 step=9990 loss=0.0693 elapsed=95.8m
+epoch=4 step=10000 loss=0.0953 elapsed=96.1m
+epoch=4 step=10010 loss=0.0759 elapsed=96.5m
+epoch=4 step=10020 loss=0.1482 elapsed=96.8m
+epoch=4 step=10030 loss=0.0804 elapsed=97.1m
+epoch=4 step=10040 loss=0.3774 elapsed=97.4m
+epoch=4 step=10050 loss=0.0779 elapsed=97.7m
+epoch=4 step=10060 loss=0.2003 elapsed=98.1m
+epoch=4 step=10070 loss=0.0470 elapsed=98.4m
+epoch=4 step=10080 loss=0.0082 elapsed=98.7m
+epoch=4 step=10090 loss=0.0645 elapsed=99.0m
+epoch=4 step=10100 loss=0.0813 elapsed=99.3m
+epoch=4 step=10110 loss=0.1376 elapsed=99.7m
+epoch=4 step=10120 loss=0.0496 elapsed=100.0m
+Saved checkpoint: outputs/blt_gec/learner/last.ckpt
+epoch=4 step=10130 loss=0.0808 elapsed=101.1m
+epoch=4 step=10140 loss=0.1132 elapsed=101.4m
+epoch=4 step=10150 loss=0.0025 elapsed=101.7m
+epoch=4 step=10160 loss=0.0748 elapsed=102.0m
+epoch=4 step=10170 loss=0.0342 elapsed=102.3m
+epoch=4 step=10180 loss=0.0348 elapsed=102.7m
+epoch=4 step=10190 loss=0.1685 elapsed=103.0m
+epoch=4 step=10200 loss=0.2175 elapsed=103.3m
+epoch=4 step=10210 loss=0.2372 elapsed=103.6m
+epoch=4 step=10220 loss=0.0286 elapsed=103.9m
+epoch=4 step=10230 loss=0.0531 elapsed=104.2m
+epoch=4 step=10240 loss=0.0319 elapsed=104.6m
+epoch=4 step=10250 loss=0.0022 elapsed=104.9m

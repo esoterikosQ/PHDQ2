@@ -1,0 +1,97 @@
+==========================================
+SLURM_JOB_ID = 753328
+SLURM_NODELIST = gpu36
+==========================================
+Job ID: 753328
+Node: gpu36
+CUDA_VISIBLE_DEVICES: 0
+Start Time: Tue Jun  9 15:58:01 KST 2026
+Submit Dir: /scratch/r984a02/PHDQ2
+Partition: amd_a100nv_8
+Requested GPUs: 1
+Requested CPU cores per task: 4
+Python: /home01/r984a02/.conda/envs/phdq/bin/python
+/home01/r984a02/.conda/envs/phdq/lib/python3.10/site-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Torch: 2.12.0+cu130
+NumPy: 2.2.6
+Starting KoBART GEC Training on union dataset...
+BART run name: union_clean
+BART profile: paper
+BART lr: 3e-5
+BART batch size: 64
+BART max epochs: 10
+BART num_beams: 4
+Resuming from explicit checkpoint: outputs/union_clean/last.ckpt
+Arguments:
+{'adamw_correct_bias': False,
+ 'batch_size': 64,
+ 'best': {'f0.5': 0, 'gleu': 0, 'prec': 0, 'rec': 0},
+ 'check_val_every_n_epoch': 1,
+ 'checkpoint_interval_minutes': 20,
+ 'data': 'union_clean',
+ 'debug': False,
+ 'every_n_epochs': 1,
+ 'init_ckpt_path': '',
+ 'log_every_n_steps': 50,
+ 'lr': 3e-05,
+ 'm2_source_gold_path': '',
+ 'max_epochs': 10,
+ 'max_seq_len': 128,
+ 'max_time': '00:01:50:00',
+ 'model_ckpt_path': '',
+ 'name': 'kobart-union_clean',
+ 'num_beams': 4,
+ 'num_workers': 4,
+ 'resume_ckpt_path': 'outputs/union_clean/last.ckpt',
+ 'seed': 0,
+ 'test_data_path': '/scratch/r984a02/PHDQ2/data/Preprocessed/union/union_test.txt',
+ 'train_data_path': '/scratch/r984a02/PHDQ2/data/Preprocessed/union/union_train.txt',
+ 'val_data_path': '/scratch/r984a02/PHDQ2/data/Preprocessed/union/union_val.txt',
+ 'warmup_ratio': 0.0}
+Removed Lightning Timer state from resume checkpoint: ['Timer'] -> outputs/union_clean/last.resume_no_timer.ckpt
+Resuming training from outputs/union_clean/last.resume_no_timer.ckpt...
+┏━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
+┃   ┃ Name  ┃ Type                         ┃ Params ┃ Mode  ┃ FLOPs ┃
+┡━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
+│ 0 │ model │ BartForConditionalGeneration │  123 M │ train │     0 │
+└───┴───────┴──────────────────────────────┴────────┴───────┴───────┘
+Trainable params: 123 M                                                         
+Non-trainable params: 0                                                         
+Total params: 123 M                                                             
+Total estimated model params size (MB): 495.440                                 
+Modules in train mode: 182                                                      
+Modules in eval mode: 0                                                         
+Total FLOPs: 0                                                                  
+
+
+EPOCH 0 / VAL_LOSS 0.72 / GLEU 27.14
+
+{0: {'f_score': None,
+     'gleu': 27.1406,
+     'loss': 0.7219805121421814,
+     'precision': None,
+     'recall': None}}
+Saved best checkpoint alias: outputs/union_clean/best.ckpt
+
+Generation time: 203.8767056465149
+
+
+EPOCH 1 / VAL_LOSS 0.73 / GLEU 26.93
+
+{0: {'f_score': None,
+     'generation_time': 203.8767056465149,
+     'gleu': 27.1406,
+     'loss': 0.7219805121421814,
+     'precision': None,
+     'recall': None},
+ 1: {'f_score': None,
+     'gleu': 26.9278,
+     'loss': 0.7312970161437988,
+     'precision': None,
+     'recall': None}}
+
+Generation time: 201.57456374168396
+Saved final resumable checkpoint: outputs/union_clean/last.ckpt
+Epoch 9/9  ━━━━━━━━━━━━━━━━━━ 1702/1702 0:11:12 • 0:00:00 2.56it/s v_num: 16.000
+End Time: Tue Jun  9 16:31:09 KST 2026
