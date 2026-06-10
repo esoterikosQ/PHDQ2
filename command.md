@@ -66,26 +66,57 @@ CONDA_ENV=phdq_blt DATASET_TYPE=union NUM_GPUS=1 MAX_EPOCHS=10 \
   -p amd_h200nv_8 --nodelist=gpu55 --gres=gpu:1 --cpus-per-task=4 scripts/train_blt.sh
 ```
 
+# BLT 48시간 학습
+
+`scripts/train_blt.sh`는 기본적으로 SLURM job의 `TimeLimit`을 읽어서 Python 학습 코드의 `--max_time`에 자동 반영한다.
+따라서 48시간으로 돌릴 때는 `sbatch --time=2-00:00:00`만 override하면 된다.
+
+```bash
+# union 4GPU, 48시간 이어서 학습
+CONDA_ENV=phdq_blt DATASET_TYPE=union NUM_GPUS=4 MAX_EPOCHS=10 \
+  RESUME_CKPT=outputs/blt_gec/union/last.ckpt \
+  GRAD_ACCUM_STEPS=2 \
+  sbatch --time=2-00:00:00 -p amd_a100nv_8 --nodelist=[노드명] \
+  --gres=gpu:4 --cpus-per-task=8 scripts/train_blt.sh
+
+# native 2GPU, 48시간 이어서 학습
+CONDA_ENV=phdq_blt DATASET_TYPE=native NUM_GPUS=2 MAX_EPOCHS=10 \
+  RESUME_CKPT=outputs/blt_gec/native/last.ckpt \
+  GRAD_ACCUM_STEPS=4 \
+  sbatch --time=2-00:00:00 -p amd_a100nv_8 --nodelist=[노드명] \
+  --gres=gpu:2 --cpus-per-task=8 scripts/train_blt.sh
+
+# learner 2GPU, 48시간 이어서 학습
+CONDA_ENV=phdq_blt DATASET_TYPE=learner NUM_GPUS=2 MAX_EPOCHS=10 \
+  RESUME_CKPT=outputs/blt_gec/learner/last.ckpt \
+  GRAD_ACCUM_STEPS=4 \
+  sbatch --time=2-00:00:00 -p amd_a100nv_8 --nodelist=[노드명] \
+  --gres=gpu:2 --cpus-per-task=8 scripts/train_blt.sh
+```
+
+수동으로 내부 학습 제한을 지정해야 하면 `MAX_TIME=DD:HH:MM:SS`를 같이 준다.
+예: `MAX_TIME=01:23:50:00 sbatch --time=2-00:00:00 ...`
+
 
 union
 
 CONDA_ENV=phdq_blt DATASET_TYPE=union NUM_GPUS=1 MAX_EPOCHS=10 \
   RESUME_CKPT=outputs/blt_gec/union/last.ckpt \
-  sbatch --dependency=afterok:753723 \
+  sbatch \
   -p amd_h200nv_8 --nodelist=gpu55 --gres=gpu:1 --cpus-per-task=4 scripts/train_blt.sh
 
 native
 
 CONDA_ENV=phdq_blt DATASET_TYPE=native NUM_GPUS=1 MAX_EPOCHS=10 \
   RESUME_CKPT=outputs/blt_gec/native/last.ckpt \
-  sbatch --dependency=afterok:753644 \
+  sbatch \
   -p amd_a100nv_8 --nodelist=gpu41 --gres=gpu:1 --cpus-per-task=4 scripts/train_blt.sh
 
 learner
 
 CONDA_ENV=phdq_blt DATASET_TYPE=learner NUM_GPUS=1 MAX_EPOCHS=10 \
   RESUME_CKPT=outputs/blt_gec/learner/last.ckpt \
-  sbatch --dependency=afterok:753647 \
+  sbatch  \
   -p amd_a100nv_8 --nodelist=gpu43 --gres=gpu:1 --cpus-per-task=4 scripts/train_blt.sh
 
 
@@ -99,3 +130,12 @@ sbatch scripts/eval_bart.sh
 
 DATASET_TYPE=union BART_RUN_NAME=union_clean SPLIT=test \
 sbatch scripts/eval_bart.sh
+
+
+753881 : union
+753878 : learner
+753882 : native
+
+753911 : learner
+753945 : union4
+753950 : native2

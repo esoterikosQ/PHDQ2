@@ -141,6 +141,8 @@ LOG_EVERY_STEPS="${LOG_EVERY_STEPS:-10}"
 M2_SOURCE_GOLD_PATH="${M2_SOURCE_GOLD_PATH:-}"
 RUN_TEST_ON_END="${RUN_TEST_ON_END:-0}"
 TEST_ONLY="${TEST_ONLY:-0}"
+MAX_TIME="${MAX_TIME:-auto}"
+CHECKPOINT_INTERVAL_MINUTES="${CHECKPOINT_INTERVAL_MINUTES:-20}"
 
 PREPROCESSED_DIR="$DATA_DIR/Preprocessed/$DATASET_DIR_NAME"
 TRAIN_DATA="${TRAIN_DATA:-$PREPROCESSED_DIR/${DATASET_DIR_NAME}_train.txt}"
@@ -252,6 +254,41 @@ if [[ "$TEST_ONLY" == "1" || "$TEST_ONLY" == "true" ]]; then
     TEST_ARGS+=(--test_only)
 fi
 
+resolve_train_max_time() {
+    if [[ "$MAX_TIME" != "auto" ]]; then
+        echo "$MAX_TIME"
+        return 0
+    fi
+
+    local time_limit=""
+    if command -v scontrol >/dev/null 2>&1 && [[ -n "${SLURM_JOB_ID:-}" ]]; then
+        time_limit="$(scontrol show job "$SLURM_JOB_ID" 2>/dev/null | tr ' ' '\n' | awk -F= '$1 == "TimeLimit" {print $2; exit}')"
+    fi
+
+    if [[ -z "$time_limit" || "$time_limit" == "UNLIMITED" || "$time_limit" == "Partition_Limit" ]]; then
+        echo "00:01:55:00"
+        return 0
+    fi
+
+    "$PYTHON_BIN" - "$time_limit" <<'PY'
+import re
+import sys
+
+value = sys.argv[1]
+match = re.fullmatch(r"(?:(\d+)-)?(\d+):(\d+):(\d+)", value)
+if not match:
+    raise SystemExit(f"Cannot parse SLURM TimeLimit={value!r}")
+
+days = int(match.group(1) or 0)
+hours = int(match.group(2))
+minutes = int(match.group(3))
+seconds = int(match.group(4))
+print(f"{days:02d}:{hours:02d}:{minutes:02d}:{seconds:02d}")
+PY
+}
+
+TRAIN_MAX_TIME="$(resolve_train_max_time)"
+
 echo "Starting reference BLT-GEC fine-tuning on $DATASET_TYPE dataset..."
 echo "BLT lr: $LR"
 echo "BLT weight_decay: $WEIGHT_DECAY"
@@ -260,6 +297,8 @@ echo "BLT scheduler: $SCHEDULER"
 echo "BLT warmup_steps: $WARMUP_STEPS"
 echo "BLT num_beams: $BLT_NUM_BEAMS"
 echo "BLT NUM_GPUS: $NUM_GPUS"
+echo "BLT checkpoint interval minutes: $CHECKPOINT_INTERVAL_MINUTES"
+echo "BLT train max_time: $TRAIN_MAX_TIME"
 
 export PYTHONUNBUFFERED=1
 
@@ -303,8 +342,8 @@ fi
     --eval_every_steps "$EVAL_EVERY_STEPS" \
     --max_steps "$MAX_STEPS" \
     --log_every_steps "$LOG_EVERY_STEPS" \
-    --checkpoint_interval_minutes 20 \
-    --max_time "00:01:50:00" \
+    --checkpoint_interval_minutes "$CHECKPOINT_INTERVAL_MINUTES" \
+    --max_time "$TRAIN_MAX_TIME" \
     "${LOCAL_FILES_ARGS[@]}" \
     "${GEN_EVAL_ARGS[@]}" \
     "${M2_ARGS[@]}" \
