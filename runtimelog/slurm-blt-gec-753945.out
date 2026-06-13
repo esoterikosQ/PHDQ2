@@ -1,0 +1,252 @@
+==========================================
+SLURM_JOB_ID = 753945
+SLURM_NODELIST = gpu43
+==========================================
+Job ID: 753945
+Node: gpu43
+CUDA_VISIBLE_DEVICES: 0,1,2,3
+Start Time: Wed Jun 10 09:53:01 KST 2026
+Submit Dir: /scratch/r984a02/PHDQ2
+Partition: amd_a100nv_8
+Requested GPUs: 4
+Requested CPU cores per task: 8
+Python: /home01/r984a02/.conda/envs/phdq_blt/bin/python
+/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Torch: 2.5.1+cu121
+NumPy: 2.4.6
+Visible CUDA device count: 4
+/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Reference BLT import path: /scratch/r984a02/PHDQ2/reference_code/blt
+Checkpoint is loadable: outputs/blt_gec/union/last.ckpt
+Resuming from explicit checkpoint: outputs/blt_gec/union/last.ckpt
+Starting reference BLT-GEC fine-tuning on union dataset...
+BLT lr: 1e-5
+BLT weight_decay: 0.1
+BLT Adam betas: (0.9, 0.95)
+BLT scheduler: cosine
+BLT warmup_steps: 2000
+BLT num_beams: 4
+BLT NUM_GPUS: 4
+Device: cuda:0
+Distributed: True rank=0 world_size=4
+Backend: reference_blt
+Reference BLT code: /scratch/r984a02/PHDQ2/reference_code/blt
+BLT repo: facebook/blt-1b
+Entropy repo: facebook/blt-entropy
+Train: /scratch/r984a02/PHDQ2/data/Preprocessed/union/union_train.txt
+Val:   /scratch/r984a02/PHDQ2/data/Preprocessed/union/union_val.txt
+Test:  /scratch/r984a02/PHDQ2/data/Preprocessed/union/union_test.txt
+DDP: world_size=4, grad_accum 2 -> 1, effective_batch_size=4
+Loaded checkpoint: outputs/blt_gec/union/last.ckpt (epoch=0, global_step=24107)
+epoch=0 step=24110 loss=0.1170 elapsed=0.1m
+epoch=0 step=24120 loss=0.2458 elapsed=0.1m
+epoch=0 step=24130 loss=0.1565 elapsed=0.2m
+epoch=0 step=24140 loss=0.2910 elapsed=0.3m
+epoch=0 step=24150 loss=0.0110 elapsed=0.4m
+epoch=0 step=24160 loss=0.2496 elapsed=0.4m
+epoch=0 step=24170 loss=0.1329 elapsed=0.5m
+epoch=0 step=24180 loss=0.4394 elapsed=0.6m
+epoch=0 step=24190 loss=0.0236 elapsed=0.7m
+epoch=0 step=24200 loss=0.1949 elapsed=0.7m
+epoch=0 step=24210 loss=0.0615 elapsed=0.8m
+epoch=0 step=24220 loss=0.4028 elapsed=0.9m
+epoch=0 step=24230 loss=0.6278 elapsed=1.0m
+epoch=0 step=24240 loss=0.2604 elapsed=1.0m
+epoch=0 step=24250 loss=0.3410 elapsed=1.1m
+epoch=0 step=24260 loss=0.1143 elapsed=1.2m
+epoch=0 step=24270 loss=0.2532 elapsed=1.3m
+epoch=0 step=24280 loss=0.3082 elapsed=1.3m
+epoch=0 step=24290 loss=0.2786 elapsed=1.4m
+epoch=0 step=24300 loss=0.2350 elapsed=1.5m
+epoch=0 step=24310 loss=0.1537 elapsed=1.6m
+epoch=0 step=24320 loss=0.2311 elapsed=1.6m
+epoch=0 step=24330 loss=0.1726 elapsed=1.7m
+epoch=0 step=24340 loss=0.2541 elapsed=1.8m
+epoch=0 step=24350 loss=0.0933 elapsed=1.9m
+epoch=0 step=24360 loss=0.3406 elapsed=1.9m
+epoch=0 step=24370 loss=0.0455 elapsed=2.0m
+epoch=0 step=24380 loss=0.1087 elapsed=2.1m
+epoch=0 step=24390 loss=0.0045 elapsed=2.2m
+epoch=0 step=24400 loss=0.3468 elapsed=2.2m
+epoch=0 step=24410 loss=0.1111 elapsed=2.3m
+epoch=0 step=24420 loss=0.1326 elapsed=2.4m
+epoch=0 step=24430 loss=0.0378 elapsed=2.5m
+epoch=0 step=24440 loss=0.0956 elapsed=2.5m
+epoch=0 step=24450 loss=0.3544 elapsed=2.6m
+epoch=0 step=24460 loss=0.0455 elapsed=2.7m
+epoch=0 step=24470 loss=0.1557 elapsed=2.8m
+epoch=0 step=24480 loss=0.2627 elapsed=2.8m
+epoch=0 step=24490 loss=0.1913 elapsed=2.9m
+epoch=0 step=24500 loss=0.1567 elapsed=3.0m
+epoch=0 step=24510 loss=0.0738 elapsed=3.0m
+epoch=0 step=24520 loss=0.0373 elapsed=3.1m
+epoch=0 step=24530 loss=0.1938 elapsed=3.2m
+epoch=0 step=24540 loss=0.0207 elapsed=3.3m
+epoch=0 step=24550 loss=0.0198 elapsed=3.3m
+epoch=0 step=24560 loss=0.1143 elapsed=3.4m
+epoch=0 step=24570 loss=0.0370 elapsed=3.5m
+epoch=0 step=24580 loss=0.0314 elapsed=3.6m
+epoch=0 step=24590 loss=0.0466 elapsed=3.6m
+epoch=0 step=24600 loss=0.0313 elapsed=3.7m
+epoch=0 step=24610 loss=0.0673 elapsed=3.8m
+epoch=0 step=24620 loss=0.1631 elapsed=3.9m
+epoch=0 step=24630 loss=0.2439 elapsed=3.9m
+epoch=0 step=24640 loss=0.2472 elapsed=4.0m
+epoch=0 step=24650 loss=0.2012 elapsed=4.1m
+epoch=0 step=24660 loss=0.1610 elapsed=4.2m
+epoch=0 step=24670 loss=0.1637 elapsed=4.2m
+epoch=0 step=24680 loss=0.0250 elapsed=4.3m
+epoch=0 step=24690 loss=0.1623 elapsed=4.4m
+epoch=0 step=24700 loss=0.0432 elapsed=4.5m
+epoch=0 step=24710 loss=0.0348 elapsed=4.5m
+epoch=0 step=24720 loss=0.0981 elapsed=4.6m
+epoch=0 step=24730 loss=0.1081 elapsed=4.7m
+epoch=0 step=24740 loss=0.1911 elapsed=4.8m
+epoch=0 step=24750 loss=0.5224 elapsed=4.8m
+epoch=0 step=24760 loss=0.0320 elapsed=4.9m
+epoch=0 step=24770 loss=0.1907 elapsed=5.0m
+epoch=0 step=24780 loss=0.2818 elapsed=5.1m
+epoch=0 step=24790 loss=0.0840 elapsed=5.1m
+epoch=0 step=24800 loss=0.6711 elapsed=5.2m
+epoch=0 step=24810 loss=0.3387 elapsed=5.3m
+epoch=0 step=24820 loss=0.3106 elapsed=5.4m
+epoch=0 step=24830 loss=0.1561 elapsed=5.4m
+epoch=0 step=24840 loss=0.1040 elapsed=5.5m
+epoch=0 step=24850 loss=0.0923 elapsed=5.6m
+epoch=0 step=24860 loss=0.6238 elapsed=5.7m
+epoch=0 step=24870 loss=0.1625 elapsed=5.7m
+epoch=0 step=24880 loss=0.1521 elapsed=5.8m
+epoch=0 step=24890 loss=0.4492 elapsed=5.9m
+epoch=0 step=24900 loss=0.6510 elapsed=6.0m
+epoch=0 step=24910 loss=0.2753 elapsed=6.0m
+epoch=0 step=24920 loss=0.1774 elapsed=6.1m
+epoch=0 step=24930 loss=0.0423 elapsed=6.2m
+epoch=0 step=24940 loss=0.0787 elapsed=6.3m
+epoch=0 step=24950 loss=0.0663 elapsed=6.3m
+epoch=0 step=24960 loss=0.3003 elapsed=6.4m
+epoch=0 step=24970 loss=0.0818 elapsed=6.5m
+epoch=0 step=24980 loss=0.2002 elapsed=6.6m
+epoch=0 step=24990 loss=0.0657 elapsed=6.6m
+epoch=0 step=25000 loss=0.0331 elapsed=6.7m
+epoch=0 step=25010 loss=0.0709 elapsed=6.8m
+epoch=0 step=25020 loss=0.0258 elapsed=6.9m
+epoch=0 step=25030 loss=0.0757 elapsed=6.9m
+epoch=0 step=25040 loss=0.4353 elapsed=7.0m
+epoch=0 step=25050 loss=0.0219 elapsed=7.1m
+epoch=0 step=25060 loss=0.0357 elapsed=7.2m
+epoch=0 step=25070 loss=0.0378 elapsed=7.2m
+epoch=0 step=25080 loss=0.2137 elapsed=7.3m
+epoch=0 step=25090 loss=0.1588 elapsed=7.4m
+epoch=0 step=25100 loss=0.0232 elapsed=7.5m
+epoch=0 step=25110 loss=0.0651 elapsed=7.5m
+epoch=0 step=25120 loss=0.1225 elapsed=7.6m
+epoch=0 step=25130 loss=0.0681 elapsed=7.7m
+epoch=0 step=25140 loss=0.0786 elapsed=7.8m
+epoch=0 step=25150 loss=0.0891 elapsed=7.8m
+epoch=0 step=25160 loss=0.1573 elapsed=7.9m
+epoch=0 step=25170 loss=0.0714 elapsed=8.0m
+epoch=0 step=25180 loss=0.1673 elapsed=8.1m
+epoch=0 step=25190 loss=0.3889 elapsed=8.1m
+epoch=0 step=25200 loss=0.1638 elapsed=8.2m
+epoch=0 step=25210 loss=0.2404 elapsed=8.3m
+epoch=0 step=25220 loss=0.1074 elapsed=8.4m
+epoch=0 step=25230 loss=0.0741 elapsed=8.4m
+epoch=0 step=25240 loss=0.2594 elapsed=8.5m
+epoch=0 step=25250 loss=0.2756 elapsed=8.6m
+epoch=0 step=25260 loss=0.2451 elapsed=8.7m
+epoch=0 step=25270 loss=0.1181 elapsed=8.7m
+epoch=0 step=25280 loss=0.0988 elapsed=8.8m
+epoch=0 step=25290 loss=0.0222 elapsed=8.9m
+epoch=0 step=25300 loss=0.1204 elapsed=9.0m
+epoch=0 step=25310 loss=0.1131 elapsed=9.0m
+epoch=0 step=25320 loss=0.1032 elapsed=9.1m
+epoch=0 step=25330 loss=0.1438 elapsed=9.2m
+epoch=0 step=25340 loss=0.0604 elapsed=9.3m
+epoch=0 step=25350 loss=0.0374 elapsed=9.3m
+epoch=0 step=25360 loss=0.3450 elapsed=9.4m
+epoch=0 step=25370 loss=0.0545 elapsed=9.5m
+epoch=0 step=25380 loss=0.1690 elapsed=9.6m
+epoch=0 step=25390 loss=0.0363 elapsed=9.6m
+epoch=0 step=25400 loss=0.1860 elapsed=9.7m
+epoch=0 step=25410 loss=0.0305 elapsed=9.8m
+epoch=0 step=25420 loss=0.2388 elapsed=9.9m
+epoch=0 step=25430 loss=0.1235 elapsed=9.9m
+epoch=0 step=25440 loss=0.2450 elapsed=10.0m
+epoch=0 step=25450 loss=0.2528 elapsed=10.1m
+epoch=0 step=25460 loss=0.0034 elapsed=10.2m
+epoch=0 step=25470 loss=0.2195 elapsed=10.2m
+epoch=0 step=25480 loss=0.2790 elapsed=10.3m
+epoch=0 step=25490 loss=0.2351 elapsed=10.4m
+epoch=0 step=25500 loss=0.1382 elapsed=10.5m
+epoch=0 step=25510 loss=0.1236 elapsed=10.5m
+epoch=0 step=25520 loss=0.0145 elapsed=10.6m
+epoch=0 step=25530 loss=0.3932 elapsed=10.7m
+epoch=0 step=25540 loss=0.1865 elapsed=10.8m
+epoch=0 step=25550 loss=0.0621 elapsed=10.8m
+epoch=0 step=25560 loss=0.1728 elapsed=10.9m
+epoch=0 step=25570 loss=0.0414 elapsed=11.0m
+epoch=0 step=25580 loss=0.0579 elapsed=11.0m
+epoch=0 step=25590 loss=0.2962 elapsed=11.1m
+epoch=0 step=25600 loss=0.0454 elapsed=11.2m
+epoch=0 step=25610 loss=0.0998 elapsed=11.3m
+epoch=0 step=25620 loss=0.2725 elapsed=11.3m
+epoch=0 step=25630 loss=0.3960 elapsed=11.4m
+epoch=0 step=25640 loss=0.2568 elapsed=11.5m
+epoch=0 step=25650 loss=0.0111 elapsed=11.6m
+epoch=0 step=25660 loss=0.0990 elapsed=11.7m
+epoch=0 step=25670 loss=0.0363 elapsed=11.7m
+epoch=0 step=25680 loss=0.0759 elapsed=11.8m
+epoch=0 step=25690 loss=0.3249 elapsed=11.9m
+epoch=0 step=25700 loss=0.2949 elapsed=12.0m
+epoch=0 step=25710 loss=0.0932 elapsed=12.0m
+epoch=0 step=25720 loss=0.0836 elapsed=12.1m
+epoch=0 step=25730 loss=0.0759 elapsed=12.2m
+epoch=0 step=25740 loss=0.2514 elapsed=12.3m
+epoch=0 step=25750 loss=0.3665 elapsed=12.3m
+epoch=0 step=25760 loss=0.6228 elapsed=12.4m
+epoch=0 step=25770 loss=0.4816 elapsed=12.5m
+epoch=0 step=25780 loss=0.2726 elapsed=12.6m
+epoch=0 step=25790 loss=0.3281 elapsed=12.6m
+epoch=0 step=25800 loss=0.4091 elapsed=12.7m
+epoch=0 step=25810 loss=0.8329 elapsed=12.8m
+epoch=0 step=25820 loss=0.1490 elapsed=12.9m
+epoch=0 step=25830 loss=0.0514 elapsed=12.9m
+epoch=0 step=25840 loss=0.1282 elapsed=13.0m
+epoch=0 step=25850 loss=0.0605 elapsed=13.1m
+epoch=0 step=25860 loss=0.0484 elapsed=13.2m
+epoch=0 step=25870 loss=0.2626 elapsed=13.2m
+epoch=0 step=25880 loss=0.0656 elapsed=13.3m
+epoch=0 step=25890 loss=0.0345 elapsed=13.4m
+epoch=0 step=25900 loss=0.1906 elapsed=13.5m
+epoch=0 step=25910 loss=0.0689 elapsed=13.5m
+epoch=0 step=25920 loss=0.0369 elapsed=13.6m
+epoch=0 step=25930 loss=0.2320 elapsed=13.7m
+epoch=0 step=25940 loss=0.2807 elapsed=13.7m
+epoch=0 step=25950 loss=0.2971 elapsed=13.8m
+epoch=0 step=25960 loss=0.0969 elapsed=13.9m
+epoch=0 step=25970 loss=0.1110 elapsed=14.0m
+epoch=0 step=25980 loss=0.1076 elapsed=14.0m
+epoch=0 step=25990 loss=0.2121 elapsed=14.1m
+epoch=0 step=26000 loss=0.1763 elapsed=14.2m
+epoch=0 step=26010 loss=0.1485 elapsed=14.3m
+epoch=0 step=26020 loss=0.4873 elapsed=14.3m
+epoch=0 step=26030 loss=0.2320 elapsed=14.4m
+epoch=0 step=26040 loss=0.0746 elapsed=14.5m
+epoch=0 step=26050 loss=0.1881 elapsed=14.6m
+epoch=0 step=26060 loss=0.1228 elapsed=14.6m
+epoch=0 step=26070 loss=0.0420 elapsed=14.7m
+epoch=0 step=26080 loss=0.0490 elapsed=14.8m
+epoch=0 step=26090 loss=0.1844 elapsed=14.9m
+epoch=0 step=26100 loss=0.0140 elapsed=14.9m
+epoch=0 step=26110 loss=0.2277 elapsed=15.0m
+epoch=0 step=26120 loss=0.1636 elapsed=15.1m
+epoch=0 step=26130 loss=0.1137 elapsed=15.2m
+epoch=0 step=26140 loss=0.0420 elapsed=15.2m
+epoch=0 step=26150 loss=0.0776 elapsed=15.3m
+epoch=0 step=26160 loss=0.3046 elapsed=15.4m
+epoch=0 step=26170 loss=0.3909 elapsed=15.5m
+epoch=0 step=26180 loss=0.0447 elapsed=15.5m
+epoch=0 step=26190 loss=0.1674 elapsed=15.6m
+epoch=0 step=26200 loss=0.2064 elapsed=15.7m
