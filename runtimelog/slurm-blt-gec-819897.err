@@ -1,0 +1,160 @@
+/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+WARNING:__main__:
+*****************************************
+Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+*****************************************
+/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[rank3]:[W701 14:55:44.289997525 ProcessGroupNCCL.cpp:4115] [PG ID 0 PG GUID 0 Rank 3]  using GPU 3 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect.Specify device_ids in barrier() to force use of a particular device,or call init_process_group() with a device_id.
+[rank2]:[W701 14:55:44.290013269 ProcessGroupNCCL.cpp:4115] [PG ID 0 PG GUID 0 Rank 2]  using GPU 2 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect.Specify device_ids in barrier() to force use of a particular device,or call init_process_group() with a device_id.
+[rank1]:[W701 14:55:44.290032127 ProcessGroupNCCL.cpp:4115] [PG ID 0 PG GUID 0 Rank 1]  using GPU 1 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect.Specify device_ids in barrier() to force use of a particular device,or call init_process_group() with a device_id.
+[rank0]:[W701 14:55:44.290027810 ProcessGroupNCCL.cpp:4115] [PG ID 0 PG GUID 0 Rank 0]  using GPU 0 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect.Specify device_ids in barrier() to force use of a particular device,or call init_process_group() with a device_id.
+[rank3]:[E701 16:48:56.956468257 ProcessGroupNCCL.cpp:616] [Rank 3] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=2340952, OpType=ALLREDUCE, NumelIn=1, NumelOut=1, Timeout(ms)=600000) ran for 600016 milliseconds before timing out.
+[rank2]:[E701 16:48:56.956485063 ProcessGroupNCCL.cpp:616] [Rank 2] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=2340952, OpType=ALLREDUCE, NumelIn=1, NumelOut=1, Timeout(ms)=600000) ran for 600057 milliseconds before timing out.
+[rank1]:[E701 16:48:56.956538242 ProcessGroupNCCL.cpp:616] [Rank 1] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=2340952, OpType=ALLREDUCE, NumelIn=1, NumelOut=1, Timeout(ms)=600000) ran for 600029 milliseconds before timing out.
+[rank1]:[E701 16:48:56.339833164 ProcessGroupNCCL.cpp:1785] [PG ID 0 PG GUID 0(default_pg) Rank 1] Exception (either an error or timeout) detected by watchdog at work: 2340952, last enqueued NCCL work: 2340952, last completed NCCL work: 2340951.
+[rank3]:[E701 16:48:56.339845552 ProcessGroupNCCL.cpp:1785] [PG ID 0 PG GUID 0(default_pg) Rank 3] Exception (either an error or timeout) detected by watchdog at work: 2340952, last enqueued NCCL work: 2340952, last completed NCCL work: 2340951.
+[rank2]:[E701 16:48:56.339947145 ProcessGroupNCCL.cpp:1785] [PG ID 0 PG GUID 0(default_pg) Rank 2] Exception (either an error or timeout) detected by watchdog at work: 2340952, last enqueued NCCL work: 2340952, last completed NCCL work: 2340951.
+[rank1]:[E701 16:48:57.992252459 ProcessGroupNCCL.cpp:1834] [PG ID 0 PG GUID 0(default_pg) Rank 1] Timeout at NCCL work: 2340952, last enqueued NCCL work: 2340952, last completed NCCL work: 2340951.
+[rank1]:[E701 16:48:57.992269094 ProcessGroupNCCL.cpp:630] [Rank 1] Some NCCL operations have failed or timed out. Due to the asynchronous nature of CUDA kernels, subsequent GPU operations might run on corrupted/incomplete data.
+[rank1]:[E701 16:48:57.992272990 ProcessGroupNCCL.cpp:636] [Rank 1] To avoid data inconsistency, we are taking the entire process down.
+[rank2]:[E701 16:48:57.993938119 ProcessGroupNCCL.cpp:1834] [PG ID 0 PG GUID 0(default_pg) Rank 2] Timeout at NCCL work: 2340952, last enqueued NCCL work: 2340952, last completed NCCL work: 2340951.
+[rank2]:[E701 16:48:57.993947604 ProcessGroupNCCL.cpp:630] [Rank 2] Some NCCL operations have failed or timed out. Due to the asynchronous nature of CUDA kernels, subsequent GPU operations might run on corrupted/incomplete data.
+[rank2]:[E701 16:48:57.993950298 ProcessGroupNCCL.cpp:636] [Rank 2] To avoid data inconsistency, we are taking the entire process down.
+[rank3]:[E701 16:48:57.995039402 ProcessGroupNCCL.cpp:1834] [PG ID 0 PG GUID 0(default_pg) Rank 3] Timeout at NCCL work: 2340952, last enqueued NCCL work: 2340952, last completed NCCL work: 2340951.
+[rank3]:[E701 16:48:57.995051260 ProcessGroupNCCL.cpp:630] [Rank 3] Some NCCL operations have failed or timed out. Due to the asynchronous nature of CUDA kernels, subsequent GPU operations might run on corrupted/incomplete data.
+[rank3]:[E701 16:48:57.995055627 ProcessGroupNCCL.cpp:636] [Rank 3] To avoid data inconsistency, we are taking the entire process down.
+[E701 16:48:58.004118037 ProcessGroupNCCL.cpp:1595] [PG ID 0 PG GUID 0(default_pg) Rank 2] Process group watchdog thread terminated with exception: [Rank 2] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=2340952, OpType=ALLREDUCE, NumelIn=1, NumelOut=1, Timeout(ms)=600000) ran for 600057 milliseconds before timing out.
+Exception raised from checkTimeout at ../torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:618 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::string) + 0x96 (0x1483ac61d446 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: c10d::ProcessGroupNCCL::WorkNCCL::checkTimeout(std::optional<std::chrono::duration<long, std::ratio<1l, 1000l> > >) + 0x282 (0x1483ad964a92 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #2: c10d::ProcessGroupNCCL::watchdogHandler() + 0x233 (0x1483ad96bed3 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #3: c10d::ProcessGroupNCCL::ncclCommWatchdog() + 0x14d (0x1483ad96d93d in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #4: <unknown function> + 0x145c0 (0x1483f69555c0 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch.so)
+frame #5: <unknown function> + 0x9f802 (0x1483f8b77802 in /lib64/libc.so.6)
+frame #6: <unknown function> + 0x3f450 (0x1483f8b17450 in /lib64/libc.so.6)
+
+[E701 16:48:58.004117577 ProcessGroupNCCL.cpp:1595] [PG ID 0 PG GUID 0(default_pg) Rank 1] Process group watchdog thread terminated with exception: [Rank 1] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=2340952, OpType=ALLREDUCE, NumelIn=1, NumelOut=1, Timeout(ms)=600000) ran for 600029 milliseconds before timing out.
+Exception raised from checkTimeout at ../torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:618 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::string) + 0x96 (0x145ae33ff446 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: c10d::ProcessGroupNCCL::WorkNCCL::checkTimeout(std::optional<std::chrono::duration<long, std::ratio<1l, 1000l> > >) + 0x282 (0x145ae4746a92 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #2: c10d::ProcessGroupNCCL::watchdogHandler() + 0x233 (0x145ae474ded3 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #3: c10d::ProcessGroupNCCL::ncclCommWatchdog() + 0x14d (0x145ae474f93d in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #4: <unknown function> + 0x145c0 (0x145b2d7375c0 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch.so)
+frame #5: <unknown function> + 0x9f802 (0x145b2fa59802 in /lib64/libc.so.6)
+frame #6: <unknown function> + 0x3f450 (0x145b2f9f9450 in /lib64/libc.so.6)
+
+[E701 16:48:58.004138198 ProcessGroupNCCL.cpp:1595] [PG ID 0 PG GUID 0(default_pg) Rank 3] Process group watchdog thread terminated with exception: [Rank 3] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=2340952, OpType=ALLREDUCE, NumelIn=1, NumelOut=1, Timeout(ms)=600000) ran for 600016 milliseconds before timing out.
+Exception raised from checkTimeout at ../torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:618 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::string) + 0x96 (0x146ba38c7446 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: c10d::ProcessGroupNCCL::WorkNCCL::checkTimeout(std::optional<std::chrono::duration<long, std::ratio<1l, 1000l> > >) + 0x282 (0x146ba4c0ea92 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #2: c10d::ProcessGroupNCCL::watchdogHandler() + 0x233 (0x146ba4c15ed3 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #3: c10d::ProcessGroupNCCL::ncclCommWatchdog() + 0x14d (0x146ba4c1793d in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #4: <unknown function> + 0x145c0 (0x146bedbff5c0 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch.so)
+frame #5: <unknown function> + 0x9f802 (0x146beff21802 in /lib64/libc.so.6)
+frame #6: <unknown function> + 0x3f450 (0x146befec1450 in /lib64/libc.so.6)
+
+terminate called after throwing an instance of 'c10::DistBackendError'
+terminate called after throwing an instance of 'c10::DistBackendError'
+terminate called after throwing an instance of 'c10::DistBackendError'
+  what():  [PG ID 0 PG GUID 0(default_pg) Rank 3] Process group watchdog thread terminated with exception: [Rank 3] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=2340952, OpType=ALLREDUCE, NumelIn=1, NumelOut=1, Timeout(ms)=600000) ran for 600016 milliseconds before timing out.
+Exception raised from checkTimeout at ../torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:618 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::string) + 0x96 (0x146ba38c7446 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: c10d::ProcessGroupNCCL::WorkNCCL::checkTimeout(std::optional<std::chrono::duration<long, std::ratio<1l, 1000l> > >) + 0x282 (0x146ba4c0ea92 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #2: c10d::ProcessGroupNCCL::watchdogHandler() + 0x233 (0x146ba4c15ed3 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #3: c10d::ProcessGroupNCCL::ncclCommWatchdog() + 0x14d (0x146ba4c1793d in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #4: <unknown function> + 0x145c0 (0x146bedbff5c0 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch.so)
+frame #5: <unknown function> + 0x9f802 (0x146beff21802 in /lib64/libc.so.6)
+frame #6: <unknown function> + 0x3f450 (0x146befec1450 in /lib64/libc.so.6)
+
+Exception raised from ncclCommWatchdog at ../torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:1601 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::string) + 0x96 (0x146ba38c7446 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0xe7eb1b (0x146ba488cb1b in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #2: <unknown function> + 0x145c0 (0x146bedbff5c0 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch.so)
+frame #3: <unknown function> + 0x9f802 (0x146beff21802 in /lib64/libc.so.6)
+frame #4: <unknown function> + 0x3f450 (0x146befec1450 in /lib64/libc.so.6)
+
+  what():  [PG ID 0 PG GUID 0(default_pg) Rank 1] Process group watchdog thread terminated with exception: [Rank 1] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=2340952, OpType=ALLREDUCE, NumelIn=1, NumelOut=1, Timeout(ms)=600000) ran for 600029 milliseconds before timing out.
+Exception raised from checkTimeout at ../torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:618 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::string) + 0x96 (0x145ae33ff446 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: c10d::ProcessGroupNCCL::WorkNCCL::checkTimeout(std::optional<std::chrono::duration<long, std::ratio<1l, 1000l> > >) + 0x282 (0x145ae4746a92 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #2: c10d::ProcessGroupNCCL::watchdogHandler() + 0x233 (0x145ae474ded3 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #3: c10d::ProcessGroupNCCL::ncclCommWatchdog() + 0x14d (0x145ae474f93d in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #4: <unknown function> + 0x145c0 (0x145b2d7375c0 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch.so)
+frame #5: <unknown function> + 0x9f802 (0x145b2fa59802 in /lib64/libc.so.6)
+frame #6: <unknown function> + 0x3f450 (0x145b2f9f9450 in /lib64/libc.so.6)
+
+Exception raised from ncclCommWatchdog at ../torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:1601 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::string) + 0x96 (0x145ae33ff446 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0xe7eb1b (0x145ae43c4b1b in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #2: <unknown function> + 0x145c0 (0x145b2d7375c0 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch.so)
+frame #3: <unknown function> + 0x9f802 (0x145b2fa59802 in /lib64/libc.so.6)
+frame #4: <unknown function> + 0x3f450 (0x145b2f9f9450 in /lib64/libc.so.6)
+
+  what():  [PG ID 0 PG GUID 0(default_pg) Rank 2] Process group watchdog thread terminated with exception: [Rank 2] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=2340952, OpType=ALLREDUCE, NumelIn=1, NumelOut=1, Timeout(ms)=600000) ran for 600057 milliseconds before timing out.
+Exception raised from checkTimeout at ../torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:618 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::string) + 0x96 (0x1483ac61d446 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: c10d::ProcessGroupNCCL::WorkNCCL::checkTimeout(std::optional<std::chrono::duration<long, std::ratio<1l, 1000l> > >) + 0x282 (0x1483ad964a92 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #2: c10d::ProcessGroupNCCL::watchdogHandler() + 0x233 (0x1483ad96bed3 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #3: c10d::ProcessGroupNCCL::ncclCommWatchdog() + 0x14d (0x1483ad96d93d in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #4: <unknown function> + 0x145c0 (0x1483f69555c0 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch.so)
+frame #5: <unknown function> + 0x9f802 (0x1483f8b77802 in /lib64/libc.so.6)
+frame #6: <unknown function> + 0x3f450 (0x1483f8b17450 in /lib64/libc.so.6)
+
+Exception raised from ncclCommWatchdog at ../torch/csrc/distributed/c10d/ProcessGroupNCCL.cpp:1601 (most recent call first):
+frame #0: c10::Error::Error(c10::SourceLocation, std::string) + 0x96 (0x1483ac61d446 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libc10.so)
+frame #1: <unknown function> + 0xe7eb1b (0x1483ad5e2b1b in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch_cuda.so)
+frame #2: <unknown function> + 0x145c0 (0x1483f69555c0 in /home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/lib/libtorch.so)
+frame #3: <unknown function> + 0x9f802 (0x1483f8b77802 in /lib64/libc.so.6)
+frame #4: <unknown function> + 0x3f450 (0x1483f8b17450 in /lib64/libc.so.6)
+
+W0701 16:50:10.516000 3897471 /scratch/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/api.py:897] Sending process 3897785 closing signal SIGTERM
+W0701 16:50:10.533000 3897471 /scratch/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/api.py:897] Sending process 3897787 closing signal SIGTERM
+W0701 16:50:10.533000 3897471 /scratch/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/api.py:897] Sending process 3897788 closing signal SIGTERM
+W0701 16:50:40.533000 3897471 /scratch/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/api.py:916] Unable to shutdown process 3897785 via 15, forcefully exiting via 9
+E0701 16:50:41.060000 3897471 /scratch/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/api.py:869] failed (exitcode: -6) local_rank: 1 (pid: 3897786) of binary: /home01/r984a02/.conda/envs/phdq_blt/bin/python
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/distributed/run.py", line 923, in <module>
+    main()
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 355, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/distributed/run.py", line 919, in main
+    run(args)
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/distributed/run.py", line 910, in run
+    elastic_launch(
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 138, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 269, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+========================================================
+blt_gec.train FAILED
+--------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+--------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-07-01_16:50:10
+  host      : gpu54.eth
+  rank      : 1 (local_rank: 1)
+  exitcode  : -6 (pid: 3897786)
+  error_file: <N/A>
+  traceback : Signal 6 (SIGABRT) received by PID 3897786
+========================================================
+srun: error: gpu54: task 0: Exited with exit code 1

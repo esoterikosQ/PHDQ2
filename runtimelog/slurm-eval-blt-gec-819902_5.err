@@ -1,0 +1,45 @@
+ibwarn: [1697263] mad_rpc_open_port: can't open UMAD port ((null):1)
+/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/scratch/r984a02/PHDQ2/blt_gec/eval.py", line 266, in <module>
+    main()
+  File "/scratch/r984a02/PHDQ2/blt_gec/eval.py", line 262, in main
+    run_generation(args)
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/scratch/r984a02/PHDQ2/blt_gec/eval.py", line 192, in run_generation
+    checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/serialization.py", line 1360, in load
+    return _load(
+           ^^^^^^
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/serialization.py", line 1848, in _load
+    result = unpickler.load()
+             ^^^^^^^^^^^^^^^^
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/serialization.py", line 1812, in persistent_load
+    typed_storage = load_tensor(
+                    ^^^^^^^^^^^^
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/serialization.py", line 1784, in load_tensor
+    wrap_storage=restore_location(storage, location),
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/serialization.py", line 1690, in restore_location
+    return default_restore_location(storage, str(map_location))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/serialization.py", line 601, in default_restore_location
+    result = fn(storage, location)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/serialization.py", line 540, in _deserialize
+    return obj.to(device=device)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/storage.py", line 279, in to
+    return _to(self, device, non_blocking)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/_utils.py", line 88, in _to
+    untyped_storage = torch.UntypedStorage(self.size(), device=device)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 978.00 MiB. GPU 0 has a total capacity of 31.73 GiB of which 828.25 MiB is free. Including non-PyTorch memory, this process has 30.92 GiB memory in use. Of the allocated memory 30.39 GiB is allocated by PyTorch, and 174.04 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+srun: error: gpu19: task 0: Exited with exit code 1
