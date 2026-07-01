@@ -144,6 +144,14 @@ TEST_ONLY="${TEST_ONLY:-0}"
 MAX_TIME="${MAX_TIME:-auto}"
 CHECKPOINT_INTERVAL_MINUTES="${CHECKPOINT_INTERVAL_MINUTES:-20}"
 
+if [[ "$GRAD_ACCUM_STEPS" -lt "$NUM_GPUS" || $((GRAD_ACCUM_STEPS % NUM_GPUS)) -ne 0 ]]; then
+    echo "Error: GRAD_ACCUM_STEPS is the global accumulation factor and must be"
+    echo "divisible by NUM_GPUS. Got GRAD_ACCUM_STEPS=$GRAD_ACCUM_STEPS, NUM_GPUS=$NUM_GPUS."
+    exit 1
+fi
+LOCAL_GRAD_ACCUM_STEPS=$((GRAD_ACCUM_STEPS / NUM_GPUS))
+EFFECTIVE_BATCH_SIZE=$((BATCH_SIZE * GRAD_ACCUM_STEPS))
+
 PREPROCESSED_DIR="$DATA_DIR/Preprocessed/$DATASET_DIR_NAME"
 TRAIN_DATA="${TRAIN_DATA:-$PREPROCESSED_DIR/${DATASET_DIR_NAME}_train.txt}"
 VAL_DATA="${VAL_DATA:-$PREPROCESSED_DIR/${DATASET_DIR_NAME}_val.txt}"
@@ -297,6 +305,8 @@ echo "BLT scheduler: $SCHEDULER"
 echo "BLT warmup_steps: $WARMUP_STEPS"
 echo "BLT num_beams: $BLT_NUM_BEAMS"
 echo "BLT NUM_GPUS: $NUM_GPUS"
+echo "BLT grad accumulation: global=$GRAD_ACCUM_STEPS local=$LOCAL_GRAD_ACCUM_STEPS"
+echo "BLT effective batch size: $EFFECTIVE_BATCH_SIZE"
 echo "BLT checkpoint interval minutes: $CHECKPOINT_INTERVAL_MINUTES"
 echo "BLT train max_time: $TRAIN_MAX_TIME"
 

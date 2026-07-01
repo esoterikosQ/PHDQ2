@@ -14,6 +14,7 @@ import os
 import signal
 import time
 from contextlib import nullcontext
+from datetime import timedelta
 from pathlib import Path
 from typing import Any
 
@@ -46,12 +47,15 @@ def _handle_stop_signal(signum, frame):
     print(f"Received signal {signum}; will save checkpoint after current step.")
 
 
-def setup_distributed() -> int:
+def setup_distributed(timeout_minutes: int = 120) -> int:
     local_rank = int(os.environ.get("LOCAL_RANK", 0))
     if not torch.cuda.is_available():
         raise RuntimeError("Distributed training requires CUDA.")
     torch.cuda.set_device(local_rank)
-    dist.init_process_group(backend="nccl")
+    dist.init_process_group(
+        backend="nccl",
+        timeout=timedelta(minutes=timeout_minutes),
+    )
     return local_rank
 
 
@@ -81,6 +85,15 @@ def print_main(*args, **kwargs) -> None:
         print(*args, **kwargs)
 
 
+def distributed_barrier(device: torch.device) -> None:
+    if not is_distributed():
+        return
+    if device.type == "cuda" and device.index is not None:
+        dist.barrier(device_ids=[device.index])
+    else:
+        dist.barrier()
+
+
 def raw_model(model: torch.nn.Module) -> torch.nn.Module:
     return model.module if hasattr(model, "module") else model
 
@@ -103,6 +116,32 @@ def parse_max_time(value: str) -> int:
         raise ValueError("--max_time must use DD:HH:MM:SS")
     days, hours, minutes, seconds = parts
     return (((days * 24) + hours) * 60 + minutes) * 60 + seconds
+
+
+class ResumableDistributedSampler(DistributedSampler):
+    """Deterministic sampler that can omit batches already consumed in an epoch."""
+
+    def __init__(self, *args, batch_size: int, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.batch_size = batch_size
+        self.resume_epoch: int | None = None
+        self.batches_completed = 0
+
+    def set_resume_position(self, epoch: int | None, batches_completed: int = 0) -> None:
+        self.resume_epoch = epoch
+        self.batches_completed = max(batches_completed, 0)
+
+    def _samples_to_skip(self) -> int:
+        if self.resume_epoch != self.epoch:
+            return 0
+        return min(self.batches_completed * self.batch_size, self.num_samples)
+
+    def __iter__(self):
+        indices = list(super().__iter__())
+        return iter(indices[self._samples_to_skip():])
+
+    def __len__(self) -> int:
+        return self.num_samples - self._samples_to_skip()
 
 
 def resolve_data_paths(args) -> tuple[Path, Path, Path]:
@@ -134,7 +173,12 @@ def parse_args():
     parser.add_argument("--adam_beta1", type=float, default=0.9)
     parser.add_argument("--adam_beta2", type=float, default=0.95)
     parser.add_argument("--adam_eps", type=float, default=1e-8)
-    parser.add_argument("--grad_accum_steps", type=int, default=8)
+    parser.add_argument(
+        "--grad_accum_steps",
+        type=int,
+        default=8,
+        help="Target global accumulation factor. In DDP it must be divisible by world size.",
+    )
     parser.add_argument("--clip_grad_norm", type=float, default=1.0)
     parser.add_argument("--precision", type=str, default="bf16", choices=["fp32", "bf16", "fp16"])
     parser.add_argument("--eval_every_steps", type=int, default=200)
@@ -156,6 +200,7 @@ def parse_args():
     parser.add_argument("--separator", type=str, default=DEFAULT_GEC_SEPARATOR)
     parser.add_argument("--max_steps", type=int, default=0,
                         help="Stop training after this many optimizer steps. 0 means no limit.")
+    parser.add_argument("--distributed_timeout_minutes", type=int, default=120)
     parser.add_argument("--seed", type=int, default=0)
     return parser.parse_args()
 
@@ -176,6 +221,7 @@ def save_checkpoint(
     scheduler,
     epoch: int,
     global_step: int,
+    batches_completed_in_epoch: int,
     best_val_loss: float,
     best_val_gleu: float,
     args: argparse.Namespace,
@@ -187,15 +233,34 @@ def save_checkpoint(
         "scheduler": scheduler.state_dict() if scheduler is not None else None,
         "epoch": epoch,
         "global_step": global_step,
+        "batches_completed_in_epoch": batches_completed_in_epoch,
+        "local_grad_accum_steps": args.grad_accum_steps,
+        "world_size": get_world_size(),
         "best_val_loss": best_val_loss,
         "best_val_gleu": best_val_gleu,
         "args": vars(args),
     }
-    torch.save(payload, path)
+    temp_path = path.with_name(f".{path.name}.tmp.{os.getpid()}")
+    try:
+        with temp_path.open("wb") as checkpoint_file:
+            torch.save(payload, checkpoint_file)
+            checkpoint_file.flush()
+            os.fsync(checkpoint_file.fileno())
+        os.replace(temp_path, path)
+    finally:
+        temp_path.unlink(missing_ok=True)
     print_main(f"Saved checkpoint: {path}")
 
 
-def load_checkpoint(path: Path, model: torch.nn.Module, optimizer: torch.optim.Optimizer, scheduler, device):
+def load_checkpoint(
+    path: Path,
+    model: torch.nn.Module,
+    optimizer: torch.optim.Optimizer,
+    scheduler,
+    device,
+    *,
+    train_batches_per_epoch: int,
+):
     checkpoint = torch.load(path, map_location=device, weights_only=False)
     model.load_state_dict(strip_module_prefix(checkpoint["model"]), strict=False)
     optimizer.load_state_dict(checkpoint["optimizer"])
@@ -203,16 +268,59 @@ def load_checkpoint(path: Path, model: torch.nn.Module, optimizer: torch.optim.O
         scheduler.load_state_dict(checkpoint["scheduler"])
     epoch = int(checkpoint.get("epoch", 0))
     global_step = int(checkpoint.get("global_step", 0))
+    batches_completed = checkpoint.get("batches_completed_in_epoch")
+    checkpoint_world_size = checkpoint.get("world_size")
+    if batches_completed is not None:
+        batches_completed = int(batches_completed)
+        if (
+            batches_completed > 0
+            and checkpoint_world_size is not None
+            and int(checkpoint_world_size) != get_world_size()
+        ):
+            raise RuntimeError(
+                "Cannot resume a partial epoch with a different world size: "
+                f"checkpoint={checkpoint_world_size}, current={get_world_size()}."
+            )
+    else:
+        checkpoint_args = checkpoint.get("args", {})
+        checkpoint_accum = int(
+            checkpoint.get(
+                "local_grad_accum_steps",
+                checkpoint_args.get("grad_accum_steps", 1),
+            )
+        )
+        optimizer_steps_per_epoch = max(
+            math.ceil(train_batches_per_epoch / max(checkpoint_accum, 1)),
+            1,
+        )
+        optimizer_steps_in_epoch = global_step - (epoch * optimizer_steps_per_epoch)
+        if 0 <= optimizer_steps_in_epoch < optimizer_steps_per_epoch:
+            batches_completed = min(
+                optimizer_steps_in_epoch * max(checkpoint_accum, 1),
+                train_batches_per_epoch,
+            )
+            if batches_completed:
+                print_main(
+                    "Legacy checkpoint has no batch position; inferred "
+                    f"batches_completed_in_epoch={batches_completed}. "
+                    "Resume with the same world size used to create the checkpoint."
+                )
+        else:
+            batches_completed = 0
     best_val_loss = float(checkpoint.get("best_val_loss", math.inf))
     best_val_gleu = float(checkpoint.get("best_val_gleu", -math.inf))
-    print_main(f"Loaded checkpoint: {path} (epoch={epoch}, global_step={global_step})")
-    return epoch, global_step, best_val_loss, best_val_gleu
+    print_main(
+        f"Loaded checkpoint: {path} "
+        f"(epoch={epoch}, batches_completed={batches_completed}, global_step={global_step})"
+    )
+    return epoch, int(batches_completed), global_step, best_val_loss, best_val_gleu
 
 
 @torch.no_grad()
 def evaluate(model, patcher, dataloader, device, precision: str) -> float:
     model.eval()
-    losses = []
+    loss_sum = 0.0
+    batch_count = 0
     autocast_enabled = precision in {"bf16", "fp16"} and device.type == "cuda"
     autocast_dtype = torch.bfloat16 if precision == "bf16" else torch.float16
     for batch in dataloader:
@@ -222,9 +330,15 @@ def evaluate(model, patcher, dataloader, device, precision: str) -> float:
         with torch.autocast(device_type=device.type, dtype=autocast_dtype, enabled=autocast_enabled):
             logits = model(input_ids, patch_lengths=patch_lengths)
             loss = compute_loss(logits, labels)
-        losses.append(float(loss.item()))
+        loss_sum += float(loss.item())
+        batch_count += 1
+    if is_distributed():
+        totals = torch.tensor([loss_sum, batch_count], dtype=torch.float64, device=device)
+        dist.all_reduce(totals, op=dist.ReduceOp.SUM)
+        loss_sum = float(totals[0].item())
+        batch_count = int(totals[1].item())
     model.train()
-    return float(sum(losses) / max(len(losses), 1))
+    return float(loss_sum / max(batch_count, 1))
 
 
 def build_scheduler(optimizer, args, train_loader_len: int):
@@ -329,7 +443,7 @@ def main():
         args = parse_args()
         distributed = "LOCAL_RANK" in os.environ
         if distributed:
-            local_rank = setup_distributed()
+            local_rank = setup_distributed(args.distributed_timeout_minutes)
             device = torch.device(f"cuda:{local_rank}")
         else:
             local_rank = 0
@@ -349,8 +463,7 @@ def main():
             run_dir.mkdir(parents=True, exist_ok=True)
             with (run_dir / "train_args.json").open("w", encoding="utf-8") as f:
                 json.dump(vars(args), f, ensure_ascii=False, indent=2)
-        if is_distributed():
-            dist.barrier()
+        distributed_barrier(device)
 
         print_main(f"Device: {device}")
         print_main(f"Distributed: {is_distributed()} rank={get_rank()} world_size={get_world_size()}")
@@ -361,6 +474,11 @@ def main():
         print_main(f"Train: {train_path}")
         print_main(f"Val:   {val_path}")
         print_main(f"Test:  {test_path}")
+        if is_distributed() and args.eval_generation:
+            raise ValueError(
+                "Inline generation evaluation is not supported with DDP. "
+                "Use scripts/eval_blt.sh after training."
+            )
 
         try:
             components = load_reference_blt_components(
@@ -383,7 +501,12 @@ def main():
         if is_distributed():
             world_size = get_world_size()
             original_accum = args.grad_accum_steps
-            args.grad_accum_steps = max(original_accum // world_size, 1)
+            if original_accum < world_size or original_accum % world_size != 0:
+                raise ValueError(
+                    "In DDP, grad_accum_steps is a global accumulation factor and "
+                    f"must be divisible by world_size. Got {original_accum} and {world_size}."
+                )
+            args.grad_accum_steps = original_accum // world_size
             effective_batch = args.batch_size * args.grad_accum_steps * world_size
             print_main(
                 f"DDP: world_size={world_size}, "
@@ -410,11 +533,38 @@ def main():
             separator=args.separator,
         )
         collator = GecBltCollator(pad_token_id=tokenizer.eos_id)
-        train_sampler = DistributedSampler(train_dataset, shuffle=True, seed=args.seed) if is_distributed() else None
+        train_sampler = ResumableDistributedSampler(
+            train_dataset,
+            num_replicas=get_world_size(),
+            rank=get_rank(),
+            shuffle=True,
+            seed=args.seed,
+            batch_size=args.batch_size,
+        )
+        val_sampler = (
+            DistributedSampler(
+                val_dataset,
+                num_replicas=get_world_size(),
+                rank=get_rank(),
+                shuffle=False,
+            )
+            if is_distributed()
+            else None
+        )
+        test_sampler = (
+            DistributedSampler(
+                test_dataset,
+                num_replicas=get_world_size(),
+                rank=get_rank(),
+                shuffle=False,
+            )
+            if is_distributed()
+            else None
+        )
         train_loader = DataLoader(
             train_dataset,
             batch_size=args.batch_size,
-            shuffle=train_sampler is None,
+            shuffle=False,
             sampler=train_sampler,
             num_workers=args.num_workers,
             pin_memory=device.type == "cuda",
@@ -424,6 +574,7 @@ def main():
             val_dataset,
             batch_size=args.batch_size,
             shuffle=False,
+            sampler=val_sampler,
             num_workers=args.num_workers,
             pin_memory=device.type == "cuda",
             collate_fn=collator,
@@ -432,6 +583,7 @@ def main():
             test_dataset,
             batch_size=args.batch_size,
             shuffle=False,
+            sampler=test_sampler,
             num_workers=args.num_workers,
             pin_memory=device.type == "cuda",
             collate_fn=collator,
@@ -442,19 +594,32 @@ def main():
         model_for_eval = raw_model(model)
 
         optimizer = build_optimizer(model, args)
-        scheduler = build_scheduler(optimizer, args, len(train_loader))
+        full_train_batches = len(train_loader)
+        scheduler = build_scheduler(optimizer, args, full_train_batches)
         start_epoch = 0
+        resume_batches_completed = 0
         global_step = 0
         best_val_loss = math.inf
         best_val_gleu = -math.inf
         if args.resume_ckpt_path:
-            start_epoch, global_step, best_val_loss, best_val_gleu = load_checkpoint(
-                Path(args.resume_ckpt_path), model_for_eval, optimizer, scheduler, device
+            (
+                start_epoch,
+                resume_batches_completed,
+                global_step,
+                best_val_loss,
+                best_val_gleu,
+            ) = load_checkpoint(
+                Path(args.resume_ckpt_path),
+                model_for_eval,
+                optimizer,
+                scheduler,
+                device,
+                train_batches_per_epoch=full_train_batches,
             )
 
         if args.test_only:
+            test_loss = evaluate(model_for_eval, patcher, test_loader, device, args.precision)
             if is_main_process():
-                test_loss = evaluate(model_for_eval, patcher, test_loader, device, args.precision)
                 print(f"test loss={test_loss:.4f}")
                 if args.eval_generation:
                     test_metrics = evaluate_generation(
@@ -468,8 +633,7 @@ def main():
                         mode="test",
                     )
                     print(f"test generation GLEU={test_metrics['gleu']:.4f} F0.5={test_metrics['f0.5']}")
-            if is_distributed():
-                dist.barrier()
+            distributed_barrier(device)
             return
 
         max_seconds = parse_max_time(args.max_time)
@@ -482,15 +646,28 @@ def main():
         model.train()
         optimizer.zero_grad(set_to_none=True)
         for epoch in range(start_epoch, args.max_epochs):
-            if train_sampler is not None:
-                train_sampler.set_epoch(epoch)
-            total_batches = len(train_loader)
-            for step_in_epoch, batch in enumerate(train_loader, start=1):
+            train_sampler.set_epoch(epoch)
+            batches_completed = resume_batches_completed if epoch == start_epoch else 0
+            train_sampler.set_resume_position(
+                epoch if batches_completed else None,
+                batches_completed,
+            )
+            if batches_completed:
+                print_main(
+                    f"Resuming epoch={epoch} after {batches_completed}/{full_train_batches} batches."
+                )
+            for step_in_epoch, batch in enumerate(
+                train_loader,
+                start=batches_completed + 1,
+            ):
                 input_ids = batch["input_ids"].to(device)
                 labels = batch["labels"].to(device)
                 patch_lengths = build_patch_lengths(patcher, input_ids)
 
-                is_accum = step_in_epoch % args.grad_accum_steps != 0 and step_in_epoch != total_batches
+                is_accum = (
+                    step_in_epoch % args.grad_accum_steps != 0
+                    and step_in_epoch != full_train_batches
+                )
                 sync_context = model.no_sync() if is_distributed() and is_accum else nullcontext()
                 with sync_context:
                     with torch.autocast(device_type=device.type, dtype=autocast_dtype, enabled=autocast_enabled):
@@ -498,7 +675,10 @@ def main():
                         loss = compute_loss(logits, labels) / args.grad_accum_steps
                     loss.backward()
 
-                if step_in_epoch % args.grad_accum_steps == 0 or step_in_epoch == total_batches:
+                if (
+                    step_in_epoch % args.grad_accum_steps == 0
+                    or step_in_epoch == full_train_batches
+                ):
                     torch.nn.utils.clip_grad_norm_(model.parameters(), args.clip_grad_norm)
                     optimizer.step()
                     if scheduler is not None:
@@ -515,8 +695,14 @@ def main():
                         )
 
                     if args.eval_every_steps > 0 and global_step % args.eval_every_steps == 0:
+                        val_loss = evaluate(
+                            model_for_eval,
+                            patcher,
+                            val_loader,
+                            device,
+                            args.precision,
+                        )
                         if is_main_process():
-                            val_loss = evaluate(model_for_eval, patcher, val_loader, device, args.precision)
                             print(f"validation step={global_step} loss={val_loss:.4f}")
                             should_save_best = val_loss < best_val_loss
                             if args.eval_generation:
@@ -548,12 +734,12 @@ def main():
                                     scheduler=scheduler,
                                     epoch=epoch,
                                     global_step=global_step,
+                                    batches_completed_in_epoch=step_in_epoch,
                                     best_val_loss=best_val_loss,
                                     best_val_gleu=best_val_gleu,
                                     args=args,
                                 )
-                        if is_distributed():
-                            dist.barrier()
+                        distributed_barrier(device)
 
                     now = time.time()
                     if sync_should_stop(now - last_checkpoint_time >= checkpoint_interval, device):
@@ -565,13 +751,13 @@ def main():
                                 scheduler=scheduler,
                                 epoch=epoch,
                                 global_step=global_step,
+                                batches_completed_in_epoch=step_in_epoch,
                                 best_val_loss=best_val_loss,
                                 best_val_gleu=best_val_gleu,
                                 args=args,
                             )
                         last_checkpoint_time = now
-                        if is_distributed():
-                            dist.barrier()
+                        distributed_barrier(device)
 
                     if args.max_steps > 0 and global_step >= args.max_steps:
                         if is_main_process():
@@ -583,12 +769,12 @@ def main():
                                 scheduler=scheduler,
                                 epoch=epoch,
                                 global_step=global_step,
+                                batches_completed_in_epoch=step_in_epoch,
                                 best_val_loss=best_val_loss,
                                 best_val_gleu=best_val_gleu,
                                 args=args,
                             )
-                        if is_distributed():
-                            dist.barrier()
+                        distributed_barrier(device)
                         return
 
                     elapsed = now - start_time
@@ -601,17 +787,17 @@ def main():
                                 scheduler=scheduler,
                                 epoch=epoch,
                                 global_step=global_step,
+                                batches_completed_in_epoch=step_in_epoch,
                                 best_val_loss=best_val_loss,
                                 best_val_gleu=best_val_gleu,
                                 args=args,
                             )
                             print("Stopping early to preserve checkpoint before time limit.")
-                        if is_distributed():
-                            dist.barrier()
+                        distributed_barrier(device)
                         return
 
+            val_loss = evaluate(model_for_eval, patcher, val_loader, device, args.precision)
             if is_main_process():
-                val_loss = evaluate(model_for_eval, patcher, val_loader, device, args.precision)
                 print(f"epoch={epoch} validation loss={val_loss:.4f}")
                 should_save_best = val_loss < best_val_loss
                 if args.eval_generation:
@@ -640,6 +826,7 @@ def main():
                         scheduler=scheduler,
                         epoch=epoch + 1,
                         global_step=global_step,
+                        batches_completed_in_epoch=0,
                         best_val_loss=best_val_loss,
                         best_val_gleu=best_val_gleu,
                         args=args,
@@ -651,17 +838,17 @@ def main():
                     scheduler=scheduler,
                     epoch=epoch + 1,
                     global_step=global_step,
+                    batches_completed_in_epoch=0,
                     best_val_loss=best_val_loss,
                     best_val_gleu=best_val_gleu,
                     args=args,
                 )
-            if is_distributed():
-                dist.barrier()
+            distributed_barrier(device)
 
         print_main("Training complete.")
         if args.run_test_on_end:
+            test_loss = evaluate(model_for_eval, patcher, test_loader, device, args.precision)
             if is_main_process():
-                test_loss = evaluate(model_for_eval, patcher, test_loader, device, args.precision)
                 print(f"test loss={test_loss:.4f}")
                 if args.eval_generation:
                     test_metrics = evaluate_generation(
@@ -675,8 +862,7 @@ def main():
                         mode="test",
                     )
                     print(f"test generation GLEU={test_metrics['gleu']:.4f} F0.5={test_metrics['f0.5']}")
-            if is_distributed():
-                dist.barrier()
+            distributed_barrier(device)
     finally:
         cleanup_distributed()
 

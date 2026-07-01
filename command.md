@@ -8,7 +8,7 @@ sinfo
 sinfo -p [파티션] -Nel
 
 # 특정 노드의 GPU 잔여량 확인
-scontron show node [노드명]
+scontrol show node [노드명]
 
 scontrol show node [노드명] | egrep "NodeName=|State=|Gres=|CfgTRES=|AllocTRES=|CPUAlloc"
 
@@ -75,7 +75,7 @@ CONDA_ENV=phdq_blt DATASET_TYPE=union NUM_GPUS=1 MAX_EPOCHS=10 \
 # union 4GPU, 48시간 이어서 학습
 CONDA_ENV=phdq_blt DATASET_TYPE=union NUM_GPUS=4 MAX_EPOCHS=10 \
   RESUME_CKPT=outputs/blt_gec/union/last.ckpt \
-  GRAD_ACCUM_STEPS=2 \
+  GRAD_ACCUM_STEPS=4 \
   sbatch --time=2-00:00:00 -p amd_a100nv_8 --nodelist=[노드명] \
   --gres=gpu:4 --cpus-per-task=8 scripts/train_blt.sh
 
@@ -132,10 +132,12 @@ DATASET_TYPE=union BART_RUN_NAME=union_clean SPLIT=test \
 sbatch scripts/eval_bart.sh
 
 
-753881 : union
-753878 : learner
-753882 : native
+753881 : union / done
+753878 : learner / done
+753882 : native / done
 
-753911 : learner
-753945 : union4
+753911 : learner / cancel
+753945 : union4 / cancel
 753950 : native2
+
+753976 : union4
