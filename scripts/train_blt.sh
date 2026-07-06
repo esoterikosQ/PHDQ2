@@ -131,6 +131,8 @@ LOCAL_FILES_ONLY="${LOCAL_FILES_ONLY:-0}"
 SCHEDULER="${SCHEDULER:-cosine}"
 WARMUP_STEPS="${WARMUP_STEPS:-2000}"
 WARMUP_RATIO="${WARMUP_RATIO:-0.0}"
+SCHEDULER_TOTAL_STEPS="${SCHEDULER_TOTAL_STEPS:-0}"
+RESET_SCHEDULER_ON_RESUME="${RESET_SCHEDULER_ON_RESUME:-0}"
 BLT_NUM_BEAMS="${BLT_NUM_BEAMS:-4}"
 MAX_GEN_LEN="${MAX_GEN_LEN:-256}"
 EVAL_GENERATION="${EVAL_GENERATION:-0}"
@@ -261,6 +263,10 @@ fi
 if [[ "$TEST_ONLY" == "1" || "$TEST_ONLY" == "true" ]]; then
     TEST_ARGS+=(--test_only)
 fi
+SCHEDULER_RESUME_ARGS=()
+if [[ "$RESET_SCHEDULER_ON_RESUME" == "1" || "$RESET_SCHEDULER_ON_RESUME" == "true" ]]; then
+    SCHEDULER_RESUME_ARGS+=(--reset_scheduler_on_resume)
+fi
 
 resolve_train_max_time() {
     if [[ "$MAX_TIME" != "auto" ]]; then
@@ -303,6 +309,8 @@ echo "BLT weight_decay: $WEIGHT_DECAY"
 echo "BLT Adam betas: ($ADAM_BETA1, $ADAM_BETA2)"
 echo "BLT scheduler: $SCHEDULER"
 echo "BLT warmup_steps: $WARMUP_STEPS"
+echo "BLT scheduler_total_steps override: $SCHEDULER_TOTAL_STEPS"
+echo "BLT reset_scheduler_on_resume: $RESET_SCHEDULER_ON_RESUME"
 echo "BLT num_beams: $BLT_NUM_BEAMS"
 echo "BLT NUM_GPUS: $NUM_GPUS"
 echo "BLT grad accumulation: global=$GRAD_ACCUM_STEPS local=$LOCAL_GRAD_ACCUM_STEPS"
@@ -346,6 +354,7 @@ fi
     --scheduler "$SCHEDULER" \
     --warmup_steps "$WARMUP_STEPS" \
     --warmup_ratio "$WARMUP_RATIO" \
+    --scheduler_total_steps "$SCHEDULER_TOTAL_STEPS" \
     --num_beams "$BLT_NUM_BEAMS" \
     --max_gen_len "$MAX_GEN_LEN" \
     --eval_max_examples "$EVAL_MAX_EXAMPLES" \
@@ -358,6 +367,7 @@ fi
     "${GEN_EVAL_ARGS[@]}" \
     "${M2_ARGS[@]}" \
     "${TEST_ARGS[@]}" \
+    "${SCHEDULER_RESUME_ARGS[@]}" \
     "${RESUME_ARGS[@]}"
 
 echo "End Time: $(date)"

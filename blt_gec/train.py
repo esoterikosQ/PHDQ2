@@ -23,9 +23,9 @@ import torch.distributed as dist
 import torch.nn.functional as F
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.optim import AdamW
+from torch.optim.lr_scheduler import LambdaLR
 from torch.utils.data import DataLoader
 from torch.utils.data.distributed import DistributedSampler
-from transformers import get_cosine_schedule_with_warmup, get_linear_schedule_with_warmup
 
 from blt_gec.data_adapter import (
     DEFAULT_GEC_SEPARATOR,
@@ -193,6 +193,8 @@ def parse_args():
     parser.add_argument("--scheduler", type=str, default="cosine", choices=["constant", "linear", "cosine"])
     parser.add_argument("--warmup_steps", type=int, default=2000)
     parser.add_argument("--warmup_ratio", type=float, default=0.0)
+    parser.add_argument("--scheduler_total_steps", type=int, default=0)
+    parser.add_argument("--reset_scheduler_on_resume", action="store_true")
     parser.add_argument("--m2_source_gold_path", type=str, default="")
     parser.add_argument("--resume_ckpt_path", type=str, default="")
     parser.add_argument("--run_test_on_end", action="store_true")
@@ -231,6 +233,9 @@ def save_checkpoint(
         "model": raw_model(model).state_dict(),
         "optimizer": optimizer.state_dict(),
         "scheduler": scheduler.state_dict() if scheduler is not None else None,
+        "scheduler_total_steps": getattr(args, "scheduler_total_steps_resolved", 0),
+        "scheduler_warmup_steps": getattr(args, "scheduler_warmup_steps_resolved", 0),
+        "scheduler_origin_global_step": getattr(args, "scheduler_origin_global_step", 0),
         "epoch": epoch,
         "global_step": global_step,
         "batches_completed_in_epoch": batches_completed_in_epoch,
@@ -256,7 +261,6 @@ def load_checkpoint(
     path: Path,
     model: torch.nn.Module,
     optimizer: torch.optim.Optimizer,
-    scheduler,
     device,
     *,
     train_batches_per_epoch: int,
@@ -264,8 +268,6 @@ def load_checkpoint(
     checkpoint = torch.load(path, map_location=device, weights_only=False)
     model.load_state_dict(strip_module_prefix(checkpoint["model"]), strict=False)
     optimizer.load_state_dict(checkpoint["optimizer"])
-    if scheduler is not None and checkpoint.get("scheduler") is not None:
-        scheduler.load_state_dict(checkpoint["scheduler"])
     epoch = int(checkpoint.get("epoch", 0))
     global_step = int(checkpoint.get("global_step", 0))
     batches_completed = checkpoint.get("batches_completed_in_epoch")
@@ -313,7 +315,7 @@ def load_checkpoint(
         f"Loaded checkpoint: {path} "
         f"(epoch={epoch}, batches_completed={batches_completed}, global_step={global_step})"
     )
-    return epoch, int(batches_completed), global_step, best_val_loss, best_val_gleu
+    return checkpoint, epoch, int(batches_completed), global_step, best_val_loss, best_val_gleu
 
 
 @torch.no_grad()
@@ -341,27 +343,30 @@ def evaluate(model, patcher, dataloader, device, precision: str) -> float:
     return float(loss_sum / max(batch_count, 1))
 
 
-def build_scheduler(optimizer, args, train_loader_len: int):
-    optimizer_steps_per_epoch = max(math.ceil(train_loader_len / args.grad_accum_steps), 1)
-    total_steps = max(optimizer_steps_per_epoch * args.max_epochs, 1)
+def build_scheduler(optimizer, args, total_steps: int):
+    total_steps = max(total_steps, 1)
     warmup_steps = args.warmup_steps
     if args.warmup_ratio > 0:
         warmup_steps = int(total_steps * args.warmup_ratio)
     warmup_steps = min(max(warmup_steps, 0), total_steps)
 
+    args.scheduler_total_steps_resolved = total_steps
+    args.scheduler_warmup_steps_resolved = warmup_steps
+
     if args.scheduler == "constant":
         return None
-    if args.scheduler == "linear":
-        return get_linear_schedule_with_warmup(
-            optimizer,
-            num_warmup_steps=warmup_steps,
-            num_training_steps=total_steps,
-        )
-    return get_cosine_schedule_with_warmup(
-        optimizer,
-        num_warmup_steps=warmup_steps,
-        num_training_steps=total_steps,
-    )
+
+    def lr_factor(current_step: int) -> float:
+        if warmup_steps > 0 and current_step < warmup_steps:
+            return float(current_step) / float(max(warmup_steps, 1))
+        decay_steps = max(total_steps - warmup_steps, 1)
+        progress = float(current_step - warmup_steps) / float(decay_steps)
+        progress = min(max(progress, 0.0), 1.0)
+        if args.scheduler == "linear":
+            return 1.0 - progress
+        return 0.5 * (1.0 + math.cos(math.pi * progress))
+
+    return LambdaLR(optimizer, lr_lambda=lr_factor)
 
 
 def build_optimizer(model, args):
@@ -595,14 +600,19 @@ def main():
 
         optimizer = build_optimizer(model, args)
         full_train_batches = len(train_loader)
-        scheduler = build_scheduler(optimizer, args, full_train_batches)
+        optimizer_steps_per_epoch = max(
+            math.ceil(full_train_batches / args.grad_accum_steps),
+            1,
+        )
         start_epoch = 0
         resume_batches_completed = 0
         global_step = 0
         best_val_loss = math.inf
         best_val_gleu = -math.inf
+        checkpoint = None
         if args.resume_ckpt_path:
             (
+                checkpoint,
                 start_epoch,
                 resume_batches_completed,
                 global_step,
@@ -612,15 +622,80 @@ def main():
                 Path(args.resume_ckpt_path),
                 model_for_eval,
                 optimizer,
-                scheduler,
                 device,
                 train_batches_per_epoch=full_train_batches,
             )
 
         if args.test_only:
+            scheduler = None
+            args.scheduler_total_steps_resolved = 0
+            args.scheduler_warmup_steps_resolved = 0
+            args.scheduler_origin_global_step = global_step
+        elif checkpoint is None:
+            scheduler_total_steps = (
+                args.scheduler_total_steps
+                if args.scheduler_total_steps > 0
+                else optimizer_steps_per_epoch * args.max_epochs
+            )
+            args.scheduler_origin_global_step = 0
+            scheduler = build_scheduler(optimizer, args, scheduler_total_steps)
+        elif args.reset_scheduler_on_resume:
+            remaining_epochs = max(args.max_epochs - start_epoch, 1)
+            scheduler_total_steps = (
+                args.scheduler_total_steps
+                if args.scheduler_total_steps > 0
+                else optimizer_steps_per_epoch * remaining_epochs
+            )
+            for param_group in optimizer.param_groups:
+                param_group["lr"] = args.lr
+                param_group["initial_lr"] = args.lr
+            args.scheduler_origin_global_step = global_step
+            scheduler = build_scheduler(optimizer, args, scheduler_total_steps)
+            print_main(
+                "Reset scheduler on resume: "
+                f"origin_global_step={global_step}, total_steps={scheduler_total_steps}, "
+                f"warmup_steps={args.scheduler_warmup_steps_resolved}, lr={args.lr:.3e}"
+            )
+        else:
+            scheduler_total_steps = int(checkpoint.get("scheduler_total_steps", 0))
+            if scheduler_total_steps <= 0:
+                raise RuntimeError(
+                    "Legacy checkpoint has no stable scheduler plan. "
+                    "Resume with --reset_scheduler_on_resume and choose LR/warmup explicitly."
+                )
+            checkpoint_args = checkpoint.get("args", {})
+            checkpoint_scheduler = checkpoint_args.get("scheduler", args.scheduler)
+            if checkpoint_scheduler != args.scheduler:
+                raise RuntimeError(
+                    "Scheduler type changed across resume: "
+                    f"checkpoint={checkpoint_scheduler}, current={args.scheduler}. "
+                    "Use --reset_scheduler_on_resume to start a new schedule."
+                )
+            args.warmup_steps = int(
+                checkpoint.get("scheduler_warmup_steps", args.warmup_steps)
+            )
+            args.warmup_ratio = 0.0
+            args.scheduler_origin_global_step = int(
+                checkpoint.get("scheduler_origin_global_step", 0)
+            )
+            scheduler = build_scheduler(optimizer, args, scheduler_total_steps)
+            scheduler_state = checkpoint.get("scheduler")
+            if scheduler is not None and scheduler_state is not None:
+                scheduler.load_state_dict(scheduler_state)
+                last_lrs = scheduler_state.get("_last_lr", [])
+                for param_group, last_lr in zip(optimizer.param_groups, last_lrs):
+                    param_group["lr"] = float(last_lr)
+            print_main(
+                "Resumed scheduler plan: "
+                f"origin_global_step={args.scheduler_origin_global_step}, "
+                f"total_steps={scheduler_total_steps}, "
+                f"scheduler_step={scheduler.last_epoch if scheduler is not None else 0}"
+            )
+
+        if args.test_only:
             test_loss = evaluate(model_for_eval, patcher, test_loader, device, args.precision)
             if is_main_process():
-                print(f"test loss={test_loss:.4f}")
+                print(f"test loss={test_loss:.8f}")
                 if args.eval_generation:
                     test_metrics = evaluate_generation(
                         model_for_eval,
@@ -688,9 +763,11 @@ def main():
 
                     if global_step % args.log_every_steps == 0 and is_main_process():
                         elapsed_min = (time.time() - start_time) / 60
+                        current_lr = optimizer.param_groups[0]["lr"]
                         print(
                             f"epoch={epoch} step={global_step} "
                             f"loss={loss.item() * args.grad_accum_steps:.4f} "
+                            f"lr={current_lr:.3e} "
                             f"elapsed={elapsed_min:.1f}m"
                         )
 
@@ -703,7 +780,11 @@ def main():
                             args.precision,
                         )
                         if is_main_process():
-                            print(f"validation step={global_step} loss={val_loss:.4f}")
+                            current_lr = optimizer.param_groups[0]["lr"]
+                            print(
+                                f"validation step={global_step} "
+                                f"loss={val_loss:.8f} lr={current_lr:.3e}"
+                            )
                             should_save_best = val_loss < best_val_loss
                             if args.eval_generation:
                                 gen_metrics = evaluate_generation(
@@ -798,7 +879,11 @@ def main():
 
             val_loss = evaluate(model_for_eval, patcher, val_loader, device, args.precision)
             if is_main_process():
-                print(f"epoch={epoch} validation loss={val_loss:.4f}")
+                current_lr = optimizer.param_groups[0]["lr"]
+                print(
+                    f"epoch={epoch} validation loss={val_loss:.8f} "
+                    f"lr={current_lr:.3e}"
+                )
                 should_save_best = val_loss < best_val_loss
                 if args.eval_generation:
                     gen_metrics = evaluate_generation(
@@ -849,7 +934,7 @@ def main():
         if args.run_test_on_end:
             test_loss = evaluate(model_for_eval, patcher, test_loader, device, args.precision)
             if is_main_process():
-                print(f"test loss={test_loss:.4f}")
+                print(f"test loss={test_loss:.8f}")
                 if args.eval_generation:
                     test_metrics = evaluate_generation(
                         model_for_eval,

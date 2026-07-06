@@ -75,7 +75,7 @@ CONDA_ENV=phdq_blt DATASET_TYPE=union NUM_GPUS=1 MAX_EPOCHS=10 \
 # union 4GPU, 48시간 이어서 학습
 CONDA_ENV=phdq_blt DATASET_TYPE=union NUM_GPUS=4 MAX_EPOCHS=10 \
   RESUME_CKPT=outputs/blt_gec/union/last.ckpt \
-  GRAD_ACCUM_STEPS=4 \
+  GRAD_ACCUM_STEPS=2 \
   sbatch --time=2-00:00:00 -p amd_a100nv_8 --nodelist=[노드명] \
   --gres=gpu:4 --cpus-per-task=8 scripts/train_blt.sh
 
@@ -141,3 +141,61 @@ sbatch scripts/eval_bart.sh
 753950 : native2
 
 753976 : union4
+
+learner 작업 819735 종료 후
+
+CONDA_ENV=phdq_blt DATASET_TYPE=learner SPLIT=test \
+  CKPT_PATH=outputs/blt_gec/learner/best.ckpt \
+  NUM_SHARDS=80 PRECISION=fp16 \
+  sbatch -p cas_v100_4 --array=4-7 \
+  --gres=gpu:1 --cpus-per-task=4 scripts/eval_blt.sh
+
+819897 union epoch0 이어서
+
+819902 learner validation array 4-7 [done]
+
+820154 learner 16-19/79
+820158 native 4-7/39
+820188 learner 20-23/79
+820248 learner 24-27/79
+820344 learner 28-31/79
+
+820341 union epoch0 이어서
+
+820374 learner 32-35/79
+823115 learner 40-43/79
+823126 union epoch1
+
+CONDA_ENV=phdq_blt DATASET_TYPE=union NUM_GPUS=4 MAX_EPOCHS=2 \
+  RESUME_CKPT=outputs/blt_gec/union/last.ckpt \
+  GRAD_ACCUM_STEPS=4 \
+  sbatch --time=12:00:00 -p amd_h200nv_8 \
+  --nodes=1 --gres=gpu:4 --cpus-per-task=8 scripts/train_blt.sh
+
+823131 native 8-11/39
+CONDA_ENV=phdq_blt DATASET_TYPE=native SPLIT=test \
+  CKPT_PATH=outputs/blt_gec/native/best.ckpt NUM_SHARDS=40 \
+  sbatch --array=8-11 scripts/eval_blt.sh
+
+823336 learner 44-47/79
+
+823433 learner 48-51/79
+823437 native 12-15/39
+823656 learner 52-55/79
+
+823988 learner 56-59/79
+823992 native 16-19/39
+
+824070 learner 60-63/79
+824208 learner 64-67/79
+
+824537 learner 68-71/79
+824540 native 20-23/39
+
+824546 union epoch 2-7
+
+824587 learner 72-75/79
+824602 learner 76-79/79
+
+
+834647 native 28-31/39
