@@ -1,0 +1,6 @@
+==========================================
+SLURM_JOB_ID = 834675
+SLURM_NODELIST = gpu42
+==========================================
+Error: Neuron jobs must be submitted from /scratch/r984a02.
+Current directory: /home01/r984a02/PHDQ2
