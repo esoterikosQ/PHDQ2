@@ -189,8 +189,12 @@ def run_generation(args) -> dict[str, float | int | None]:
     except ReferenceBltUnavailable as exc:
         raise SystemExit(f"Error: {exc}") from exc
 
-    checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
-    components.model.load_state_dict(strip_module_prefix(checkpoint["model"]), strict=False)
+    # Keep the checkpoint tensors on CPU. Loading them directly onto CUDA briefly
+    # duplicates the full model state and can exhaust 32 GB evaluation GPUs.
+    checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
+    model_state = strip_module_prefix(checkpoint["model"])
+    components.model.load_state_dict(model_state, strict=False)
+    del model_state, checkpoint
 
     dataset = GecBltDataset(
         split_path,
