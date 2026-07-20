@@ -1,0 +1,35 @@
+==========================================
+SLURM_JOB_ID = 839792
+SLURM_NODELIST = gpu36
+==========================================
+Job ID: 839792
+Array task: 39
+Node: gpu36
+CUDA_VISIBLE_DEVICES: 0
+Start Time: Thu Jul  9 18:44:09 KST 2026
+Submit Dir: /scratch/r984a02/PHDQ2
+Partition: amd_a100nv_8
+Requested GPUs: 1
+Requested CPU cores per task: 4
+Python: /home01/r984a02/.conda/envs/phdq_blt/bin/python
+/home01/r984a02/.conda/envs/phdq_blt/lib/python3.12/site-packages/torch/cuda/__init__.py:61: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Torch: 2.5.1+cu121
+NumPy: 2.4.6
+Evaluating BLT checkpoint: outputs/blt_gec/native/best.ckpt
+Dataset: native
+Split: test
+Total examples: 2634
+NUM_SHARDS: 40
+TASK_ID: 39
+START_INDEX: 2574
+MAX_EXAMPLES: 66
+{
+  "split": "test",
+  "start_index": 2574,
+  "end_index": 2634,
+  "examples": 60,
+  "generation_time": 8644.47382903099,
+  "seconds_per_example": 144.0745638171832
+}
+End Time: Thu Jul  9 21:12:25 KST 2026
